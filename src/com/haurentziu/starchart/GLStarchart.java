@@ -34,6 +34,9 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private float azimuthAngle = (float) Math.toRadians(60);
 	
 	private int initX, initY;
+	
+	private byte projection = 0; //0 -> stereographic 1 -> ortographic
+	
 	private float zoom = 1;
 	
 	GLStarchart(GLCanvas c){
@@ -51,14 +54,37 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 		
-		float time = drawable.getAnimator().getLastFPS();
+		float fps = drawable.getAnimator().getLastFPS();
 		
-		System.out.println(time);
+	//	System.out.println(fps);
 		
 		drawConstellations(gl);
 		drawStars(gl);
-		for(int i = 0; i < stars.length; i++);
-		displayFPS();
+		updateTime();
+	}
+	
+	@Override
+	public void dispose(GLAutoDrawable arg0) {
+		
+	}
+
+	@Override
+	public void init(GLAutoDrawable drawable) {
+		drawable.getAnimator().setUpdateFPSFrames(3, null);
+	}
+	
+
+	@Override
+	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+		final GL2 gl = drawable.getGL().getGL2();
+		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glLoadIdentity();
+		
+		double aspectRatio = (double)width/height;
+		gl.glOrtho(-2*aspectRatio, 2*aspectRatio, -2, 2, -1, 1);
+		gl.glViewport(0, 0, width, height);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glLoadIdentity();
 	}
 	
 	private void drawConstellations(GL2 gl){
@@ -66,14 +92,23 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		for(int i = 0; i < constellations.length; i++){
 			ConstellationLine[] lines = constellations[i].getLines();
 			for(int j = 0; j < lines.length; j++){
+				
 				EquatorialCoordinates equatorial[] = lines[j].getPositions(stars);
 				HorizontalCoordinates start = equatorial[0].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
 				HorizontalCoordinates end = equatorial[1].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
 				
 				if(start.getAltitude() > 0 && end.getAltitude() > 0){
-					Point2D p1 = start.toStereographicProjection(azimuthAngle, altitudeAngle);
-					Point2D p2 = end.toStereographicProjection(azimuthAngle, altitudeAngle);
-
+					Point2D p1, p2;
+					if(projection == 0){
+						p1 = start.toStereographicProjection(azimuthAngle, altitudeAngle);
+						p2 = end.toStereographicProjection(azimuthAngle, altitudeAngle);
+					}
+					
+					else{
+						p1 = start.toOrtohraphicProjection(azimuthAngle, altitudeAngle);
+						p2 = end.toOrtohraphicProjection(azimuthAngle, altitudeAngle);
+					}
+					
 					gl.glBegin(GL2.GL_LINES);
 					gl.glVertex2f((float)(zoom*p1.getX()), (float)(zoom*p1.getY()));
 					gl.glVertex2f((float)(zoom*p2.getX()), (float)(zoom*p2.getY()));
@@ -86,10 +121,14 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private void drawStars(GL2 gl){
 		gl.glColor3f(1f, 1f, 1f);
 		for(int i = 0; i < stars.length; i++){
-			if(stars[i].getMagnitude() < 5.5){
+			if(stars[i].getMagnitude() < 5.5 + 0.1*zoom){
 				HorizontalCoordinates c = stars[i].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
 				if(c.getAltitude() > 0){
-					Point2D p = c.toStereographicProjection(azimuthAngle, altitudeAngle);
+					Point2D p;
+					if(projection == 0)
+						p= c.toStereographicProjection(azimuthAngle, altitudeAngle);
+					else
+						p = c.toOrtohraphicProjection(azimuthAngle, altitudeAngle);
 					drawCircle((float)(zoom*p.getX()), (float)(zoom*p.getY()), stars[i].getRadius(), gl);
 				}
 			}
@@ -107,25 +146,11 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		gl.glEnd();
 	}
 	
-	private void displayFPS(){
+	private void updateTime(){
 		timestamp = System.currentTimeMillis();
 	}
 	
-	@Override
-	public void dispose(GLAutoDrawable arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void init(GLAutoDrawable drawable) {
-		drawable.getAnimator().setUpdateFPSFrames(3, null);
-	}
-
-	@Override
-	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-
-	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {

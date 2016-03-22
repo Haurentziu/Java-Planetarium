@@ -18,14 +18,14 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 
 public class Main {
-	static int width = 950, height = 950;
+	static int width = 1200, height = 950;
 	public static void main(String[] args){
 		GLProfile glp = GLProfile.getDefault();
 		GLCapabilities caps = new GLCapabilities(glp);
 		GLCanvas canvas = new GLCanvas(caps);
 		
-		GLStarchart uaie = new GLStarchart(canvas);
-		canvas.addGLEventListener(uaie);
+		GLStarchart starchart = new GLStarchart(canvas);
+		canvas.addGLEventListener(starchart);
 		
 		FPSAnimator animator = new FPSAnimator(canvas, 120);
 		animator.start();

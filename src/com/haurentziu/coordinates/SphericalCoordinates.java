@@ -33,8 +33,8 @@ public class SphericalCoordinates {
 		
 		double zenithAngle = Math.PI/2 + rotatedLatitude;
 		double radius = 1f/Math.tan(zenithAngle/2);
-		double x = radius * Math.cos(Math.PI + rotatedLongitude);
-		double y = radius * Math.sin(Math.PI + rotatedLongitude);
+		double x = -radius * Math.cos(rotatedLongitude);
+		double y = -radius * Math.sin(rotatedLongitude);
 		Point2D p = new Point2D.Double(x, y);
 		return p;
 	}
@@ -50,7 +50,7 @@ public class SphericalCoordinates {
 
 //		double r = 1f/Math.tan(Math.PI/2 + rotatedLatitude);
 		
-		double x = r*Math.cos(rotatedLongitude);
+		double x = -r*Math.cos(rotatedLongitude);
 		double y = -r*Math.sin(rotatedLongitude);
 		return new Point2D.Double(x, y);
 	}

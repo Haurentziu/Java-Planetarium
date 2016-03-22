@@ -35,7 +35,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	
 	private int initX, initY;
 	
-	private byte projection = 0; //0 -> stereographic 1 -> ortographic
+	private byte projection = 1; //0 -> stereographic 1 -> ortographic
 	
 	private float zoom = 1;
 	

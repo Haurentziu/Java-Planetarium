@@ -68,7 +68,7 @@ public class DataLoader {
 
 		}
 		catch(Exception ex){
-			ex.printStackTrace();
+			System.out.println("Could not load constellation lines");
 			return null;
 		}
 	}

@@ -13,6 +13,12 @@ public class SphericalCoordinates {
 	protected double latitude; //declination, altitude
 	protected double longitude; //right ascension, hour angle, azimuth
 	
+	private byte projectionType;
+	
+	public static final byte STEREOGRAPHIC_PROJECTION = 0;
+	public static final byte ORTOGRAPHIC_PROJECTION = 1;
+	public static final byte GNOMOIC_PROJECTION = 2;
+	
 	public SphericalCoordinates(double longitude, double latitude){
 		this.latitude = latitude;
 		this.longitude = longitude;
@@ -25,41 +31,39 @@ public class SphericalCoordinates {
 	}
 	
 	
-	public Point2D toStereographicProjection(float longRotation, float latRotation){
-		
-		SphericalCoordinates rotatedSystem = rotateSystem(longRotation, latRotation);
-		double rotatedLatitude = rotatedSystem.getLatitude();
-		double rotatedLongitude = rotatedSystem.getLongitude();
-		
-		double zenithAngle = Math.PI/2 + rotatedLatitude;
-		double radius = 1f/Math.tan(zenithAngle/2);
-		double x = -radius * Math.cos(rotatedLongitude);
-		double y = -radius * Math.sin(rotatedLongitude);
-		Point2D p = new Point2D.Double(x, y);
-		return p;
-	}
-	
-	
-	
-	public Point2D toOrtohraphicProjection(float longRotation , float latRotation){
-		SphericalCoordinates rotatedSystem = rotateSystem(longRotation, latRotation);
-		double rotatedLatitude = rotatedSystem.getLatitude();
-		double rotatedLongitude = rotatedSystem.getLongitude();
-		
-		double r = Math.sin(Math.PI/2 - rotatedLatitude); 
 
-//		double r = 1f/Math.tan(Math.PI/2 + rotatedLatitude);
-		
-		double x = -r*Math.cos(rotatedLongitude);
-		double y = -r*Math.sin(rotatedLongitude);
-		return new Point2D.Double(x, y);
-	}
-	
-	private SphericalCoordinates rotateSystem(float longRotation, float latRotation){
+	public Point2D toProjection(float longRotation , float latRotation, byte type){
 		float rotatedLongitude = (float) Math.atan2(Math.sin(longitude + longRotation)*Math.cos(latRotation) - Math.tan(latitude)*Math.sin(latRotation), Math.cos(longitude + longRotation));
 		float rotatedLatitude = (float)Math.asin(Math.sin(latitude) * Math.cos(latRotation) + Math.cos(latitude)*Math.sin(latRotation)*Math.sin(longitude + longRotation));
-		return new SphericalCoordinates(rotatedLongitude, rotatedLatitude);
+		double r = 0;
+	/*	double x = 0, y = 0;
+		if(type == ORTOGRAPHIC_PROJECTION){
+			x = Math.cos(latitude)*Math.sin(longitude - longRotation);
+			y = Math.cos(latRotation)*Math.sin(latitude) - Math.sin(latRotation)*Math.cos(latitude)*Math.cos(longitude - longRotation);
+		}
+		
+		else if (type == STEREOGRAPHIC_PROJECTION){
+			double r = 1/Math.tan(Math.PI/4 - )
+		}
+		*/
+		switch(type){
+			case STEREOGRAPHIC_PROJECTION:	r = 1f/Math.tan((Math.PI/2 - rotatedLatitude)/2);
+											break;
+											
+			case ORTOGRAPHIC_PROJECTION:	r = Math.sin(Math.PI/2 - rotatedLatitude); 
+											break;
+			
+			case GNOMOIC_PROJECTION:		r = 1/Math.tan(rotatedLatitude);
+											break;
+			
+		}		
+		
+		float x = (float) (-r*Math.cos(rotatedLongitude));
+		float y = (float) (r*Math.sin(rotatedLongitude));
+		return new Point2D.Float(x, y);
 	}
+	
+	
 	
 	public double getLatitude(){
 		return latitude;

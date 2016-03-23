@@ -6,9 +6,11 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Float;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
+import com.haurentziu.coordinates.SphericalCoordinates;
 import com.jogamp.opengl.FPSCounter;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -30,14 +32,20 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private FPSCounter fps;
 	
 	private float localSideralTime = 12; //Local Sideral Time
-	private float altitudeAngle = (float) Math.toRadians(70);
+	private float altitudeAngle = (float) Math.toRadians(-70);
 	private float azimuthAngle = (float) Math.toRadians(60);
 	
 	private int initX, initY;
 	
-	private byte projection = 1; //0 -> stereographic 1 -> ortographic
+	private boolean showUnderHorizon = false;
 	
-	private float zoom = 1;
+	final byte projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION; 
+//	final byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
+//	final byte projection = SphericalCoordinates.GNOMOIC_PROJECTION;
+	
+	private int height, width;
+	
+	private float zoom = 2;
 	
 	GLStarchart(GLCanvas c){
 		DataLoader loader = new DataLoader();
@@ -54,13 +62,19 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 		
+		if(altitudeAngle > -Math.PI/2 || projection == SphericalCoordinates.ORTOGRAPHIC_PROJECTION)
+			gl.glClearColor(0f, 0.075f, 0.125f, 1f); //prussian blue
+		else
+			gl.glClearColor(0.28f, 0.21f, 0.16f, 1f); //brown
+			
 		float fps = drawable.getAnimator().getLastFPS();
 		
-	//	System.out.println(fps);
+		System.out.println(fps);
 		
+		drawHorizon(gl);
 		drawConstellations(gl);
 		drawStars(gl);
-		updateTime();
+	//	updateTime();
 	}
 	
 	@Override
@@ -70,7 +84,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 
 	@Override
 	public void init(GLAutoDrawable drawable) {
-		drawable.getAnimator().setUpdateFPSFrames(3, null);
+		drawable.getAnimator().setUpdateFPSFrames(20, null);
 	}
 	
 
@@ -85,6 +99,27 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
+		
+		this.width = width;
+		this.height = height;
+	}
+	
+	private void drawHorizon(GL2 gl){
+		if(altitudeAngle > -Math.PI/2)
+			gl.glColor3f(0.28f, 0.21f, 0.16f); //brown
+		else
+			gl.glColor3f(0f, 0.075f, 0.125f); //prussian blue
+
+		gl.glBegin(GL2.GL_POLYGON);
+		for(float i = 0; i < 2*Math.PI + 0.1; i+=0.1){
+			
+			HorizontalCoordinates h = new HorizontalCoordinates(i, 0);
+			Point2D p = h.toProjection(azimuthAngle, altitudeAngle, projection);
+			
+			gl.glVertex2f((float)(zoom*p.getX()), (float)(zoom*p.getY()));
+			
+		}
+		gl.glEnd();
 	}
 	
 	private void drawConstellations(GL2 gl){
@@ -97,17 +132,11 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 				HorizontalCoordinates start = equatorial[0].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
 				HorizontalCoordinates end = equatorial[1].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
 				
-				if(start.getAltitude() > 0 && end.getAltitude() > 0){
+				if(start.getAltitude() > 0 && end.getAltitude() > 0 || showUnderHorizon){
 					Point2D p1, p2;
-					if(projection == 0){
-						p1 = start.toStereographicProjection(azimuthAngle, altitudeAngle);
-						p2 = end.toStereographicProjection(azimuthAngle, altitudeAngle);
-					}
 					
-					else{
-						p1 = start.toOrtohraphicProjection(azimuthAngle, altitudeAngle);
-						p2 = end.toOrtohraphicProjection(azimuthAngle, altitudeAngle);
-					}
+					p1 = start.toProjection(azimuthAngle, altitudeAngle, projection);
+					p2 = end.toProjection(azimuthAngle, altitudeAngle, projection);
 					
 					gl.glBegin(GL2.GL_LINES);
 					gl.glVertex2f((float)(zoom*p1.getX()), (float)(zoom*p1.getY()));
@@ -123,12 +152,9 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		for(int i = 0; i < stars.length; i++){
 			if(stars[i].getMagnitude() < 5.5 + 0.1*zoom){
 				HorizontalCoordinates c = stars[i].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
-				if(c.getAltitude() > 0){
+				if(c.getAltitude() > 0 || showUnderHorizon){
 					Point2D p;
-					if(projection == 0)
-						p= c.toStereographicProjection(azimuthAngle, altitudeAngle);
-					else
-						p = c.toOrtohraphicProjection(azimuthAngle, altitudeAngle);
+					p= c.toProjection(azimuthAngle, altitudeAngle, projection);
 					drawCircle((float)(zoom*p.getX()), (float)(zoom*p.getY()), stars[i].getRadius(), gl);
 				}
 			}
@@ -147,7 +173,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	}
 	
 	private void updateTime(){
-		timestamp = System.currentTimeMillis();
+		localSideralTime += 0.01;
 	}
 	
 
@@ -160,8 +186,8 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		initX = e.getX();
 		initY = e.getY();
 		
-		azimuthAngle += (float)Math.PI*distanceX/(2*Main.width*zoom);
-		altitudeAngle -= (float)Math.PI*distanceY/(2*Main.height*zoom);
+		azimuthAngle += (float)Math.PI*distanceX/(width*zoom);
+		altitudeAngle -= (float)Math.PI*distanceY/(height*zoom);
 		
 	}
 

@@ -3,9 +3,7 @@ package com.haurentziu.starchart;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 
-import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -27,7 +25,7 @@ public class Main {
 		GLStarchart starchart = new GLStarchart(canvas);
 		canvas.addGLEventListener(starchart);
 		
-		FPSAnimator animator = new FPSAnimator(canvas, 120);
+		FPSAnimator animator = new FPSAnimator(canvas, 60);
 		animator.start();
 	
 		Frame frame = new Frame("JavaChart");

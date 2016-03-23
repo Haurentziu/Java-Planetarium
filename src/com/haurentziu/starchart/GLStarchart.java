@@ -39,8 +39,8 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	
 	private boolean showUnderHorizon = false;
 	
-	final byte projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION; 
-//	final byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
+//	final byte projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION; 
+	final byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
 //	final byte projection = SphericalCoordinates.GNOMOIC_PROJECTION;
 	
 	private int height, width;
@@ -62,18 +62,17 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 		
-		if(altitudeAngle > -Math.PI/2 || projection == SphericalCoordinates.ORTOGRAPHIC_PROJECTION)
-			gl.glClearColor(0f, 0.075f, 0.125f, 1f); //prussian blue
-		else
-			gl.glClearColor(0.28f, 0.21f, 0.16f, 1f); //brown
+		
 			
 		float fps = drawable.getAnimator().getLastFPS();
 		
 		System.out.println(fps);
 		
 		drawHorizon(gl);
+		drawGrid(gl);
 		drawConstellations(gl);
 		drawStars(gl);
+
 	//	updateTime();
 	}
 	
@@ -104,7 +103,38 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		this.height = height;
 	}
 	
+	private void drawGrid(GL2 gl){
+		gl.glColor3f(0.192f, 0.325f, 0f);
+		//altitude lines
+		for(float i = 0.1f; i < 2*Math.PI; i+= 10f*Math.PI/180f){
+			gl.glBegin(GL2.GL_LINE_STRIP);
+			for(float j = 0; j < Math.PI/2; j+= 0.25){
+				HorizontalCoordinates h = new HorizontalCoordinates(i, j);
+				Point2D p = h.toProjection(azimuthAngle, altitudeAngle, projection);
+				gl.glVertex2f((float)(zoom*p.getX()), (float)(zoom*p.getY()));
+			}
+			gl.glEnd();
+		}
+		
+		for(float i = 0; i < Math.PI/2; i += 10f*Math.PI/180f){
+			gl.glBegin(GL2.GL_LINE_STRIP);
+			for(float j = 0; j < 2*Math.PI + 0.25; j += 0.1){
+				HorizontalCoordinates h = new HorizontalCoordinates(j, i);
+				Point2D p = h.toProjection(azimuthAngle, altitudeAngle, projection);
+				gl.glVertex2f((float)(zoom*p.getX()), (float)(zoom*p.getY()));
+			}
+			gl.glEnd();
+		}
+		
+	}
+	
 	private void drawHorizon(GL2 gl){
+		
+		if(altitudeAngle > -Math.PI/2 || projection == SphericalCoordinates.ORTOGRAPHIC_PROJECTION)
+			gl.glClearColor(0f, 0.075f, 0.125f, 1f); //prussian blue
+		else
+			gl.glClearColor(0.28f, 0.21f, 0.16f, 1f); //brown
+		
 		if(altitudeAngle > -Math.PI/2)
 			gl.glColor3f(0.28f, 0.21f, 0.16f); //brown
 		else

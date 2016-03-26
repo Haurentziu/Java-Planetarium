@@ -30,10 +30,10 @@ public class Main {
 	
 		Frame frame = new Frame("JavaChart");
 		
-			
 		frame.setSize(width, height);
 		frame.add(canvas);
 		frame.setVisible(true);
+		
 		
 		
 		

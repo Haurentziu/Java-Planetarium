@@ -12,8 +12,8 @@ public class EquatorialCoordinates extends SphericalCoordinates{
 		super(rightAscension, declination);
 	}
 	
-	public HorizontalCoordinates toHorizontal(double observerLatitude, double sideralTime){
-		double hourAngle = sideralTime - longitude; 
+	public HorizontalCoordinates toHorizontal(double observerLongitude, double observerLatitude, double sideralTime){
+		double hourAngle = sideralTime - longitude - observerLongitude; 
 		double altitude = Math.asin(Math.sin(latitude) * Math.sin(observerLatitude) + Math.cos(latitude) * Math.cos(observerLatitude) * Math.cos(hourAngle));
 		double azimuth = Math.atan2(Math.sin(hourAngle), Math.cos(hourAngle) * Math.sin(observerLatitude) - Math.tan(latitude) * Math.cos(observerLatitude));
 		

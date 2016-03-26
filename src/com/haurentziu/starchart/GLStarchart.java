@@ -29,12 +29,14 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class GLStarchart implements GLEventListener, MouseMotionListener, MouseListener, MouseWheelListener, KeyListener{
 	private long timestamp = System.currentTimeMillis();
 	
-	private Star stars[];
-	private Constellation constellations[];
+	private final Star stars[];
+	private final Constellation constellations[];
 	
 	private FPSCounter fps;
 	
 	private float localSideralTime = 12; //Local Sideral Time
+	private float latitude = (float) Math.toRadians(51 + 28.0/60.0);
+	private float longitude = 0;
 	private float altitudeAngle = (float) Math.toRadians(-80); //+90 = alt
 	private float azimuthAngle = (float) Math.toRadians(180); //+90 = az
 	
@@ -44,18 +46,16 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private boolean showGrid = true;
 	private boolean showConstellationLines = true;
 	private boolean addTime = false;
+	private boolean showCardinalPoints = true;
 	
-	
-//	private byte projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION; 
 	private byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
-//	private byte projection = SphericalCoordinates.GNOMOIC_PROJECTION;
 	
 	private int height, width;
 	
 	private float zoom = 2;
 	
 	private Star selectedStar = new Star(0, 0, 0, 0);
-	private boolean isSelected = true;
+	private boolean isSelected = false;
 	
 	GLStarchart(GLCanvas c){
 		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
@@ -64,8 +64,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		while(LST0 > 360)
 			LST0 -= 360;
 		
-		System.out.println((LST0)/15);
-		localSideralTime = (float) Math.toRadians(LST0 + 26);
+		localSideralTime = (float) Math.toRadians(LST0);
 		
 		DataLoader loader = new DataLoader();
 		stars = loader.loadStars();
@@ -79,8 +78,10 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		c.addMouseWheelListener(this);
 	}
 	
+	
 	@Override
 	public void display(GLAutoDrawable drawable) {
+//		System.out.println(rad2String(latitude, false, false));
 		final GL2 gl = drawable.getGL().getGL2();
 	
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
@@ -98,7 +99,8 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 			drawConstellations(gl);
 		drawStars(gl);
 		
-		drawCardinalPoints();
+		if(showCardinalPoints)
+			drawCardinalPoints();
 
 		if(isSelected)
 			renderInfoText();
@@ -137,18 +139,47 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	
 	private void renderInfoText(){
 		TextRenderer titleRenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 26));
-		titleRenderer.setColor(0.416f, 0.365f, 0.722f, 1f);
+		titleRenderer.setColor(0.051f, 0.596f, 0.729f, 1f);
 		titleRenderer.beginRendering(width, height);
 		titleRenderer.draw("HIP " + selectedStar.getHipparcos(), 0, height - 30);
 		titleRenderer.endRendering();
 		
 		TextRenderer infoRenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 15));
-		infoRenderer.setColor(0.416f, 0.365f, 0.722f, 1f);
+		infoRenderer.setColor(0.141f, 0.784f, 0.941f, 1f);
 		infoRenderer.beginRendering(width, height);
 		infoRenderer.draw("Magnitude: " + selectedStar.getMagnitude(), 0, height - 55);
-		infoRenderer.draw("RA/Declination: " + Math.toDegrees(selectedStar.getRightAscension()) + " / "+Math.toDegrees(selectedStar.getDeclination()), 0, height - 75);
-		infoRenderer.draw("Az/Alt: " + Math.toDegrees(selectedStar.getHorizontalCoordinates().getAzimuth()) + " / "+Math.toDegrees(selectedStar.getHorizontalCoordinates().getAltitude()), 0, height - 95);
+
+		String raString = rad2String(selectedStar.getRightAscension(), false, true);
+		String decString = rad2String(selectedStar.getDeclination(), false, false);
+		infoRenderer.draw("RA/Dec(J2000): "  + raString + "/" + decString, 0, height - 75);
+		
+		String azString = rad2String(Math.PI - selectedStar.getHorizontalCoordinates().getAzimuth(), true, false);
+		String altString = rad2String(selectedStar.getHorizontalCoordinates().getAltitude(), false, false);
+		System.out.println(Math.toDegrees(selectedStar.getHorizontalCoordinates().getAltitude()));
+		infoRenderer.draw("Az/Alt: " + azString + " / " + altString, 0, height - 95);
 		infoRenderer.endRendering();
+	}
+	
+	private String rad2String(double d, boolean normalise, boolean inHours){
+		double deg = Math.toDegrees(d);
+		if(normalise){
+			while(deg > 360)
+				deg -= 360;
+			while(deg < 0)
+				deg +=360;
+		}
+		if(inHours)
+			deg /= 15.0;
+		int degrees = (int)deg;
+		int minutes = (int)((deg - (int)deg)*60);
+		float seconds = (float)(deg - degrees - minutes/60.0)*3600f;
+		
+		String s;
+		if(inHours)
+			s = String.format("%dh %02dm %.2fs", degrees, minutes, seconds);
+		else
+			s = String.format("%d\u00b0 %02d\u2032 %.2f\u2033", degrees, minutes, seconds);
+		return s;
 	}
 	
 	private void drawCardinalPoints(){
@@ -228,8 +259,8 @@ private void drawHorizon(GL2 gl){
 			for(int j = 0; j < lines.length; j++){
 				
 				EquatorialCoordinates equatorial[] = lines[j].getPositions(stars);
-				HorizontalCoordinates start = equatorial[0].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
-				HorizontalCoordinates end = equatorial[1].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
+				HorizontalCoordinates start = equatorial[0].toHorizontal(longitude, latitude, Math.toRadians(localSideralTime*15));
+				HorizontalCoordinates end = equatorial[1].toHorizontal(longitude, latitude, Math.toRadians(localSideralTime*15));
 				
 				if(start.getAltitude() > 0 && end.getAltitude() > 0 || showUnderHorizon){
 					Point2D p1, p2;
@@ -250,7 +281,7 @@ private void drawHorizon(GL2 gl){
 		gl.glColor3f(1f, 1f, 1f);
 		for(int i = 0; i < stars.length; i++){
 			if(stars[i].getMagnitude() < 5.5){
-				HorizontalCoordinates c = stars[i].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
+				HorizontalCoordinates c = stars[i].toHorizontal(longitude, latitude, Math.toRadians(localSideralTime*15));
 				stars[i].setHorizontalCoordinates(c);
 				if(c.getAltitude() > 0 || showUnderHorizon){
 					Point2D p;
@@ -299,25 +330,28 @@ private void drawHorizon(GL2 gl){
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
-		
-		float ortoWidth = (float)(4.0 * width/height);
-	//	System.out.println(ortoWidth/2);
-		float ortoX = (-width / 2f + x) * ortoWidth/width;
-		float ortoY = (height / 2f - y) * 4f / height;
-		System.out.println("----------------");
-		for(int i = 0; i < stars.length; i++){
-			if(stars[i].getMagnitude() < 5.5){
-				Point2D projection = stars[i].getProjection();
-			//	System.out.println(projection.getX());
-				if(Point2D.distance(ortoX, ortoY, zoom*projection.getX(), zoom*projection.getY()) < stars[i].getRadius()){
-					selectedStar = stars[i];
-					System.out.println(stars[i].getHipparcos() + "  " + stars[i].getRadius());
-					break;
+		if(e.getButton() == MouseEvent.BUTTON1){
+			int x = e.getX();
+			int y = e.getY();
+			float ortoWidth = (float)(4.0 * width/height);
+			float ortoX = (-width / 2f + x) * ortoWidth/width;
+			float ortoY = (height / 2f - y) * 4f / height;
+			System.out.println("----------------");
+			for(int i = 0; i < stars.length; i++){
+				if(stars[i].getMagnitude() < 5.5){
+					Point2D projection = stars[i].getProjection();
+				//	System.out.println(projection.getX());
+					if(Point2D.distance(ortoX, ortoY, zoom*projection.getX(), zoom*projection.getY()) < stars[i].getRadius()){
+						selectedStar = stars[i];
+						isSelected = true;
+						System.out.println(stars[i].getHipparcos() + "  " + stars[i].getRadius());
+						break;
+					}
 				}
 			}
-			
+		}
+		else{
+			isSelected = false;
 		}
 	//	System.out.println(ortoX + "   " + ortoY);
 		
@@ -381,6 +415,9 @@ private void drawHorizon(GL2 gl){
 							
 		case KeyEvent.VK_SPACE: addTime = !addTime;
 								break;
+								
+		case KeyEvent.VK_P:	showCardinalPoints = !showCardinalPoints;
+							break;
 		}
 		
 	}

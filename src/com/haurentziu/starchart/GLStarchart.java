@@ -1,5 +1,6 @@
 package com.haurentziu.starchart;
 
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -17,6 +18,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 /**
  * 
@@ -33,15 +35,15 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private FPSCounter fps;
 	
 	private float localSideralTime = 12; //Local Sideral Time
-	private float altitudeAngle = (float) Math.toRadians(0); //+90 = alt
-	private float azimuthAngle = (float) Math.toRadians(90); //+90 = az
+	private float altitudeAngle = (float) Math.toRadians(-80); //+90 = alt
+	private float azimuthAngle = (float) Math.toRadians(180); //+90 = az
 	
 	private int initX, initY;
 	
 	private boolean showUnderHorizon = false;
 	private boolean showGrid = true;
 	private boolean showConstellationLines = true;
-	private boolean addTime =true;
+	private boolean addTime = false;
 	
 	
 //	private byte projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION; 
@@ -51,6 +53,9 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private int height, width;
 	
 	private float zoom = 2;
+	
+	private Star selectedStar = new Star(0, 0, 0, 0);
+	private boolean isSelected = true;
 	
 	GLStarchart(GLCanvas c){
 		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
@@ -66,6 +71,8 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		stars = loader.loadStars();
 		constellations = loader.loadConstellations();
 		
+		
+		c.setFocusable(true);
 		c.addKeyListener(this);
 		c.addMouseMotionListener(this);
 		c.addMouseListener(this);
@@ -80,8 +87,9 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 			
 		float fps = drawable.getAnimator().getLastFPS();
 		
-	//	System.out.println(Math.toDegrees(altitudeAngle));
+		System.out.println(fps);
 		drawHorizon(gl);
+		
 
 		if(showGrid)
 			drawGrid(gl);
@@ -89,6 +97,12 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		if(showConstellationLines)
 			drawConstellations(gl);
 		drawStars(gl);
+		
+		drawCardinalPoints();
+
+		if(isSelected)
+			renderInfoText();
+		
 		if(addTime)
 			updateTime();
 		
@@ -121,6 +135,43 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		this.height = height;
 	}
 	
+	private void renderInfoText(){
+		TextRenderer titleRenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 26));
+		titleRenderer.setColor(0.416f, 0.365f, 0.722f, 1f);
+		titleRenderer.beginRendering(width, height);
+		titleRenderer.draw("HIP " + selectedStar.getHipparcos(), 0, height - 30);
+		titleRenderer.endRendering();
+		
+		TextRenderer infoRenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 15));
+		infoRenderer.setColor(0.416f, 0.365f, 0.722f, 1f);
+		infoRenderer.beginRendering(width, height);
+		infoRenderer.draw("Magnitude: " + selectedStar.getMagnitude(), 0, height - 55);
+		infoRenderer.draw("RA/Declination: " + Math.toDegrees(selectedStar.getRightAscension()) + " / "+Math.toDegrees(selectedStar.getDeclination()), 0, height - 75);
+		infoRenderer.draw("Az/Alt: " + Math.toDegrees(selectedStar.getHorizontalCoordinates().getAzimuth()) + " / "+Math.toDegrees(selectedStar.getHorizontalCoordinates().getAltitude()), 0, height - 95);
+		infoRenderer.endRendering();
+	}
+	
+	private void drawCardinalPoints(){
+		TextRenderer renderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 36));
+		renderer.beginRendering(width, height);
+		renderer.setColor(0.075f, 0.306f, 0.075f, 1f); //orange
+		String[] cardinalPoints = {"S", "W", "N", "E"};
+		for(int i = 0; i < 4; i++){
+			HorizontalCoordinates hc = new HorizontalCoordinates(i*Math.PI/2, 0);
+			Point2D p = hc.toProjection(azimuthAngle, altitudeAngle, projection);
+			
+			renderer.setColor(1f, 0.647f, 0f, 1f);
+			float ortoWidth = (float)(4.0 * width / height);
+			int x = (int) ((zoom * p.getX() + ortoWidth) * width / ortoWidth - width /2.0);
+			int y = (int) ((zoom * p.getY() + 4) * height / 4.0 - height/2.0);
+			
+			renderer.draw(cardinalPoints[i], x, y);
+		}
+
+		renderer.endRendering();
+	}
+	
+		
 	private void drawGrid(GL2 gl){
 		gl.glColor3f(0.192f, 0.325f, 0f);
 		//altitude lines
@@ -146,7 +197,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		
 	}
 	
-	private void drawHorizon(GL2 gl){
+private void drawHorizon(GL2 gl){
 		
 		if(altitudeAngle > -Math.PI/2 || projection == SphericalCoordinates.ORTOGRAPHIC_PROJECTION)
 			gl.glClearColor(0f, 0.075f, 0.125f, 1f); //prussian blue
@@ -200,6 +251,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		for(int i = 0; i < stars.length; i++){
 			if(stars[i].getMagnitude() < 5.5){
 				HorizontalCoordinates c = stars[i].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
+				stars[i].setHorizontalCoordinates(c);
 				if(c.getAltitude() > 0 || showUnderHorizon){
 					Point2D p;
 					p = c.toProjection(azimuthAngle, altitudeAngle, projection);
@@ -246,8 +298,28 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+	public void mouseClicked(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
+		
+		float ortoWidth = (float)(4.0 * width/height);
+	//	System.out.println(ortoWidth/2);
+		float ortoX = (-width / 2f + x) * ortoWidth/width;
+		float ortoY = (height / 2f - y) * 4f / height;
+		System.out.println("----------------");
+		for(int i = 0; i < stars.length; i++){
+			if(stars[i].getMagnitude() < 5.5){
+				Point2D projection = stars[i].getProjection();
+			//	System.out.println(projection.getX());
+				if(Point2D.distance(ortoX, ortoY, zoom*projection.getX(), zoom*projection.getY()) < stars[i].getRadius()){
+					selectedStar = stars[i];
+					System.out.println(stars[i].getHipparcos() + "  " + stars[i].getRadius());
+					break;
+				}
+			}
+			
+		}
+	//	System.out.println(ortoX + "   " + ortoY);
 		
 	}
 
@@ -276,6 +348,9 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		
 	}
 
+//	private get
+	
+	
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		int moves = e.getWheelRotation();

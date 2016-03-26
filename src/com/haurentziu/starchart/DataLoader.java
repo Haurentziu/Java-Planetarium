@@ -9,9 +9,10 @@ import java.io.FileReader;
  *
  */
 
-public class DataLoader {
+
+class DataLoader {
 	
-	public DataLoader(){
+	DataLoader(){
 		
 	}
 	
@@ -45,6 +46,7 @@ public class DataLoader {
 			System.out.println("Loaded Stars");
 		}
 		catch(Exception ex){
+			ex.printStackTrace();
 			System.out.println("Could not load stars!");
 		}
 		

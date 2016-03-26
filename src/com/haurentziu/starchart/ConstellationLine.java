@@ -22,8 +22,8 @@ public class ConstellationLine {
 	public EquatorialCoordinates[] getPositions(Star stars[]){
 		EquatorialCoordinates[] line = new EquatorialCoordinates[2];
 		
-		line[0] = (EquatorialCoordinates)binarySearch(stars, hipparcosStart);
-		line[1] = (EquatorialCoordinates)binarySearch(stars, hipparcosEnd);
+		line[0] = binarySearch(stars, hipparcosStart);
+		line[1] = binarySearch(stars, hipparcosEnd);
 
 		return line;
 	}

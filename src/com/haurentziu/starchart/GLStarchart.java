@@ -320,7 +320,6 @@ private void drawHorizon(GL2 gl){
 		
 		azimuthAngle += (float)Math.PI*distanceX/(width*zoom);
 		altitudeAngle -= (float)Math.PI*distanceY/(height*zoom);
-		
 	}
 
 	@Override
@@ -336,15 +335,12 @@ private void drawHorizon(GL2 gl){
 			float ortoWidth = (float)(4.0 * width/height);
 			float ortoX = (-width / 2f + x) * ortoWidth/width;
 			float ortoY = (height / 2f - y) * 4f / height;
-			System.out.println("----------------");
 			for(int i = 0; i < stars.length; i++){
 				if(stars[i].getMagnitude() < 5.5){
 					Point2D projection = stars[i].getProjection();
-				//	System.out.println(projection.getX());
 					if(Point2D.distance(ortoX, ortoY, zoom*projection.getX(), zoom*projection.getY()) < stars[i].getRadius()){
 						selectedStar = stars[i];
 						isSelected = true;
-						System.out.println(stars[i].getHipparcos() + "  " + stars[i].getRadius());
 						break;
 					}
 				}
@@ -353,8 +349,7 @@ private void drawHorizon(GL2 gl){
 		else{
 			isSelected = false;
 		}
-	//	System.out.println(ortoX + "   " + ortoY);
-		
+
 	}
 
 	@Override
@@ -366,7 +361,7 @@ private void drawHorizon(GL2 gl){
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

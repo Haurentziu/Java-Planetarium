@@ -2,6 +2,8 @@
 
 Open Source planetarium program made by Haurentziu using Java and JOGL
 
+![JavaChart image](http://i.imgur.com/90RZCH0.png)
+
 ###Controls
 
 * 1 - stereographic projection

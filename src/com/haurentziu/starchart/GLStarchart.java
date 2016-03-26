@@ -1,12 +1,13 @@
 package com.haurentziu.starchart;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Float;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
@@ -23,7 +24,7 @@ import com.jogamp.opengl.awt.GLCanvas;
  *
  */
 
-public class GLStarchart implements GLEventListener, MouseMotionListener, MouseListener, MouseWheelListener{
+public class GLStarchart implements GLEventListener, MouseMotionListener, MouseListener, MouseWheelListener, KeyListener{
 	private long timestamp = System.currentTimeMillis();
 	
 	private Star stars[];
@@ -32,25 +33,40 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private FPSCounter fps;
 	
 	private float localSideralTime = 12; //Local Sideral Time
-	private float altitudeAngle = (float) Math.toRadians(-70);
-	private float azimuthAngle = (float) Math.toRadians(60);
+	private float altitudeAngle = (float) Math.toRadians(0); //+90 = alt
+	private float azimuthAngle = (float) Math.toRadians(90); //+90 = az
 	
 	private int initX, initY;
 	
 	private boolean showUnderHorizon = false;
+	private boolean showGrid = true;
+	private boolean showConstellationLines = true;
+	private boolean addTime =true;
 	
-//	final byte projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION; 
-	final byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
-//	final byte projection = SphericalCoordinates.GNOMOIC_PROJECTION;
+	
+//	private byte projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION; 
+	private byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
+//	private byte projection = SphericalCoordinates.GNOMOIC_PROJECTION;
 	
 	private int height, width;
 	
 	private float zoom = 2;
 	
 	GLStarchart(GLCanvas c){
+		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
+		double T = (julianDate - 2451545.0)/36525.0;
+		double LST0 = 280.46061837 + 360.98564736629 * (julianDate - 2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
+		while(LST0 > 360)
+			LST0 -= 360;
+		
+		System.out.println((LST0)/15);
+		localSideralTime = (float) Math.toRadians(LST0 + 26);
+		
 		DataLoader loader = new DataLoader();
 		stars = loader.loadStars();
 		constellations = loader.loadConstellations();
+		
+		c.addKeyListener(this);
 		c.addMouseMotionListener(this);
 		c.addMouseListener(this);
 		c.addMouseWheelListener(this);
@@ -61,19 +77,21 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		final GL2 gl = drawable.getGL().getGL2();
 	
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-		
-		
 			
 		float fps = drawable.getAnimator().getLastFPS();
 		
-		System.out.println(fps);
-		
+	//	System.out.println(Math.toDegrees(altitudeAngle));
 		drawHorizon(gl);
-		drawGrid(gl);
-		drawConstellations(gl);
-		drawStars(gl);
 
-	//	updateTime();
+		if(showGrid)
+			drawGrid(gl);
+		
+		if(showConstellationLines)
+			drawConstellations(gl);
+		drawStars(gl);
+		if(addTime)
+			updateTime();
+		
 	}
 	
 	@Override
@@ -108,7 +126,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		//altitude lines
 		for(float i = 0.1f; i < 2*Math.PI; i+= 10f*Math.PI/180f){
 			gl.glBegin(GL2.GL_LINE_STRIP);
-			for(float j = 0; j < Math.PI/2; j+= 0.25){
+			for(float j = 0; j < Math.PI/2; j+= 0.1){
 				HorizontalCoordinates h = new HorizontalCoordinates(i, j);
 				Point2D p = h.toProjection(azimuthAngle, altitudeAngle, projection);
 				gl.glVertex2f((float)(zoom*p.getX()), (float)(zoom*p.getY()));
@@ -116,9 +134,9 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 			gl.glEnd();
 		}
 		
-		for(float i = 0; i < Math.PI/2; i += 10f*Math.PI/180f){
+		for(float i = 0; i < Math.PI/2; i += 0.15){
 			gl.glBegin(GL2.GL_LINE_STRIP);
-			for(float j = 0; j < 2*Math.PI + 0.25; j += 0.1){
+			for(float j = 0; j < 2*Math.PI + 0.2; j += 0.1){
 				HorizontalCoordinates h = new HorizontalCoordinates(j, i);
 				Point2D p = h.toProjection(azimuthAngle, altitudeAngle, projection);
 				gl.glVertex2f((float)(zoom*p.getX()), (float)(zoom*p.getY()));
@@ -141,7 +159,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 			gl.glColor3f(0f, 0.075f, 0.125f); //prussian blue
 
 		gl.glBegin(GL2.GL_POLYGON);
-		for(float i = 0; i < 2*Math.PI + 0.1; i+=0.1){
+		for(float i = 0; i < 2*Math.PI + 0.25; i+=0.15){
 			
 			HorizontalCoordinates h = new HorizontalCoordinates(i, 0);
 			Point2D p = h.toProjection(azimuthAngle, altitudeAngle, projection);
@@ -180,11 +198,12 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private void drawStars(GL2 gl){
 		gl.glColor3f(1f, 1f, 1f);
 		for(int i = 0; i < stars.length; i++){
-			if(stars[i].getMagnitude() < 5.5 + 0.1*zoom){
+			if(stars[i].getMagnitude() < 5.5){
 				HorizontalCoordinates c = stars[i].toHorizontal(Math.toRadians(45), Math.toRadians(localSideralTime*15));
 				if(c.getAltitude() > 0 || showUnderHorizon){
 					Point2D p;
-					p= c.toProjection(azimuthAngle, altitudeAngle, projection);
+					p = c.toProjection(azimuthAngle, altitudeAngle, projection);
+					stars[i].setProjection(p);
 					drawCircle((float)(zoom*p.getX()), (float)(zoom*p.getY()), stars[i].getRadius(), gl);
 				}
 			}
@@ -260,11 +279,46 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		int moves = e.getWheelRotation();
-		if(moves > 0){
+		if(moves > 0 && zoom > 1){
 			zoom /= 1.1;
 		}
 		else{
 			zoom *= 1.1;
 		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		int k = e.getKeyCode();
+		
+		switch (k){
+		case KeyEvent.VK_1: projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
+							break;
+							
+		case KeyEvent.VK_2: projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION;
+							break;
+		
+		case KeyEvent.VK_A: showGrid = !showGrid;
+							break;
+							
+		case KeyEvent.VK_C: showConstellationLines = !showConstellationLines;
+							break;
+							
+		case KeyEvent.VK_SPACE: addTime = !addTime;
+								break;
+		}
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

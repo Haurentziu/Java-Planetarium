@@ -31,6 +31,7 @@ public class DataLoader {
 				int hip = Integer.parseInt(s[1].trim());
 				double rightAscension = 15 * (Integer.parseInt(raStrings[0]) + Integer.parseInt(raStrings[1])/60f + Float.parseFloat(raStrings[2])/3600f);
 				double declination = Integer.parseInt(decStrings[0]) + Integer.parseInt(decStrings[1])/60f + Float.parseFloat(decStrings[2])/3600f;
+				
 				starsArray[i++] = new Star(Math.toRadians(rightAscension), Math.toRadians(declination), mag, hip);
 				line = reader.readLine();
 			}

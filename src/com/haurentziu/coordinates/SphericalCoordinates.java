@@ -13,8 +13,7 @@ public class SphericalCoordinates {
 	protected double latitude; //declination, altitude
 	protected double longitude; //right ascension, hour angle, azimuth
 	
-	private byte projectionType;
-	
+
 	public static final byte STEREOGRAPHIC_PROJECTION = 0;
 	public static final byte ORTOGRAPHIC_PROJECTION = 1;
 	public static final byte GNOMOIC_PROJECTION = 2;
@@ -33,6 +32,7 @@ public class SphericalCoordinates {
 	
 
 	public Point2D toProjection(float longRotation , float latRotation, byte type){
+		
 		float rotatedLongitude = (float) Math.atan2(Math.sin(longitude + longRotation)*Math.cos(latRotation) - Math.tan(latitude)*Math.sin(latRotation), Math.cos(longitude + longRotation));
 		float rotatedLatitude = (float)Math.asin(Math.sin(latitude) * Math.cos(latRotation) + Math.cos(latitude)*Math.sin(latRotation)*Math.sin(longitude + longRotation));
 		double r = 0;
@@ -46,6 +46,8 @@ public class SphericalCoordinates {
 			double r = 1/Math.tan(Math.PI/4 - )
 		}
 		*/
+		
+	//	rotatedLatitude = (float) (Math.PI/2 - rotatedLatitude);
 		switch(type){
 			case STEREOGRAPHIC_PROJECTION:	r = 1f/Math.tan((Math.PI/2 - rotatedLatitude)/2);
 											break;

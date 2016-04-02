@@ -48,7 +48,7 @@ public class Star extends EquatorialCoordinates{
 	}
 	
 	public float getRadius(){
-		return  (float)(28*Math.pow(1.5, -magnitude)/Main.height);
+		return  (float)(24*Math.pow(1.4, -magnitude)/Main.height);
 	}
 	
 	public int getHipparcos(){

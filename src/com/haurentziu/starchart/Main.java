@@ -28,7 +28,7 @@ public class Main {
 		FPSAnimator animator = new FPSAnimator(canvas, 60);
 		animator.start();
 	
-		Frame frame = new Frame("JavaChart");
+		Frame frame = new Frame("Java Ephemerides");
 		
 		frame.setSize(width, height);
 		frame.add(canvas);

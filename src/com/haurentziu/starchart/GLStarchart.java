@@ -34,8 +34,8 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private double localSideralTime = 12; //Local Sideral Time
 	private float latitude = (float) Math.toRadians(51 + 28.0/60.0);
 	private float longitude = 0;
-	private float altitudeAngle = (float) Math.toRadians(-80); //+90 = alt
-	private float azimuthAngle = (float) Math.toRadians(180); //+90 = az
+	private float altitudeAngle = (float) Math.toRadians(-80);
+	private float azimuthAngle = (float) Math.toRadians(180);
 	
 	private int initX, initY;
 	
@@ -50,9 +50,9 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 
 	private int height, width;
 	private double ortoHeight, ortoWidth;
-	Timer t = new Timer();
-	
-	private float zoom = 2;
+	private Timer t = new Timer();
+
+	private float zoom = 1;
 	
 	private Star selectedStar = new Star(0, 0, 0, 0);
 	private boolean isSelected = false;
@@ -65,7 +65,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 			LST0 -= 360;
 		
 		localSideralTime = (float) Math.toRadians(LST0);
-		System.out.println(rad2String(localSideralTime, false, true));
+	//	System.out.println(rad2String(localSideralTime, false, true));
 		DataLoader loader = new DataLoader();
 		stars = loader.loadStars();
 		constellations = loader.loadConstellations();
@@ -87,17 +87,11 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 			
 		float fps = drawable.getAnimator().getLastFPS();
-	//	System.out.println(fps);
-		System.out.println(rad2String(altitudeAngle, false, false));
+		System.out.println(fps);
+	//	System.out.println(rad2String(altitudeAngle, false, false) + " | "+ rad2String(azimuthAngle, false, false));
 		if(altitudeAngle > -Math.PI/2) {
 			drawSky(gl);
-			if(showGrid)
-				drawGrid(gl);
-
-			if(showConstellationLines)
-				drawConstellations(gl);
-
-			drawStars(gl);
+			renderCelestialObjects(gl);
 		}
 		else{
 			drawGround(gl);
@@ -108,13 +102,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 			drawGround(gl);
 		else {
 			drawSky(gl);
-			if(showGrid)
-				drawGrid(gl);
-
-			if(showConstellationLines)
-				drawConstellations(gl);
-
-			drawStars(gl);
+			renderCelestialObjects(gl);
 
 		}
 		if(showCardinalPoints)
@@ -125,6 +113,16 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 
 		updateTime();
 		
+	}
+
+	private void renderCelestialObjects(GL2 gl){
+		if(showGrid)
+			drawGrid(gl);
+
+		if(showConstellationLines)
+			drawConstellations(gl);
+
+		drawStars(gl);
 	}
 	
 	@Override
@@ -176,7 +174,6 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		
 		String azString = rad2String(selectedStar.getHorizontalCoordinates().getAzimuth() - Math.PI, true, false);
 		String altString = rad2String(selectedStar.getHorizontalCoordinates().getAltitude(), false, false);
-	//	System.out.println(Math.toDegrees(selectedStar.getHorizontalCoordinates().getAltitude()));
 		infoRenderer.draw("Az/Alt: " + azString + " / " + altString, 0, height - 95);
 		infoRenderer.endRendering();
 	}
@@ -249,15 +246,16 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		
 	}
 
-	public void drawSky(GL2 gl){
+	private void drawSky(GL2 gl){
 		gl.glColor3f(0f, 0.075f, 0.125f);
-		for(double i = 0; i <= 2*Math.PI; i += Math.PI/20.0){
+		for(double i = 0; i <= 2*Math.PI + Math.toRadians(235/2); i += Math.PI/20.0){
+
 			drawPieceofSky(gl, i, i + Math.PI/19.8, Math.PI/45.0);
 
 		}
 	}
 
-	public void drawGround(GL2 gl){
+	private void drawGround(GL2 gl){
 		gl.glColor3f(0.28f, 0.21f, 0.16f);
 		for(double i = 0; i <= 2*Math.PI; i += Math.PI/20.0){
 			drawPieceofGround(gl, i, i + Math.PI/19.8, Math.PI/45.0);
@@ -459,7 +457,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		int moves = e.getWheelRotation();
 		if(moves > 0){
-			if(zoom > 1.5)
+		//	if(zoom > 1.5)
 				zoom /= 1.1;
 		}
 		else{

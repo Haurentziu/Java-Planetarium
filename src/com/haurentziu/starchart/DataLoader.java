@@ -56,7 +56,6 @@ class DataLoader {
 	public Constellation[] loadConstellations(){
 		try{
 			BufferedReader reader = new BufferedReader(new FileReader("./res/constellations.csv"));
-			System.out.println("Found file");
 			String line = reader.readLine();
 			int i = 0;
 			Constellation constellations[] = new Constellation[88];

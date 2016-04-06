@@ -23,7 +23,7 @@ public class SphericalCoordinates {
 		this.longitude = longitude;
 	}
 	
-	public SphericalCoordinates rotate(float alpha){
+	public SphericalCoordinates rotate(double alpha){
 		float rotatedLongitude = (float) Math.atan2(Math.sin(longitude)*Math.cos(alpha) - Math.tan(latitude)*Math.sin(alpha), Math.cos(longitude));
 		float rotatedLatitude = (float)Math.asin(Math.sin(latitude) * Math.cos(alpha) + Math.cos(latitude)*Math.sin(alpha)*Math.sin(longitude));
 		return new SphericalCoordinates(rotatedLongitude, rotatedLatitude);

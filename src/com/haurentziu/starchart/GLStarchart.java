@@ -1,20 +1,15 @@
 package com.haurentziu.starchart;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.Font;
+
 import java.awt.geom.Point2D;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.SphericalCoordinates;
-import com.jogamp.opengl.*;
-import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 
@@ -24,40 +19,36 @@ import com.jogamp.opengl.util.awt.TextRenderer;
  *
  */
 
-public class GLStarchart implements GLEventListener, MouseMotionListener, MouseListener, MouseWheelListener, KeyListener{
-	private long timestamp = System.currentTimeMillis();
-	
-	private final Star stars[];
+public class GLStarchart implements GLEventListener{
+
+	final Star stars[];
 	private final Constellation constellations[];
 	
 
-	private double localSideralTime = 12; //Local Sideral Time
-	private float latitude = (float) Math.toRadians(51 + 28.0/60.0);
-	private float longitude = 0;
-	private float altitudeAngle = (float) Math.toRadians(-80);
-	private float azimuthAngle = (float) Math.toRadians(180);
-	
-	private int initX, initY;
-	
-	private boolean showUnderHorizon = false;
-	private boolean showGrid = true;
-	private boolean showConstellationLines = true;
-	private boolean addTime = false;
-	private boolean showCardinalPoints = true;
-	
-	private byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
-	private float timeWarp = 1;
+	double localSideralTime = 12; //Local Sideral Time
+	float latitude = (float) Math.toRadians(51 + 28.0/60.0);
+	float longitude = 0;
+	float altitudeAngle = (float) Math.toRadians(-80);
+	float azimuthAngle = (float) Math.toRadians(180);
 
-	private int height, width;
-	private double ortoHeight, ortoWidth;
+	boolean showUnderHorizon = false;
+	boolean showGrid = true;
+	boolean showConstellationLines = true;
+	boolean showCardinalPoints = true;
+	
+	byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
+	float timeWarp = 1;
+
+	int height, width;
+	double ortoHeight, ortoWidth;
 	private Timer t = new Timer();
 
-	private float zoom = 1;
+	float zoom = 1;
 	
-	private Star selectedStar = new Star(0, 0, 0, 0);
-	private boolean isSelected = false;
+	Star selectedStar = new Star(0, 0, 0, 0);
+	boolean isSelected = false;
 	
-	GLStarchart(GLCanvas c){
+	GLStarchart(){
 		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
 		double T = (julianDate - 2451545.0)/36525.0;
 		double LST0 = 280.46061837 + 360.98564736629 * (julianDate - 2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
@@ -65,30 +56,20 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 			LST0 -= 360;
 		
 		localSideralTime = (float) Math.toRadians(LST0);
-	//	System.out.println(rad2String(localSideralTime, false, true));
 		DataLoader loader = new DataLoader();
 		stars = loader.loadStars();
 		constellations = loader.loadConstellations();
-
-		c.setFocusable(true);
-		c.addKeyListener(this);
-		c.addMouseMotionListener(this);
-		c.addMouseListener(this);
-		c.addMouseWheelListener(this);
-
 	}
 	
 	
 	@Override
 	public void display(GLAutoDrawable drawable) {
-//		System.out.println(rad2String(latitude, false, false));
 		final GL2 gl = drawable.getGL().getGL2();
 	
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 			
 		float fps = drawable.getAnimator().getLastFPS();
 		System.out.println(fps);
-	//	System.out.println(rad2String(altitudeAngle, false, false) + " | "+ rad2String(azimuthAngle, false, false));
 		if(altitudeAngle > -Math.PI/2) {
 			drawSky(gl);
 			renderCelestialObjects(gl);
@@ -115,16 +96,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		
 	}
 
-	private void renderCelestialObjects(GL2 gl){
-		if(showGrid)
-			drawGrid(gl);
 
-		if(showConstellationLines)
-			drawConstellations(gl);
-
-		drawStars(gl);
-	}
-	
 	@Override
 	public void dispose(GLAutoDrawable arg0) {
 		
@@ -153,6 +125,23 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 		this.height = height;
 	}
 
+	private void renderCelestialObjects(GL2 gl){
+		renderBodies(gl);
+		if(showGrid)
+			drawGrid(gl);
+
+		if(showConstellationLines)
+			drawConstellations(gl);
+
+		drawStars(gl);
+	}
+	
+	private void renderBodies(GL2 gl){
+		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
+		SolarSystem system = new SolarSystem();
+		EquatorialCoordinates sunEquatorial = system.computeSunEquatorial(julianDate);
+	//	System.out.printf("RA: %s  DE: %s\n", rad2String(sunEquatorial.getRightAscension(), true, true), rad2String(sunEquatorial.getDeclination(), true, false));
+	}
 
 
 	private void renderInfoText(GL2 gl){
@@ -197,6 +186,7 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 			s = String.format("%dh %02dm %.2fs", degrees, minutes, seconds);
 		else
 			s = String.format("%d\u00b0 %02d\u2032 %.2f\u2033", degrees, minutes, seconds);
+
 		return s;
 	}
 	
@@ -377,132 +367,5 @@ public class GLStarchart implements GLEventListener, MouseMotionListener, MouseL
 	private void updateTime(){
 		localSideralTime += 4.84813681e-9*timeWarp*t.getDeltaTime(); //dt*pi/(180*3600000) ms(time) -> rad
 	}
-	
 
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		int distanceX = (e.getX() - initX);
-		int distanceY = (e.getY() - initY);
-		
-		initX = e.getX();
-		initY = e.getY();
-
-		azimuthAngle += (float)Math.PI*distanceX/(width*zoom);
-
-		float newAltitudeAngle = altitudeAngle - (float)Math.PI*distanceY/(height*zoom);
-		if(newAltitudeAngle < 0 && newAltitudeAngle > -Math.PI)
-			altitudeAngle = newAltitudeAngle;
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		if(e.getButton() == MouseEvent.BUTTON1){
-			int x = e.getX();
-			int y = e.getY();
-			float ortoWidth = (float)(4.0 * width/height);
-			float ortoX = (-width / 2f + x) * ortoWidth/width;
-			float ortoY = (height / 2f - y) * 4f / height;
-			for(int i = 0; i < stars.length; i++){
-				if(stars[i].getMagnitude() < 5.5){
-					Point2D projection = stars[i].getProjection();
-					if(Point2D.distance(ortoX, ortoY, zoom*projection.getX(), zoom*projection.getY()) < stars[i].getRadius()){
-						selectedStar = stars[i];
-						isSelected = true;
-						break;
-					}
-				}
-			}
-		}
-		else{
-			isSelected = false;
-		}
-
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		initX = e.getX();
-		initY = e.getY();
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-//	private get
-	
-	
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		int moves = e.getWheelRotation();
-		if(moves > 0){
-		//	if(zoom > 1.5)
-				zoom /= 1.1;
-		}
-		else{
-			zoom *= 1.1;
-		}
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		int k = e.getKeyCode();
-		
-		switch (k){
-		case KeyEvent.VK_1: projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
-							break;
-							
-		case KeyEvent.VK_2: projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION;
-							break;
-		
-		case KeyEvent.VK_A: showGrid = !showGrid;
-							break;
-							
-		case KeyEvent.VK_C: showConstellationLines = !showConstellationLines;
-							break;
-							
-		case KeyEvent.VK_LEFT: timeWarp *= 2;
-								break;
-
-		case KeyEvent.VK_RIGHT:	timeWarp /= 2;
-								break;
-								
-		case KeyEvent.VK_P:	showCardinalPoints = !showCardinalPoints;
-							break;
-		}
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 }

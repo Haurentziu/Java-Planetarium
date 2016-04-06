@@ -15,16 +15,17 @@ import com.jogamp.opengl.util.FPSAnimator;
  *
  */
 
+//FIXME everything
 public class Main {
 	static int width = 1200, height = 950;
 	public static void main(String[] args){
 		GLProfile glp = GLProfile.getDefault();
 		GLCapabilities caps = new GLCapabilities(glp);
-		GLCanvas canvas = new GLCanvas(caps);
+		StarchartCanvas canvas = new StarchartCanvas(caps);
 		
-		GLStarchart starchart = new GLStarchart(canvas);
-		canvas.addGLEventListener(starchart);
-		
+		//GLStarchart starchart = new GLStarchart(canvas);
+	//	canvas.addGLEventListener(starchart);
+
 		FPSAnimator animator = new FPSAnimator(canvas, 60);
 		animator.start();
 	

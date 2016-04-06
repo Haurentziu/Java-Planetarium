@@ -1,5 +1,7 @@
 package com.haurentziu.planets;
 
+import com.haurentziu.coordinates.RectangularCoordinates;
+
 /*
 
    EARTH - VSOP87 Series Version C
@@ -34,7 +36,7 @@ package com.haurentziu.planets;
 
 */
 public class Earth {
-    static double Earth_X0(double t) // 1007 terms of order 0
+    private double Earth_X0(double t) // 1007 terms of order 0
     {
         double X0 = 0;
         X0 += 0.99986069925 * Math.cos(1.75347045757 + 6283.3196674749 * t);
@@ -1048,7 +1050,7 @@ public class Earth {
     }
 
 
-    static double Earth_X1(double t) // 600 terms of order 1
+    private double Earth_X1(double t) // 600 terms of order 1
     {
         double X1 = 0;
         X1 += 0.00154550744 * Math.cos(0.64605836878 + 0.2438174835 * t);
@@ -1655,7 +1657,7 @@ public class Earth {
     }
 
 
-    static double Earth_X2(double t) // 248 terms of order 2
+    private double Earth_X2(double t) // 248 terms of order 2
     {
         double X2 = 0;
         X2 += 0.00052911498 * Math.cos(3.32403354915 + 6283.3196674749 * t);
@@ -1910,7 +1912,7 @@ public class Earth {
     }
 
 
-    static double Earth_X3(double t) // 46 terms of order 3
+    private double Earth_X3(double t) // 46 terms of order 3
     {
         double X3 = 0;
         X3 += 0.00000232790 * Math.cos(3.40634928966 + 0.2438174835 * t);
@@ -1963,7 +1965,7 @@ public class Earth {
     }
 
 
-    static double Earth_X4(double t) // 20 terms of order 4
+    private double Earth_X4(double t) // 20 terms of order 4
     {
         double X4 = 0;
         X4 += 0.00000114918 * Math.cos(0.06053023506 + 6283.3196674749 * t);
@@ -1990,7 +1992,7 @@ public class Earth {
     }
 
 
-    static double Earth_X5(double t) // 7 terms of order 5
+    private double Earth_X5(double t) // 7 terms of order 5
     {
         double X5 = 0;
         X5 += 0.00000000877 * Math.cos(0.16136296068 + 6283.3196674749 * t);
@@ -2004,7 +2006,7 @@ public class Earth {
     }
 
 
-    static double Earth_Y0(double t) // 1007 terms of order 0
+    private double Earth_Y0(double t) // 1007 terms of order 0
     {
         double Y0 = 0;
         Y0 += 0.99986069925 * Math.cos(0.18267413078 + 6283.3196674749 * t);
@@ -3018,7 +3020,7 @@ public class Earth {
     }
 
 
-    static double Earth_Y1(double t) // 600 terms of order 1
+    private double Earth_Y1(double t) // 600 terms of order 1
     {
         double Y1 = 0;
         Y1 += 0.00154550744 * Math.cos(5.35844734917 + 0.2438174835 * t);
@@ -3625,7 +3627,7 @@ public class Earth {
     }
 
 
-    static double Earth_Y2(double t) // 248 terms of order 2
+    private double Earth_Y2(double t) // 248 terms of order 2
     {
         double Y2 = 0;
         Y2 += 0.00052911498 * Math.cos(1.75323722235 + 6283.3196674749 * t);
@@ -3880,7 +3882,7 @@ public class Earth {
     }
 
 
-    static double Earth_Y3(double t) // 46 terms of order 3
+    private double Earth_Y3(double t) // 46 terms of order 3
     {
         double Y3 = 0;
         Y3 += 0.00000232790 * Math.cos(1.83555296287 + 0.2438174835 * t);
@@ -3933,7 +3935,7 @@ public class Earth {
     }
 
 
-    static double Earth_Y4(double t) // 20 terms of order 4
+    private double Earth_Y4(double t) // 20 terms of order 4
     {
         double Y4 = 0;
         Y4 += 0.00000114918 * Math.cos(4.77291921544 + 6283.3196674749 * t);
@@ -3960,7 +3962,7 @@ public class Earth {
     }
 
 
-    static double Earth_Y5(double t) // 7 terms of order 5
+    private double Earth_Y5(double t) // 7 terms of order 5
     {
         double Y5 = 0;
         Y5 += 0.00000000877 * Math.cos(4.87375194107 + 6283.3196674749 * t);
@@ -3974,7 +3976,7 @@ public class Earth {
     }
 
 
-    static double Earth_Z0(double t) // 178 terms of order 0
+    private double Earth_Z0(double t) // 178 terms of order 0
     {
         double Z0 = 0;
         Z0 += 0.00000279620 * Math.cos(3.19870156017 + 84334.66158130829 * t);
@@ -4159,7 +4161,7 @@ public class Earth {
     }
 
 
-    static double Earth_Z1(double t) // 97 terms of order 1
+    private double Earth_Z1(double t) // 97 terms of order 1
     {
         double Z1 = 0;
         Z1 += 0.00000009031 * Math.cos(3.89751156799 + 5507.5532386674 * t);
@@ -4263,7 +4265,7 @@ public class Earth {
     }
 
 
-    static double Earth_Z2(double t) // 47 terms of order 2
+    private double Earth_Z2(double t) // 47 terms of order 2
     {
         double Z2 = 0;
         Z2 += 0.00000001662 * Math.cos(1.62703209173 + 84334.66158130829 * t);
@@ -4317,7 +4319,7 @@ public class Earth {
     }
 
 
-    static double Earth_Z3(double t) // 11 terms of order 3
+    private double Earth_Z3(double t) // 11 terms of order 3
     {
         double Z3 = 0;
         Z3 += 0.00000000011 * Math.cos(0.23877262399 + 7860.4193924392 * t);
@@ -4335,7 +4337,7 @@ public class Earth {
     }
 
 
-    static double Earth_Z4(double t) // 5 terms of order 4
+    private double Earth_Z4(double t) // 5 terms of order 4
     {
         double Z4 = 0;
         Z4 += 0.00000000004 * Math.cos(0.79662198849 + 6438.4962494256 * t);
@@ -4347,11 +4349,21 @@ public class Earth {
     }
 
 
-    static double Earth_Z5(double t) // 1 term of order 5
+    private double Earth_Z5(double t) // 1 term of order 5
     {
         double Z5 = 0;
         Z5 += 0.00000000000;
         return Z5 * t * t * t * t * t;
     }
+    
+    public RectangularCoordinates computeEarthCoordinates(double julianDate){
+        double tau = (julianDate - 2451545) / 365250;
+    //    double x = Earth_X0()
+    	double x = Earth_X0(tau) + tau*(Earth_X1(tau) + tau*(Earth_X2(tau) + tau*(Earth_X3(tau) + tau*(Earth_X4(tau) + tau*Earth_X5(tau)))));
+    	double y = Earth_Y0(tau) + tau*(Earth_Y1(tau) + tau*(Earth_Y2(tau) + tau*(Earth_Y3(tau) + tau*(Earth_Y4(tau) + tau*Earth_Y5(tau)))));
+    	double z = Earth_Z0(tau) + tau*(Earth_Z1(tau) + tau*(Earth_Z2(tau) + tau*(Earth_Z3(tau) + tau*(Earth_Z4(tau) + tau*Earth_Z5(tau)))));
+    	return new RectangularCoordinates(x, y, z);
+    }
+    
 }
 

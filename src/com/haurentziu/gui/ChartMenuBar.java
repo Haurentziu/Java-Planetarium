@@ -15,6 +15,7 @@ public class ChartMenuBar extends JMenuBar{
 
         JMenuItem timeItem = new JMenuItem("Time");
         JMenuItem locationItem = new JMenuItem("Observer Location");
+
         observerMenu.add(timeItem);
         observerMenu.add(locationItem);
     }

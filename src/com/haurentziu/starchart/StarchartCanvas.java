@@ -14,15 +14,17 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
 
     private int initX, initY;
     private GLStarchart starchart;
+    final private int[] timeWarps = {-10000, -1000, -100, -10, 0, 10, 100, 1000, 10000};
+    private int warp = 5;
 
-    private boolean isSelected = true;
 
     public StarchartCanvas(GLCapabilities caps) {
         super(caps);
-        this.addMouseMotionListener(this);
-        this.addMouseListener(this);
-        this.addMouseWheelListener(this);
-        this.addKeyListener(this);
+        addMouseMotionListener(this);
+        addMouseListener(this);
+        addMouseWheelListener(this);
+        addKeyListener(this);
+        setFocusable(true);
 
         starchart = new GLStarchart();
         addGLEventListener(starchart);
@@ -63,14 +65,14 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
                     Point2D projection = starchart.stars[i].getProjection();
                     if(Point2D.distance(ortoX, ortoY, starchart.zoom*projection.getX(), starchart.zoom*projection.getY()) < starchart.stars[i].getRadius()){
                         starchart.selectedStar = starchart.stars[i];
-                        isSelected = true;
+                        starchart.isSelected = true;
                         break;
                     }
                 }
             }
         }
         else{
-            isSelected = false;
+            starchart.isSelected = false;
         }
 
     }
@@ -132,10 +134,16 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
             case KeyEvent.VK_C: starchart.showConstellationLines = !starchart.showConstellationLines;
                 break;
 
-            case KeyEvent.VK_LEFT: starchart.timeWarp *= 2;
+            case KeyEvent.VK_RIGHT: if(warp + 1 < timeWarps.length) {
+                                    warp++;
+                                    starchart.timeWarp = timeWarps[warp];
+                                }
                 break;
 
-            case KeyEvent.VK_RIGHT:	starchart.timeWarp /= 2;
+            case KeyEvent.VK_LEFT:	if(warp - 1 >= 0) {
+                                        warp--;
+                                        starchart.timeWarp = timeWarps[warp];
+                                    }
                 break;
 
             case KeyEvent.VK_P:	starchart.showCardinalPoints = !starchart.showCardinalPoints;

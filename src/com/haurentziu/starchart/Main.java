@@ -4,10 +4,12 @@ import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import com.haurentziu.gui.ChartMenuBar;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
+
+import javax.swing.*;
 
 /**
  * 
@@ -29,8 +31,9 @@ public class Main {
 		FPSAnimator animator = new FPSAnimator(canvas, 60);
 		animator.start();
 	
-		Frame frame = new Frame("Java Ephemerides");
-		
+		JFrame frame = new JFrame("Java Ephemerides");
+		ChartMenuBar mb = new ChartMenuBar();
+		frame.setJMenuBar(mb);
 		frame.setSize(width, height);
 		frame.add(canvas);
 		frame.setVisible(true);

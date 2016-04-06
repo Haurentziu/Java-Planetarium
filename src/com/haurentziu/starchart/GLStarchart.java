@@ -126,7 +126,6 @@ public class GLStarchart implements GLEventListener{
 	}
 
 	private void renderCelestialObjects(GL2 gl){
-		renderBodies(gl);
 		if(showGrid)
 			drawGrid(gl);
 
@@ -134,12 +133,18 @@ public class GLStarchart implements GLEventListener{
 			drawConstellations(gl);
 
 		drawStars(gl);
+		renderBodies(gl);
+
 	}
 	
 	private void renderBodies(GL2 gl){
 		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
 		SolarSystem system = new SolarSystem();
 		EquatorialCoordinates sunEquatorial = system.computeSunEquatorial(julianDate);
+		HorizontalCoordinates sunHorizontal = sunEquatorial.toHorizontal(longitude, latitude, localSideralTime);
+		Point2D p = sunHorizontal.toProjection(azimuthAngle, altitudeAngle, projection);
+		gl.glColor3f(1f, 0.749f, 0f);
+		drawCircle((float)(zoom*p.getX()), (float)(zoom*p.getY()), 0.075f, gl);
 	//	System.out.printf("RA: %s  DE: %s\n", rad2String(sunEquatorial.getRightAscension(), true, true), rad2String(sunEquatorial.getDeclination(), true, false));
 	}
 
@@ -193,13 +198,13 @@ public class GLStarchart implements GLEventListener{
 	private void drawCardinalPoints(){
 		TextRenderer renderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 36));
 		renderer.beginRendering(width, height);
-		renderer.setColor(0.075f, 0.306f, 0.075f, 1f); //orange
+		//renderer.setColor(0.075f, 0.306f, 0.075f, 1f); //orange
+		renderer.setColor(0.694f, 0f, 0.345f, 1f);
 		String[] cardinalPoints = {"S", "W", "N", "E"};
 		for(int i = 0; i < 4; i++){
 			HorizontalCoordinates hc = new HorizontalCoordinates(i*Math.PI/2, 0);
 			Point2D p = hc.toProjection(azimuthAngle, altitudeAngle, projection);
 
-			renderer.setColor(1f, 0.647f, 0f, 1f);
 			float ortoWidth = (float)(4.0 * width / height);
 			int x = (int) ((zoom * p.getX() + ortoWidth) * width / ortoWidth - width /2.0);
 			int y = (int) ((zoom * p.getY() + 4) * height / 4.0 - height/2.0);

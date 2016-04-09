@@ -10,7 +10,7 @@ public class Timer {
         timestamp = System.currentTimeMillis();
     }
 
-    public int getDeltaTime(){
+    int getDeltaTime(){
         long timeNow = System.currentTimeMillis();
         int deltaT = (int)(timeNow - timestamp);
         timestamp = timeNow;

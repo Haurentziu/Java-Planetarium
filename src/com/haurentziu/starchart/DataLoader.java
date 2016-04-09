@@ -16,7 +16,7 @@ class DataLoader {
 		
 	}
 	
-	public Star[] loadStars(){
+	Star[] loadStars(){
 		Star starsArray[] = new Star[118217]; //Hipparcos catalog
 		
 		try{
@@ -38,8 +38,15 @@ class DataLoader {
 				else{
 					declination = Integer.parseInt(decStrings[0]) - Integer.parseInt(decStrings[1])/60.0 - Float.parseFloat(decStrings[2])/3600.0;
 				}
-				
-				starsArray[i++] = new Star(Math.toRadians(rightAscension), Math.toRadians(declination), mag, hip);
+
+				float bv;
+				if(s[37].trim().length() == 0){
+					bv = 0;
+				}
+				else {
+					bv = Float.parseFloat(s[37]);
+				}
+				starsArray[i++] = new Star(Math.toRadians(rightAscension), Math.toRadians(declination), mag, bv, hip);
 				line = reader.readLine();
 			}
 			reader.close();
@@ -53,7 +60,7 @@ class DataLoader {
 		return starsArray;
 	}
 	
-	public Constellation[] loadConstellations(){
+	Constellation[] loadConstellations(){
 		try{
 			BufferedReader reader = new BufferedReader(new FileReader("./res/constellations.csv"));
 			System.out.println("Found file");

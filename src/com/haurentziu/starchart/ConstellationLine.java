@@ -14,12 +14,12 @@ public class ConstellationLine {
 	private int hipparcosStart;
 	private int hipparcosEnd;
 	
-	public ConstellationLine(int hipparcosStart, int hipparcosEnd){
+	ConstellationLine(int hipparcosStart, int hipparcosEnd){
 		this.hipparcosStart = hipparcosStart;
 		this.hipparcosEnd = hipparcosEnd;
 	}
 	
-	public EquatorialCoordinates[] getPositions(Star stars[]){
+	EquatorialCoordinates[] getPositions(Star stars[]){
 		EquatorialCoordinates[] line = new EquatorialCoordinates[2];
 		
 		line[0] = binarySearch(stars, hipparcosStart);

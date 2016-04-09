@@ -28,10 +28,10 @@ public class GLStarchart implements GLEventListener{
 	double localSideralTime = 12; //Local Sideral Time
 	float latitude = (float) Math.toRadians(51 + 28.0/60.0);
 	float longitude = 0;
-	float altitudeAngle = (float) Math.toRadians(-80);
+	float altitudeAngle = (float) Math.toRadians(-150);
 	float azimuthAngle = (float) Math.toRadians(180);
 
-	boolean showUnderHorizon = false;
+	boolean showGround = true;
 	boolean showGrid = true;
 	boolean showConstellationLines = true;
 	boolean showCardinalPoints = true;
@@ -40,12 +40,12 @@ public class GLStarchart implements GLEventListener{
 	float timeWarp = 1;
 
 	int height, width;
-	double ortoHeight, ortoWidth;
+	float ortoHeight, ortoWidth;
 	private Timer t = new Timer();
 
-	float zoom = 1;
+	float zoom = 2;
 	
-	Star selectedStar = new Star(0, 0, 0, 0);
+	Star selectedStar = new Star(0, 0, 0, 0, 0);
 	boolean isSelected = false;
 	
 	GLStarchart(){
@@ -70,24 +70,20 @@ public class GLStarchart implements GLEventListener{
 			
 		float fps = drawable.getAnimator().getLastFPS();
 		System.out.println(fps);
-		if(altitudeAngle > -Math.PI/2) {
-			drawSky(gl);
-			renderCelestialObjects(gl);
-		}
-		else{
+		gl.glClearColor(0f, 0.075f, 0.125f, 1f);
+
+		if(showGrid)
+			drawGrid(gl);
+
+		if(showConstellationLines)
+			drawConstellations(gl);
+
+		drawStars(gl);
+
+		renderBodies(gl);
+
+		if(showGround)
 			drawGround(gl);
-		}
-
-
-		if(altitudeAngle > -Math.PI/2)
-			drawGround(gl);
-		else {
-			drawSky(gl);
-			renderCelestialObjects(gl);
-
-		}
-		if(showCardinalPoints)
-			drawCardinalPoints();
 
 		if(isSelected)
 			renderInfoText(gl);
@@ -119,24 +115,13 @@ public class GLStarchart implements GLEventListener{
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
-		ortoWidth = aspectRatio*2;
+		ortoWidth = (float)aspectRatio*2f;
 		ortoHeight = 2;
 		this.width = width;
 		this.height = height;
 	}
 
-	private void renderCelestialObjects(GL2 gl){
-		if(showGrid)
-			drawGrid(gl);
 
-		if(showConstellationLines)
-			drawConstellations(gl);
-
-		drawStars(gl);
-		renderBodies(gl);
-
-	}
-	
 	private void renderBodies(GL2 gl){
 		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
 		SolarSystem system = new SolarSystem();
@@ -145,7 +130,6 @@ public class GLStarchart implements GLEventListener{
 		Point2D p = sunHorizontal.toProjection(azimuthAngle, altitudeAngle, projection);
 		gl.glColor3f(1f, 0.749f, 0f);
 		drawCircle((float)(zoom*p.getX()), (float)(zoom*p.getY()), 0.075f, gl);
-	//	System.out.printf("RA: %s  DE: %s\n", rad2String(sunEquatorial.getRightAscension(), true, true), rad2String(sunEquatorial.getDeclination(), true, false));
 	}
 
 
@@ -162,13 +146,16 @@ public class GLStarchart implements GLEventListener{
 		infoRenderer.beginRendering(width, height);
 		infoRenderer.draw("Magnitude: " + selectedStar.getMagnitude(), 0, height - 55);
 
+		String bvString = String.format("BV Magnitude %.2f", selectedStar.getBVMagnitude());
+		infoRenderer.draw(bvString, 0, height - 75);
+
 		String raString = rad2String(selectedStar.getRightAscension(), false, true);
 		String decString = rad2String(selectedStar.getDeclination(), false, false);
-		infoRenderer.draw("RA/Dec(J2000): "  + raString + "/" + decString, 0, height - 75);
-		
+		infoRenderer.draw("RA/Dec(J2000): "  + raString + "/" + decString, 0, height - 95);
+
 		String azString = rad2String(selectedStar.getHorizontalCoordinates().getAzimuth() - Math.PI, true, false);
 		String altString = rad2String(selectedStar.getHorizontalCoordinates().getAltitude(), false, false);
-		infoRenderer.draw("Az/Alt: " + azString + " / " + altString, 0, height - 95);
+		infoRenderer.draw("Az/Alt: " + azString + " / " + altString, 0, height - 115);
 		infoRenderer.endRendering();
 	}
 	
@@ -217,7 +204,7 @@ public class GLStarchart implements GLEventListener{
 	
 		
 	private void drawGrid(GL2 gl){
-		gl.glColor3f(0.192f, 0.325f, 0f);
+		gl.glColor3f(0.404f, 0.302f, 0f);
 		//altitude lines
 		for(float i = 0.1f; i < 2*Math.PI; i+= Math.PI/18f){
 			gl.glBegin(GL2.GL_LINE_STRIP);
@@ -241,81 +228,46 @@ public class GLStarchart implements GLEventListener{
 		
 	}
 
-	private void drawSky(GL2 gl){
-		gl.glColor3f(0f, 0.075f, 0.125f);
-		for(double i = 0; i <= 2*Math.PI + Math.toRadians(235/2); i += Math.PI/20.0){
-
-			drawPieceofSky(gl, i, i + Math.PI/19.8, Math.PI/45.0);
-
-		}
-	}
-
 	private void drawGround(GL2 gl){
-		gl.glColor3f(0.28f, 0.21f, 0.16f);
-		for(double i = 0; i <= 2*Math.PI; i += Math.PI/20.0){
-			drawPieceofGround(gl, i, i + Math.PI/19.8, Math.PI/45.0);
+		gl.glColor3f(0.25f, 0.38f, 0.17f);
+		for(double i = 0; i <= 2*Math.PI; i += Math.PI/17){
+			drawPieceofGround(gl, i, i + Math.PI/16.8, Math.PI/30.0);
 
 		}
 	}
 
-
-	private boolean isInBounds(Point2D p){
-		double x = p.getX();
-		double y = p.getY();
-		return (x < ortoWidth && x > -ortoWidth && y < ortoHeight && y > -ortoHeight);
-	}
-
-
-
-	private void drawPieceofSky(GL2 gl, double azStart, double azEnd, double step){
-		gl.glBegin(GL2.GL_POLYGON);
-
-
-		for(double i = azStart; i <= azEnd; i += step){
-			HorizontalCoordinates c = new HorizontalCoordinates(i, 0);
-			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			gl.glVertex2d(zoom*p.getX(), zoom*p.getY());
-		}
-
-		for(double i = 0; i < Math.PI/2; i += step){
-			HorizontalCoordinates c = new HorizontalCoordinates(azEnd, i);
-			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			gl.glVertex2d(zoom*p.getX(), zoom*p.getY());
-		}
-
-
-		for(double i = Math.PI/2; i > 0; i -= step){
-			HorizontalCoordinates c = new HorizontalCoordinates(azStart, i);
-			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			gl.glVertex2d(zoom*p.getX(), zoom*p.getY());
-		}
-		gl.glEnd();
-	}
 
 	private void drawPieceofGround(GL2 gl, double azStart, double azEnd, double step){
-		gl.glBegin(GL2.GL_POLYGON);
+		gl.glBegin(GL2.GL_TRIANGLE_FAN);
 
 		for(double i = azStart; i <= azEnd; i += step){
 			HorizontalCoordinates c = new HorizontalCoordinates(i, 0);
 			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			gl.glVertex2d(zoom*p.getX(), zoom*p.getY());
+			if(p.distance(0, 0) < 2) {
+				gl.glVertex2f((float)(zoom * p.getX()), (float)(zoom * p.getY()));
+			}
 		}
 
 		for(double i = 0; i > -Math.PI/2; i -= step){
 			HorizontalCoordinates c = new HorizontalCoordinates(azEnd, i);
 			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			gl.glVertex2d(zoom*p.getX(), zoom*p.getY());
+			if(p.distance(0, 0) < 2) {
+				gl.glVertex2f((float)(zoom * p.getX()), (float)(zoom * p.getY()));
+			}
 		}
 
 
 		for(double i = -Math.PI/2; i <= 0; i += step){
 			HorizontalCoordinates c = new HorizontalCoordinates(azStart, i);
 			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			gl.glVertex2d(zoom*p.getX(), zoom*p.getY());
+			if(p.distance(0, 0) < 2) {
+				gl.glVertex2f((float)(zoom * p.getX()), (float)(zoom * p.getY()));
+			}
 		}
 
 		gl.glEnd();
 	}
+
 
 	private void drawConstellations(GL2 gl){
 		gl.glColor3f(0.4f, 0.4f, 0.4f);
@@ -327,16 +279,17 @@ public class GLStarchart implements GLEventListener{
 				HorizontalCoordinates start = equatorial[0].toHorizontal(longitude, latitude, localSideralTime);
 				HorizontalCoordinates end = equatorial[1].toHorizontal(longitude, latitude, localSideralTime);
 				
-				if(start.getAltitude() > 0 && end.getAltitude() > 0 || showUnderHorizon){
+				if(start.getAltitude() > 0 || end.getAltitude() > 0 || !showGround){
 					Point2D p1, p2;
 					
 					p1 = start.toProjection(azimuthAngle, altitudeAngle, projection);
 					p2 = end.toProjection(azimuthAngle, altitudeAngle, projection);
-					
-					gl.glBegin(GL2.GL_LINES);
-					gl.glVertex2f((float)(zoom*p1.getX()), (float)(zoom*p1.getY()));
-					gl.glVertex2f((float)(zoom*p2.getX()), (float)(zoom*p2.getY()));
-					gl.glEnd();
+					if(p1.distance(0, 0) < 2|| p2.distance(0, 0) < 2) {
+						gl.glBegin(GL2.GL_LINES);
+						gl.glVertex2f((float) (zoom * p1.getX()), (float) (zoom * p1.getY()));
+						gl.glVertex2f((float) (zoom * p2.getX()), (float) (zoom * p2.getY()));
+						gl.glEnd();
+					}
 				}
 			}
 		}
@@ -348,19 +301,26 @@ public class GLStarchart implements GLEventListener{
 			if(stars[i].getMagnitude() < 5.5){
 				HorizontalCoordinates c = stars[i].toHorizontal(longitude, latitude, localSideralTime);
 				stars[i].setHorizontalCoordinates(c);
-				if(c.getAltitude() > 0 || showUnderHorizon){
+				if(c.getAltitude() > 0 || !showGround){
 					Point2D p;
 					p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-					stars[i].setProjection(p);
-					drawCircle((float)(zoom*p.getX()), (float)(zoom*p.getY()), stars[i].getRadius(), gl);
+					if(p.distance(0, 0) < 2){
+						double[] color = stars[i].getStarRGB();
+						gl.glColor3f((float)color[0], (float)color[1], (float)color[2]);
+						stars[i].setProjection(p);
+						drawCircle((float)(zoom * p.getX()), (float)(zoom * p.getY()), stars[i].getRadius(), gl);
+					}
+
 				}
 			}
 		}
 	}
 
+
+
 	private void drawCircle(float centerX, float centerY , float radius, GL2 gl){
 		gl.glBegin(GL2.GL_POLYGON);
-		for(float angle = 0; angle < 2*Math.PI; angle += 0.5){
+		for(float angle = 0; angle < 2*Math.PI + 0.5f; angle += 0.5){
 			float x = (float)(centerX + radius * Math.cos(angle));
 			float y = (float)(centerY + radius * Math.sin(angle));
 			gl.glVertex2f(x, y);

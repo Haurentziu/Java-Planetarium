@@ -8,7 +8,7 @@ public class SolarSystem {
 		
 	}
 	
-	public EquatorialCoordinates computeSunEquatorial(double jde){
+	EquatorialCoordinates computeSunEquatorial(double jde){
 		Earth earth = new Earth();
 		RectangularCoordinates earthRect = earth.computeEarthCoordinates(jde);
 		earthRect.changeOrigin(0, 0, 0);

@@ -10,11 +10,11 @@ public class Constellation {
 	
 	ConstellationLine lines[];
 	
-	public Constellation(ConstellationLine lines[]){
+	Constellation(ConstellationLine lines[]){
 		this.lines = lines;
 	}
 	
-	public ConstellationLine[] getLines(){
+	ConstellationLine[] getLines(){
 		return lines;
 	}
 	

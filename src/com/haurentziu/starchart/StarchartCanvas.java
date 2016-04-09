@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 /**
  * Created by haurentziu on 06.04.2016.
  */
+
 public class StarchartCanvas extends GLCanvas implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 
     private int initX, initY;
@@ -134,20 +135,12 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
             case KeyEvent.VK_C: starchart.showConstellationLines = !starchart.showConstellationLines;
                 break;
 
-            case KeyEvent.VK_RIGHT: if(warp + 1 < timeWarps.length) {
-                                    warp++;
-                                    starchart.timeWarp = timeWarps[warp];
-                                }
-                break;
 
-            case KeyEvent.VK_LEFT:	if(warp - 1 >= 0) {
-                                        warp--;
-                                        starchart.timeWarp = timeWarps[warp];
-                                    }
-                break;
 
+            case KeyEvent.VK_G:     starchart.showGround = !starchart.showGround;
+                                    break;
             case KeyEvent.VK_P:	starchart.showCardinalPoints = !starchart.showCardinalPoints;
-                break;
+                                 break;
         }
 
     }

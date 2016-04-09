@@ -146,7 +146,7 @@ public class GLStarchart implements GLEventListener{
 		infoRenderer.beginRendering(width, height);
 		infoRenderer.draw("Magnitude: " + selectedStar.getMagnitude(), 0, height - 55);
 
-		String bvString = String.format("BV Magnitude %.2f", selectedStar.getBVMagnitude());
+		String bvString = String.format("B-V Color Index %.2f", selectedStar.getBVMagnitude());
 		infoRenderer.draw(bvString, 0, height - 75);
 
 		String raString = rad2String(selectedStar.getRightAscension(), false, true);
@@ -205,18 +205,27 @@ public class GLStarchart implements GLEventListener{
 		
 	private void drawGrid(GL2 gl){
 		gl.glColor3f(0.404f, 0.302f, 0f);
+		float start;
+		if(showGround) {
+			start = 0;
+		}
+		else {
+			start = - (float)Math.PI / 2f + 0.2f;
+		}
+
 		//altitude lines
 		for(float i = 0.1f; i < 2*Math.PI; i+= Math.PI/18f){
 			gl.glBegin(GL2.GL_LINE_STRIP);
-			for(float j = 0; j < Math.PI/2; j+= 0.1){
+			for(float j = start; j < Math.PI/2; j+= 0.1){
 				HorizontalCoordinates h = new HorizontalCoordinates(i, j);
 				Point2D p = h.toProjection(azimuthAngle, altitudeAngle, projection);
 				gl.glVertex2f((float)(zoom*p.getX()), (float)(zoom*p.getY()));
 			}
 			gl.glEnd();
 		}
-		
-		for(float i = 0; i < Math.PI/2; i += 0.15){
+
+		//azimuth lines
+		for(float i = start; i < Math.PI/2; i += 0.15){
 			gl.glBegin(GL2.GL_LINE_STRIP);
 			for(float j = 0; j < 2*Math.PI + 0.2; j += 0.1){
 				HorizontalCoordinates h = new HorizontalCoordinates(j, i);

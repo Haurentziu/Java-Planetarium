@@ -1,3 +1,30 @@
-#JavaChart
+#Java Planetarium
 
 Open Source planetarium program made by Haurentziu using Java and JOGL
+
+![Java Planetarium](http://i.imgur.com/RCuV0Fn.png)
+![Java Planetarium](http://i.imgur.com/oT0U4xN.png)
+
+###Controls
+
+* 1 - stereographic projection
+* 2 - ortographic projection
+* C - show/hide constellation lines
+* A - show/hide azimuthal grid
+* P - show/hide cardinal points
+* G - show/hide ground
+* N - show/hide star names
+* Right Arrow - increase time speed
+* Left Arrows - decrease time speed
+
+###Features
+
+* Realtime sky rendering
+* Realtime planet positions
+* Valuare
+* Talent
+
+###Credits
+
+* Haurentziu
+

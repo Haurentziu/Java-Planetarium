@@ -3,6 +3,9 @@ package com.haurentziu.starchart;
 import java.awt.Font;
 
 import java.awt.geom.Point2D;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
@@ -11,6 +14,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.util.awt.TextRenderer;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 /**
@@ -32,17 +36,24 @@ public class GLStarchart implements GLEventListener{
 	float azimuthAngle = (float) Math.toRadians(180);
 
 	boolean showGround = true;
-	boolean showGrid = true;
+	boolean showGrid = false;
 	boolean showConstellationLines = true;
 	boolean showCardinalPoints = true;
+	boolean showStarNames = false;
 	
 	byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
-	float timeWarp = 1;
+	int timeWarp = 1;
 
 	int height, width;
 	float ortoHeight, ortoWidth;
-	private Timer t = new Timer();
 
+	private Timer t = new Timer();
+	private long unixTime;
+
+	private boolean isSunlight;
+
+
+	private GLUT glut = new GLUT();
 	float zoom = 2;
 	
 	Star selectedStar = new Star(0, 0, 0, 0, 0);
@@ -52,6 +63,7 @@ public class GLStarchart implements GLEventListener{
 		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
 		double T = (julianDate - 2451545.0)/36525.0;
 		double LST0 = 280.46061837 + 360.98564736629 * (julianDate - 2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
+		unixTime = System.currentTimeMillis();
 		while(LST0 > 360)
 			LST0 -= 360;
 		
@@ -65,7 +77,8 @@ public class GLStarchart implements GLEventListener{
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		final GL2 gl = drawable.getGL().getGL2();
-	
+
+
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 			
 		float fps = drawable.getAnimator().getLastFPS();
@@ -85,8 +98,13 @@ public class GLStarchart implements GLEventListener{
 		if(showGround)
 			drawGround(gl);
 
+		if(showCardinalPoints)
+			drawCardinalPoints(gl);
+
 		if(isSelected)
-			renderInfoText(gl);
+			renderStarText(gl);
+
+		renderObserverInfo(gl);
 
 		updateTime();
 		
@@ -95,12 +113,16 @@ public class GLStarchart implements GLEventListener{
 
 	@Override
 	public void dispose(GLAutoDrawable arg0) {
-		
+
 	}
 
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		drawable.getAnimator().setUpdateFPSFrames(20, null);
+		GL2 gl = drawable.getGL().getGL2();
+	//	gl.glClearDepth(1.0);                     // Enables Clearing Of The Depth Buffer
+	//	gl.glEnable(GL2.GL_DEPTH_TEST);            // Enables Depth Testing
+	//	gl.glDepthFunc(GL2.GL_LEQUAL);
 	}
 	
 
@@ -123,17 +145,24 @@ public class GLStarchart implements GLEventListener{
 
 
 	private void renderBodies(GL2 gl){
-		double julianDate = System.currentTimeMillis()/86400000.0 + 2440587.5;
+		double julianDate = unixTime / 86400000.0  + 2440587.5;
 		SolarSystem system = new SolarSystem();
 		EquatorialCoordinates sunEquatorial = system.computeSunEquatorial(julianDate);
 		HorizontalCoordinates sunHorizontal = sunEquatorial.toHorizontal(longitude, latitude, localSideralTime);
-		Point2D p = sunHorizontal.toProjection(azimuthAngle, altitudeAngle, projection);
-		gl.glColor3f(1f, 0.749f, 0f);
-		drawCircle((float)(zoom*p.getX()), (float)(zoom*p.getY()), 0.075f, gl);
+		if(sunHorizontal.getAltitude() > 0) {
+			Point2D p = sunHorizontal.toProjection(azimuthAngle, altitudeAngle, projection);
+			if(isInBounds(p)) {
+				gl.glColor3f(1f, 0.749f, 0f);
+				drawCircle((float) (zoom * p.getX()), (float) (zoom * p.getY()), 0.075f, gl);
+			}
+			isSunlight = true;
+		}
+		else isSunlight = false;
+
 	}
 
 
-	private void renderInfoText(GL2 gl){
+	private void renderStarText(GL2 gl){
 
 		TextRenderer titleRenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 26));
 		titleRenderer.setColor(0.051f, 0.596f, 0.729f, 1f);
@@ -157,6 +186,24 @@ public class GLStarchart implements GLEventListener{
 		String altString = rad2String(selectedStar.getHorizontalCoordinates().getAltitude(), false, false);
 		infoRenderer.draw("Az/Alt: " + azString + " / " + altString, 0, height - 115);
 		infoRenderer.endRendering();
+	}
+
+	private void renderObserverInfo(GL2 gl){
+		GLUT glut = new GLUT();
+		Date date = new Date(unixTime);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getDefault());
+		String formatedDate = sdf.format(date);
+
+		gl.glColor3f(1, 1, 1);
+		gl.glRasterPos2f(-ortoWidth, -ortoHeight + 0.32f);
+		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, "Time Warp: " + timeWarp + "x");
+		gl.glRasterPos2f(-ortoWidth, -ortoHeight + 0.22f);
+		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, "Time: " + formatedDate);
+		gl.glRasterPos2f(-ortoWidth, -ortoHeight + 0.12f);
+		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, "Observer's Altitude: " + rad2String(latitude, false, false));
+		gl.glRasterPos2f(-ortoWidth, -ortoHeight + 0.02f);
+		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, "Observer's Longitude: " + rad2String(longitude, false, false));
 	}
 	
 	private String rad2String(double d, boolean normalise, boolean inHours){
@@ -182,24 +229,19 @@ public class GLStarchart implements GLEventListener{
 		return s;
 	}
 	
-	private void drawCardinalPoints(){
-		TextRenderer renderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 36));
-		renderer.beginRendering(width, height);
-		//renderer.setColor(0.075f, 0.306f, 0.075f, 1f); //orange
-		renderer.setColor(0.694f, 0f, 0.345f, 1f);
+	private void drawCardinalPoints(GL2 gl){
+		GLUT glu = new GLUT();
+		gl.glColor3f(0.694f, 0f, 0.345f);
 		String[] cardinalPoints = {"S", "W", "N", "E"};
+
 		for(int i = 0; i < 4; i++){
 			HorizontalCoordinates hc = new HorizontalCoordinates(i*Math.PI/2, 0);
 			Point2D p = hc.toProjection(azimuthAngle, altitudeAngle, projection);
 
-			float ortoWidth = (float)(4.0 * width / height);
-			int x = (int) ((zoom * p.getX() + ortoWidth) * width / ortoWidth - width /2.0);
-			int y = (int) ((zoom * p.getY() + 4) * height / 4.0 - height/2.0);
+			gl.glRasterPos2f((float)(zoom*p.getX()), (float)(zoom*p.getY()));
+			glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, cardinalPoints[i]);
 
-			renderer.draw(cardinalPoints[i], x, y);
 		}
-
-		renderer.endRendering();
 	}
 	
 		
@@ -238,11 +280,21 @@ public class GLStarchart implements GLEventListener{
 	}
 
 	private void drawGround(GL2 gl){
-		gl.glColor3f(0.25f, 0.38f, 0.17f);
+		if(isSunlight) {
+			gl.glColor3f(0.25f, 0.38f, 0.17f);
+		}
+		else{
+			gl.glColor3f(0.15f, 0.28f, 0.07f);
+		}
 		for(double i = 0; i <= 2*Math.PI; i += Math.PI/17){
 			drawPieceofGround(gl, i, i + Math.PI/16.8, Math.PI/30.0);
 
 		}
+	}
+
+	private boolean isInBounds(Point2D p){
+		boolean inBounds = p.getX() <= ortoWidth && p.getX() >= -ortoWidth && p.getY() <= ortoHeight && p.getY() >= -ortoHeight;
+		return inBounds;
 	}
 
 
@@ -306,6 +358,7 @@ public class GLStarchart implements GLEventListener{
 	
 	private void drawStars(GL2 gl){
 		gl.glColor3f(1f, 1f, 1f);
+		GLUT glut = new GLUT();
 		for(int i = 0; i < stars.length; i++){
 			if(stars[i].getMagnitude() < 5.5){
 				HorizontalCoordinates c = stars[i].toHorizontal(longitude, latitude, localSideralTime);
@@ -317,7 +370,13 @@ public class GLStarchart implements GLEventListener{
 						double[] color = stars[i].getStarRGB();
 						gl.glColor3f((float)color[0], (float)color[1], (float)color[2]);
 						stars[i].setProjection(p);
-						drawCircle((float)(zoom * p.getX()), (float)(zoom * p.getY()), stars[i].getRadius(), gl);
+						float radius = stars[i].getRadius();
+						drawCircle((float)(zoom * p.getX()), (float)(zoom * p.getY()), radius, gl);
+						if(stars[i].getMagnitude() < 1 && showStarNames){
+							gl.glRasterPos2f((float)(zoom * p.getX() + radius), (float)(zoom * p.getY()+ radius));
+							glut.glutBitmapString(GLUT.BITMAP_HELVETICA_12, "HIP " + stars[i].getHipparcos());
+						}
+
 					}
 
 				}
@@ -339,7 +398,9 @@ public class GLStarchart implements GLEventListener{
 	}
 	
 	private void updateTime(){
-		localSideralTime += 4.84813681e-9*timeWarp*t.getDeltaTime(); //dt*pi/(180*3600000) ms(time) -> rad
+		int deltaT = t.getDeltaTime();
+		unixTime += timeWarp*deltaT;
+		localSideralTime += 4.84813681e-9*timeWarp*deltaT; //dt*pi/(180*3600000) ms(time) -> rad
 	}
 
 }

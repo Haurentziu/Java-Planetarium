@@ -15,8 +15,8 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
 
     private int initX, initY;
     private GLStarchart starchart;
-    final private int[] timeWarps = {-10000, -1000, -100, -10, 0, 10, 100, 1000, 10000};
-    private int warp = 5;
+    final private int[] timeWarps = {-40000, -20000,-10000, -1000, -100, -10, 1, 10, 100, 1000, 10000, 20000, 40000};
+    private int currentWarp = 6;
 
 
     public StarchartCanvas(GLCapabilities caps) {
@@ -31,6 +31,14 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
         addGLEventListener(starchart);
     }
 
+
+    private void changeWarp(int warpLevel){
+        if(warpLevel < timeWarps.length && warpLevel >= 0) {
+            starchart.timeWarp = timeWarps[warpLevel];
+            currentWarp = warpLevel;
+            System.out.println(timeWarps[warpLevel]);
+        }
+    }
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -110,9 +118,10 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
     public void mouseWheelMoved(MouseWheelEvent e) {
         int moves = e.getWheelRotation();
         if(moves > 0){
-            //	if(zoom > 1.5)
-            starchart.zoom /= 1.1;
-        }
+
+            if(starchart.zoom > 2)
+                starchart.zoom /= 1.1;
+            }
         else{
             starchart.zoom *= 1.1;
         }
@@ -123,24 +132,32 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
         int k = e.getKeyCode();
 
         switch (k){
-            case KeyEvent.VK_1: starchart.projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
-                break;
+            case KeyEvent.VK_1:     starchart.projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
+                                    break;
 
-            case KeyEvent.VK_2: starchart.projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION;
-                break;
+            case KeyEvent.VK_2:     starchart.projection = SphericalCoordinates.ORTOGRAPHIC_PROJECTION;
+                                    break;
 
-            case KeyEvent.VK_A: starchart.showGrid = !starchart.showGrid;
-                break;
+            case KeyEvent.VK_A:     starchart.showGrid = !starchart.showGrid;
+                                    break;
 
-            case KeyEvent.VK_C: starchart.showConstellationLines = !starchart.showConstellationLines;
-                break;
+            case KeyEvent.VK_C:     starchart.showConstellationLines = !starchart.showConstellationLines;
+                                    break;
 
+            case KeyEvent.VK_LEFT:  changeWarp(currentWarp - 1);
+                                    break;
 
+            case KeyEvent.VK_RIGHT: changeWarp(currentWarp + 1);
+                                    break;
 
             case KeyEvent.VK_G:     starchart.showGround = !starchart.showGround;
                                     break;
-            case KeyEvent.VK_P:	starchart.showCardinalPoints = !starchart.showCardinalPoints;
-                                 break;
+
+            case KeyEvent.VK_P:	    starchart.showCardinalPoints = !starchart.showCardinalPoints;
+                                    break;
+
+            case KeyEvent.VK_N:     starchart.showStarNames = !starchart.showStarNames;
+                                    break;
         }
 
     }

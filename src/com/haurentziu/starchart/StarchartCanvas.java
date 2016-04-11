@@ -15,8 +15,8 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
 
     private int initX, initY;
     private GLStarchart starchart;
-    final private int[] timeWarps = {-40000, -20000,-10000, -1000, -100, -10, 1, 10, 100, 1000, 10000, 20000, 40000};
-    private int currentWarp = 6;
+    final private int[] timeWarps = {-10000, -5000, -3000, -1000, -100, -10, 1, 10, 100, 1000, 3000, 5000, 10000};
+    private int currentWarp = 4;
 
 
     public StarchartCanvas(GLCapabilities caps) {
@@ -158,9 +158,16 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
 
             case KeyEvent.VK_N:     starchart.showStarNames = !starchart.showStarNames;
                                     break;
+
+            case KeyEvent.VK_E:     starchart.showCelestialEquator = !starchart.showCelestialEquator;
+                                    break;
+
+            case KeyEvent.VK_S:     starchart.showEcliptic = !starchart.showEcliptic;
+                                    break;
         }
 
     }
+
 
     @Override
     public void keyReleased(KeyEvent arg0) {

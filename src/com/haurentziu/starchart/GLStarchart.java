@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import com.haurentziu.coordinates.EclipticCoordinates;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.SphericalCoordinates;
@@ -40,6 +41,8 @@ public class GLStarchart implements GLEventListener{
 	boolean showConstellationLines = true;
 	boolean showCardinalPoints = true;
 	boolean showStarNames = false;
+	boolean showCelestialEquator = false;
+	boolean showEcliptic = true;
 	
 	byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
 	int timeWarp = 1;
@@ -88,6 +91,12 @@ public class GLStarchart implements GLEventListener{
 		if(showGrid)
 			drawGrid(gl);
 
+		if(showCelestialEquator)
+			renderCelestialEquator(gl);
+
+		if(showEcliptic)
+			renderEclitptic(gl);
+
 		if(showConstellationLines)
 			drawConstellations(gl);
 
@@ -104,7 +113,7 @@ public class GLStarchart implements GLEventListener{
 		if(isSelected)
 			renderStarText(gl);
 
-		renderObserverInfo(gl);
+		renderObserverInfo(gl, fps);
 
 		updateTime();
 		
@@ -188,7 +197,7 @@ public class GLStarchart implements GLEventListener{
 		infoRenderer.endRendering();
 	}
 
-	private void renderObserverInfo(GL2 gl){
+	private void renderObserverInfo(GL2 gl, float fps){
 		GLUT glut = new GLUT();
 		Date date = new Date(unixTime);
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -196,6 +205,9 @@ public class GLStarchart implements GLEventListener{
 		String formatedDate = sdf.format(date);
 
 		gl.glColor3f(1, 1, 1);
+		gl.glRasterPos2f(-ortoWidth, -ortoHeight + 0.42f);
+		String fpsString = String.format("FPS: %.2f", fps);
+		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, fpsString);
 		gl.glRasterPos2f(-ortoWidth, -ortoHeight + 0.32f);
 		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, "Time Warp: " + timeWarp + "x");
 		gl.glRasterPos2f(-ortoWidth, -ortoHeight + 0.22f);
@@ -227,6 +239,32 @@ public class GLStarchart implements GLEventListener{
 			s = String.format("%d\u00b0 %02d\u2032 %.2f\u2033", degrees, minutes, seconds);
 
 		return s;
+	}
+
+
+	private void renderCelestialEquator(GL2 gl){
+		gl.glColor3f(0.545f, 0f, 0f);
+		gl.glBegin(GL2.GL_LINE_STRIP);
+		for(double i = 0; i <= 2*Math.PI + 0.01; i += Math.PI/40){
+			EquatorialCoordinates eq = new EquatorialCoordinates(i ,0);
+			HorizontalCoordinates hc = eq.toHorizontal(longitude, latitude, localSideralTime);
+			Point2D p = hc.toProjection(azimuthAngle, altitudeAngle, projection);
+			gl.glVertex2f((float) (zoom * p.getX()), (float) (zoom * p.getY()));
+		}
+		gl.glEnd();
+	}
+
+	private void renderEclitptic(GL2 gl){
+		gl.glColor3f(0f, 0.545f, 0.275f);
+		gl.glBegin(GL2.GL_LINE_STRIP);
+		for(double i = 0; i <= 2*Math.PI + 0.01; i += Math.PI/40){
+			EclipticCoordinates ec = new EclipticCoordinates(i , 0);
+			EquatorialCoordinates eq = ec.toEquatorialCoordinates(0.4093197552);
+			HorizontalCoordinates hc = eq.toHorizontal(longitude, latitude, localSideralTime);
+			Point2D p = hc.toProjection(azimuthAngle, altitudeAngle, projection);
+			gl.glVertex2f((float) (zoom * p.getX()), (float) (zoom * p.getY()));
+		}
+		gl.glEnd();
 	}
 	
 	private void drawCardinalPoints(GL2 gl){
@@ -286,48 +324,83 @@ public class GLStarchart implements GLEventListener{
 		else{
 			gl.glColor3f(0.15f, 0.28f, 0.07f);
 		}
-		for(double i = 0; i <= 2*Math.PI; i += Math.PI/17){
-			drawPieceofGround(gl, i, i + Math.PI/16.8, Math.PI/30.0);
 
+		for(double i = 0; i < 2*Math.PI; i +=  Math.PI / 20){
+			for(double j = 0; j > - Math.PI/2; j -= Math.PI / 20){
+				drawPieceOfGround(gl, Math.PI / 20.0, i, j, Math.PI / 40.0);
+			}
 		}
+	}
+
+	private void drawPieceOfGround(GL2 gl, double width, double beginAz, double beginAlt, double step){
+
+		HorizontalCoordinates center = new HorizontalCoordinates(beginAz + width/2, beginAlt - width/2);
+		Point2D centerPoint = center.toProjection(azimuthAngle, altitudeAngle, projection);
+
+		if(!isTileVisible(beginAz, beginAlt, width)) {
+			return;
+		}
+
+
+		gl.glBegin(GL2.GL_POLYGON);
+		for(double i = beginAz; i <= beginAz + width; i += step){
+			HorizontalCoordinates c = new HorizontalCoordinates(i, beginAlt);
+			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
+			gl.glVertex2f((float) (zoom * p.getX()), (float)(zoom * p.getY()));
+		}
+
+		for(double i = beginAlt; i >= beginAlt - width; i -= step){
+			HorizontalCoordinates c = new HorizontalCoordinates(beginAz + width, i);
+			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
+			gl.glVertex2f((float) (zoom * p.getX()), (float)(zoom * p.getY()));
+		}
+
+		for(double i = beginAz + width; i >= beginAz; i -= step){
+			HorizontalCoordinates c = new HorizontalCoordinates(i, beginAlt - width);
+			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
+			gl.glVertex2f((float) (zoom * p.getX()), (float)(zoom * p.getY()));
+		}
+
+		for(double i = beginAlt - width; i <= beginAlt; i += step){
+			HorizontalCoordinates c = new HorizontalCoordinates(beginAz, i);
+			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
+			gl.glVertex2f((float) (zoom * p.getX()), (float)(zoom * p.getY()));
+		}
+		gl.glEnd();
+
 	}
 
 	private boolean isInBounds(Point2D p){
-		boolean inBounds = p.getX() <= ortoWidth && p.getX() >= -ortoWidth && p.getY() <= ortoHeight && p.getY() >= -ortoHeight;
+		boolean inBounds = p.getX() <= ortoWidth/zoom && p.getX() >= -ortoWidth/zoom && p.getY() <= ortoHeight/zoom && p.getY() >= -ortoHeight/zoom;
 		return inBounds;
 	}
 
+	private boolean isIntersecting(Point2D p){
 
-	private void drawPieceofGround(GL2 gl, double azStart, double azEnd, double step){
-		gl.glBegin(GL2.GL_TRIANGLE_FAN);
-
-		for(double i = azStart; i <= azEnd; i += step){
-			HorizontalCoordinates c = new HorizontalCoordinates(i, 0);
-			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			if(p.distance(0, 0) < 2) {
-				gl.glVertex2f((float)(zoom * p.getX()), (float)(zoom * p.getY()));
-			}
-		}
-
-		for(double i = 0; i > -Math.PI/2; i -= step){
-			HorizontalCoordinates c = new HorizontalCoordinates(azEnd, i);
-			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			if(p.distance(0, 0) < 2) {
-				gl.glVertex2f((float)(zoom * p.getX()), (float)(zoom * p.getY()));
-			}
-		}
-
-
-		for(double i = -Math.PI/2; i <= 0; i += step){
-			HorizontalCoordinates c = new HorizontalCoordinates(azStart, i);
-			Point2D p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-			if(p.distance(0, 0) < 2) {
-				gl.glVertex2f((float)(zoom * p.getX()), (float)(zoom * p.getY()));
-			}
-		}
-
-		gl.glEnd();
+		boolean intersects = (p.getX() < ortoWidth/zoom || p.getX() > - ortoWidth/zoom) && (p.getY() < ortoHeight/zoom || p.getY() > - ortoHeight/zoom);
+		return intersects;
 	}
+
+	private boolean isTileVisible(double startAz, double startAlt, double width){
+		HorizontalCoordinates c1 = new HorizontalCoordinates(startAz, startAlt);
+		Point2D p1 = c1.toProjection(azimuthAngle, altitudeAngle, projection);
+
+		HorizontalCoordinates c2 = new HorizontalCoordinates(startAz + width, startAlt);
+		Point2D p2 = c2.toProjection(azimuthAngle, altitudeAngle, projection);
+
+		HorizontalCoordinates c3 = new HorizontalCoordinates(startAz, startAlt - width);
+		Point2D p3 = c3.toProjection(azimuthAngle, altitudeAngle, projection);
+
+		HorizontalCoordinates c4 = new HorizontalCoordinates(startAz + width, startAlt - width);
+		Point2D p4 = c4.toProjection(azimuthAngle, altitudeAngle, projection);
+
+	//	boolean isVisible = isIntersecting(p1) || isIntersecting(p2) || isIntersecting(p3) || isIntersecting(p4);
+		boolean isVisible = (isInBounds(p1) || isInBounds(p2) || isInBounds(p3) || isInBounds(p4));
+		return isVisible;
+	//	return true;
+
+	}
+
 
 
 	private void drawConstellations(GL2 gl){
@@ -400,7 +473,7 @@ public class GLStarchart implements GLEventListener{
 	private void updateTime(){
 		int deltaT = t.getDeltaTime();
 		unixTime += timeWarp*deltaT;
-		localSideralTime += 4.84813681e-9*timeWarp*deltaT; //dt*pi/(180*3600000) ms(time) -> rad
+		localSideralTime += 15*Math.PI*timeWarp*deltaT/(180*3600000); //dt*pi/(180*3600000) ms(time) -> rad
 	}
 
 }

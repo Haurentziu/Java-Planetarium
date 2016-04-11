@@ -13,6 +13,8 @@ Open Source planetarium program made by Haurentziu using Java and JOGL
 * P - show/hide cardinal points
 * G - show/hide ground
 * N - show/hide star names
+* E - show/hide celestial equator
+* S - show/hide ecliptic
 * Right Arrow - increase time speed
 * Left Arrows - decrease time speed
 

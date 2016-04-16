@@ -164,6 +164,9 @@ public class StarchartCanvas extends GLCanvas implements MouseMotionListener, Mo
 
             case KeyEvent.VK_S:     starchart.showEcliptic = !starchart.showEcliptic;
                                     break;
+
+            case KeyEvent.VK_M:     starchart.showMilkyWay = !starchart.showMilkyWay;
+                                    break;
         }
 
     }

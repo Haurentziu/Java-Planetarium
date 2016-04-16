@@ -3,7 +3,9 @@ package com.haurentziu.starchart;
 import java.awt.Font;
 
 import java.awt.geom.Point2D;
+import java.nio.FloatBuffer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -28,6 +30,7 @@ public class GLStarchart implements GLEventListener{
 
 	final Star stars[];
 	private final Constellation constellations[];
+	private final MilkyWayVertex milkyWayVertices[];
 	
 
 	double localSideralTime = 12; //Local Sideral Time
@@ -43,6 +46,7 @@ public class GLStarchart implements GLEventListener{
 	boolean showStarNames = false;
 	boolean showCelestialEquator = false;
 	boolean showEcliptic = true;
+	boolean showMilkyWay = true;
 	
 	byte projection = SphericalCoordinates.STEREOGRAPHIC_PROJECTION;
 	int timeWarp = 1;
@@ -54,6 +58,7 @@ public class GLStarchart implements GLEventListener{
 	private long unixTime;
 
 	private boolean isSunlight;
+	private FloatBuffer vertices;
 
 
 	private GLUT glut = new GLUT();
@@ -74,6 +79,7 @@ public class GLStarchart implements GLEventListener{
 		DataLoader loader = new DataLoader();
 		stars = loader.loadStars();
 		constellations = loader.loadConstellations();
+		milkyWayVertices = loader.loadMilkyWay();
 	}
 	
 	
@@ -85,8 +91,11 @@ public class GLStarchart implements GLEventListener{
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 			
 		float fps = drawable.getAnimator().getLastFPS();
-		System.out.println(fps);
+	//	System.out.println(fps);
 		gl.glClearColor(0f, 0.075f, 0.125f, 1f);
+
+		if(showMilkyWay)
+			drawMilkyWay(gl);
 
 		if(showGrid)
 			drawGrid(gl);
@@ -113,6 +122,8 @@ public class GLStarchart implements GLEventListener{
 		if(isSelected)
 			renderStarText(gl);
 
+
+
 		renderObserverInfo(gl, fps);
 
 		updateTime();
@@ -129,9 +140,7 @@ public class GLStarchart implements GLEventListener{
 	public void init(GLAutoDrawable drawable) {
 		drawable.getAnimator().setUpdateFPSFrames(20, null);
 		GL2 gl = drawable.getGL().getGL2();
-	//	gl.glClearDepth(1.0);                     // Enables Clearing Of The Depth Buffer
-	//	gl.glEnable(GL2.GL_DEPTH_TEST);            // Enables Depth Testing
-	//	gl.glDepthFunc(GL2.GL_LEQUAL);
+
 	}
 	
 
@@ -401,6 +410,20 @@ public class GLStarchart implements GLEventListener{
 
 	}
 
+	private void drawMilkyWay(GL2 gl){
+		gl.glColor3f(0, 0.251f, 0.427f);
+		gl.glBegin(GL2.GL_LINE_STRIP);
+		for(int i = 0; i < milkyWayVertices.length; i++){
+			if(milkyWayVertices[i].isMove() && i!= 0){
+				gl.glEnd();
+				gl.glBegin(GL2.GL_LINE_STRIP);
+			}
+			HorizontalCoordinates h = milkyWayVertices[i].getEquatorialCoordinates().toHorizontal(longitude, latitude, localSideralTime);
+			Point2D p = h.toProjection(azimuthAngle, altitudeAngle, projection);
+			gl.glVertex2f((float)(zoom * p.getX()), (float)(zoom * p.getY()));
+		}
+		gl.glEnd();
+	}
 
 
 	private void drawConstellations(GL2 gl){
@@ -418,7 +441,7 @@ public class GLStarchart implements GLEventListener{
 					
 					p1 = start.toProjection(azimuthAngle, altitudeAngle, projection);
 					p2 = end.toProjection(azimuthAngle, altitudeAngle, projection);
-					if(p1.distance(0, 0) < 2|| p2.distance(0, 0) < 2) {
+					if(isInBounds(p1) || isInBounds(p2)) {
 						gl.glBegin(GL2.GL_LINES);
 						gl.glVertex2f((float) (zoom * p1.getX()), (float) (zoom * p1.getY()));
 						gl.glVertex2f((float) (zoom * p2.getX()), (float) (zoom * p2.getY()));
@@ -439,7 +462,7 @@ public class GLStarchart implements GLEventListener{
 				if(c.getAltitude() > 0 || !showGround){
 					Point2D p;
 					p = c.toProjection(azimuthAngle, altitudeAngle, projection);
-					if(p.distance(0, 0) < 2){
+					if(isInBounds(p)){
 						double[] color = stars[i].getStarRGB();
 						gl.glColor3f((float)color[0], (float)color[1], (float)color[2]);
 						stars[i].setProjection(p);
@@ -455,6 +478,7 @@ public class GLStarchart implements GLEventListener{
 				}
 			}
 		}
+
 	}
 
 
@@ -464,6 +488,7 @@ public class GLStarchart implements GLEventListener{
 		for(float angle = 0; angle < 2*Math.PI + 0.5f; angle += 0.5){
 			float x = (float)(centerX + radius * Math.cos(angle));
 			float y = (float)(centerY + radius * Math.sin(angle));
+
 			gl.glVertex2f(x, y);
 		}
 

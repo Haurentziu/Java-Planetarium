@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="Java_Planetarium">
-    <output-path>$USER_HOME$/Desktop/Java Planetarium</output-path>
+    <output-path>$USER_HOME$/Desktop/JavaPlanetarium</output-path>
     <root id="archive" name="JavaChart.jar">
       <element id="module-output" name="JavaChart" />
       <element id="library" level="module" name="newt-driver-linux.jar" module-name="JavaChart" />

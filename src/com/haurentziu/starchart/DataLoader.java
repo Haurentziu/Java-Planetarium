@@ -1,5 +1,7 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.coordinates.EquatorialCoordinates;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -63,7 +65,6 @@ class DataLoader {
 	Constellation[] loadConstellations(){
 		try{
 			BufferedReader reader = new BufferedReader(new FileReader("./res/constellations.csv"));
-			System.out.println("Found file");
 			String line = reader.readLine();
 			int i = 0;
 			Constellation constellations[] = new Constellation[88];
@@ -88,4 +89,33 @@ class DataLoader {
 			return null;
 		}
 	}
+
+	MilkyWayVertex[] loadMilkyWay() {
+		try{
+			MilkyWayVertex[] vertices = new MilkyWayVertex[1027];
+
+			BufferedReader reader = new BufferedReader(new FileReader("./res/milkyway.csv"));
+			String line = reader.readLine();
+			int i = 0;
+			while(line != null){
+				String[] data = line.split(",");
+				boolean move = data[0].equals("MOVE");
+				double ra = Math.toRadians(Double.parseDouble(data[1])*15);
+				double dec = Math.toRadians(Double.parseDouble(data[2]));
+				vertices[i++] = new MilkyWayVertex(new EquatorialCoordinates(ra, dec), move);
+				line = reader.readLine();
+			}
+			return vertices;
+
+		}
+
+		catch (Exception ex){
+			ex.printStackTrace();
+			System.out.println("Could not load Milky Way vertices");
+			System.exit(0);
+			return null;
+		}
+
+	}
+
 }

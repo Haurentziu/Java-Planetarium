@@ -31,23 +31,12 @@ public class SphericalCoordinates {
 	
 	
 
-	public Point2D toProjection(float longRotation , float latRotation, byte type){
+	public ProjectionPoint toProjection(double longRotation , double latRotation, byte type){
 		
-		float rotatedLongitude = (float) Math.atan2(Math.sin(longitude + longRotation)*Math.cos(latRotation) - Math.tan(latitude)*Math.sin(latRotation), Math.cos(longitude + longRotation));
-		float rotatedLatitude = (float)Math.asin(Math.sin(latitude) * Math.cos(latRotation) + Math.cos(latitude)*Math.sin(latRotation)*Math.sin(longitude + longRotation));
+		double rotatedLongitude = Math.atan2(Math.sin(longitude + longRotation)*Math.cos(latRotation) - Math.tan(latitude)*Math.sin(latRotation), Math.cos(longitude + longRotation));
+		double rotatedLatitude = Math.asin(Math.sin(latitude) * Math.cos(latRotation) + Math.cos(latitude)*Math.sin(latRotation)*Math.sin(longitude + longRotation));
 		double r = 0;
-	/*	double x = 0, y = 0;
-		if(type == ORTOGRAPHIC_PROJECTION){
-			x = Math.cos(latitude)*Math.sin(longitude - longRotation);
-			y = Math.cos(latRotation)*Math.sin(latitude) - Math.sin(latRotation)*Math.cos(latitude)*Math.cos(longitude - longRotation);
-		}
-		
-		else if (type == STEREOGRAPHIC_PROJECTION){
-			double r = 1/Math.tan(Math.PI/4 - )
-		}
-		*/
-		
-	//	rotatedLatitude = (float) (Math.PI/2 - rotatedLatitude);
+
 		switch(type){
 			case STEREOGRAPHIC_PROJECTION:	r = 1f/Math.tan((Math.PI/2 - rotatedLatitude)/2);
 											break;
@@ -62,10 +51,13 @@ public class SphericalCoordinates {
 		
 		float x = (float) (-r*Math.cos(rotatedLongitude));
 		float y = (float) (r*Math.sin(rotatedLongitude));
-		return new Point2D.Float(x, y);
+		return new ProjectionPoint(x, y);
 	}
 	
-	
+	public static double getAngularDistance(SphericalCoordinates c1, SphericalCoordinates c2){
+		double d = Math.acos(Math.sin(c1.getLatitude()) * Math.sin(c2.getLatitude()) + Math.cos(c1.getLatitude()) * Math.cos(c2.getLatitude()) * Math.cos(c1.getLongitude() - c2.getLongitude()));
+		return d;
+	}
 	
 	public double getLatitude(){
 		return latitude;

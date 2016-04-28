@@ -1,5 +1,7 @@
 package com.haurentziu.starchart;
 
+import java.util.ArrayList;
+
 /**
  * 
  * @author haurentziu
@@ -7,16 +9,23 @@ package com.haurentziu.starchart;
  */
 
 public class Constellation {
+
+	private ArrayList<Star> lineStart;
+	private ArrayList<Star> lineEnd;
 	
-	ConstellationLine lines[];
-	
-	Constellation(ConstellationLine lines[]){
-		this.lines = lines;
+	Constellation(ArrayList<Star> lineStart, ArrayList<Star> lineEnd){
+		this.lineEnd = lineEnd;
+		this.lineStart = lineStart;
 	}
-	
-	ConstellationLine[] getLines(){
-		return lines;
+
+	ArrayList<Star> getStartStars(){
+		return lineStart;
 	}
-	
+
+	ArrayList<Star> getEndStars(){
+		return lineEnd;
+	}
+
+
 	
 }

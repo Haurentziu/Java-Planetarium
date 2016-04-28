@@ -4,6 +4,7 @@ import com.haurentziu.coordinates.EquatorialCoordinates;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 
 /**
  * 
@@ -18,14 +19,13 @@ class DataLoader {
 		
 	}
 	
-	Star[] loadStars(){
-		Star starsArray[] = new Star[118217]; //Hipparcos catalog
+	ArrayList<Star> loadStars(){
+		ArrayList stars = new ArrayList<>();
 		
 		try{
 			BufferedReader reader = new BufferedReader(new FileReader("./res/hip_main1.csv"));
 			String line = reader.readLine();
-			int i = 0;
-			
+
 			while(line != null){
 				String[] s = line.split("\\|");
 				String[] raStrings = s[3].split(" ");
@@ -48,61 +48,89 @@ class DataLoader {
 				else {
 					bv = Float.parseFloat(s[37]);
 				}
-				starsArray[i++] = new Star(Math.toRadians(rightAscension), Math.toRadians(declination), mag, bv, hip);
+				Star star = new Star(Math.toRadians(rightAscension), Math.toRadians(declination), mag, bv, hip);
+				stars.add(star);
 				line = reader.readLine();
 			}
 			reader.close();
 			System.out.println("Loaded Stars");
 		}
 		catch(Exception ex){
-			ex.printStackTrace();
 			System.out.println("Could not load stars!");
+			System.exit(0);
 		}
 		
-		return starsArray;
+		return stars;
 	}
 	
-	Constellation[] loadConstellations(){
+	ArrayList<Constellation> loadConstellations(ArrayList<Star> stars){
 		try{
 			BufferedReader reader = new BufferedReader(new FileReader("./res/constellations.csv"));
 			String line = reader.readLine();
-			int i = 0;
-			Constellation constellations[] = new Constellation[88];
+
+			ArrayList<Constellation> constellations = new ArrayList<>();
+
 			while(line != null){
 				String s[] = line.split(" ");
-				int n = Integer.parseInt(s[1]);
-				ConstellationLine constellationLines[] = new ConstellationLine[n];
+				ArrayList<Star> startLines, endLines;
+
+				startLines = new ArrayList<>();
+				endLines = new ArrayList<>();
+
 				for(int k = 2; k < s.length; k+=2){
 					int start = Integer.parseInt(s[k]);
 					int end = Integer.parseInt(s[k+1]);
-					constellationLines[(k-2)/2] = new ConstellationLine(start, end);
+					Star startStar = binarySearch(stars, start);
+					Star endStar = binarySearch(stars, end);
+					startLines.add(startStar);
+					endLines.add(endStar);
 				}
-				constellations[i++] = new Constellation(constellationLines);
+
+				constellations.add(new Constellation(startLines, endLines));
 				line = reader.readLine();
 			}
 			System.out.println("Loaded Constellation Lines");
-			return constellations;
 
+			return constellations;
 		}
 		catch(Exception ex){
 			System.out.println("Could not load constellation lines");
+			System.exit(0);
 			return null;
 		}
 	}
 
-	MilkyWayVertex[] loadMilkyWay() {
+	private Star binarySearch(ArrayList<Star> stars, int hip){
+		int high = stars.size() - 1;
+		int low = 0;
+		while(high >= low){
+			int middle = (low + high)/2;
+			Star middleStar = stars.get(middle);
+
+			if(middleStar.getHipparcos() == hip){
+				return stars.get(middle);
+			}
+			if(middleStar.getHipparcos() < hip)
+				low = middle + 1;
+
+			if(middleStar.getHipparcos() > hip)
+				high = middle - 1;
+		}
+		return null;
+	}
+
+	ArrayList<MilkyWayVertex> loadMilkyWay() {
 		try{
-			MilkyWayVertex[] vertices = new MilkyWayVertex[1027];
+			ArrayList<MilkyWayVertex> vertices = new ArrayList<>();
 
 			BufferedReader reader = new BufferedReader(new FileReader("./res/milkyway.csv"));
 			String line = reader.readLine();
-			int i = 0;
 			while(line != null){
 				String[] data = line.split(",");
 				boolean move = data[0].equals("MOVE");
 				double ra = Math.toRadians(Double.parseDouble(data[1])*15);
 				double dec = Math.toRadians(Double.parseDouble(data[2]));
-				vertices[i++] = new MilkyWayVertex(new EquatorialCoordinates(ra, dec), move);
+				vertices.add(new MilkyWayVertex(new EquatorialCoordinates(ra, dec), move));
 				line = reader.readLine();
 			}
 			return vertices;

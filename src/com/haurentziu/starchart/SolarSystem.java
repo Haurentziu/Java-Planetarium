@@ -20,7 +20,7 @@ public class SolarSystem {
 		
 	}
 	
-	static double computeObliquityOfTheEcliptic(double jde){
+	private double computeObliquityOfTheEcliptic(double jde){
 	//	double tau = (jde - 2451545.0)/365250.0;
 		double obliquity = 0.4093197552;
 		//TODO add more terms

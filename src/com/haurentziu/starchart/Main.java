@@ -21,7 +21,7 @@ import javax.swing.*;
 
 //FIXME everything
 public class Main {
-	static int width = 950, height = 950;
+	static int width = 1200, height = 950;
 	public static void main(String[] args){
 		GLProfile glp = GLProfile.getDefault();
 		GLCapabilities caps = new GLCapabilities(glp);

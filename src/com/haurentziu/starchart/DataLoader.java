@@ -23,7 +23,7 @@ class DataLoader {
 		ArrayList stars = new ArrayList<>();
 		
 		try{
-			BufferedReader reader = new BufferedReader(new FileReader("./res/hip_main1.csv"));
+			BufferedReader reader = new BufferedReader(new FileReader("./res/hip_main.csv"));
 			String line = reader.readLine();
 
 			while(line != null){

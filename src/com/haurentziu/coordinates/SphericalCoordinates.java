@@ -17,6 +17,9 @@ public class SphericalCoordinates {
 	public static final byte STEREOGRAPHIC_PROJECTION = 0;
 	public static final byte ORTOGRAPHIC_PROJECTION = 1;
 	public static final byte GNOMOIC_PROJECTION = 2;
+	public static final byte AZIMUTHAL_EQUIDISTANT_PROJECTION = 3;
+	public static final byte LAMBERT_AZIMUTHAL = 4;
+	public static final byte MERCATOR_PROJECTION = 5;
 	
 	public SphericalCoordinates(double longitude, double latitude){
 		this.latitude = latitude;
@@ -38,21 +41,39 @@ public class SphericalCoordinates {
 		double r = 0;
 
 		switch(type){
-			case STEREOGRAPHIC_PROJECTION:	r = 1f/Math.tan((Math.PI/2 - rotatedLatitude)/2);
-											break;
+			case STEREOGRAPHIC_PROJECTION:			r = 1.0 / Math.tan((Math.PI/2 - rotatedLatitude) / 2.0);
+													break;
 											
-			case ORTOGRAPHIC_PROJECTION:	r = Math.sin(Math.PI/2 - rotatedLatitude); 
-											break;
+			case ORTOGRAPHIC_PROJECTION:			r = Math.sin(Math.PI/2 - rotatedLatitude);
+													break;
 			
-			case GNOMOIC_PROJECTION:		r = 1/Math.tan(rotatedLatitude);
-											break;
-			
+			case GNOMOIC_PROJECTION:				r = - 1 / Math.tan(rotatedLatitude);
+													break;
+
+			case AZIMUTHAL_EQUIDISTANT_PROJECTION: 	r = Math.PI/2 + rotatedLatitude;
+													break;
+
+			case LAMBERT_AZIMUTHAL:					r = 2 * Math.cos(rotatedLatitude/2);
+													break;
+
+			case MERCATOR_PROJECTION:				return computeMercator(rotatedLongitude, rotatedLatitude);
+
+
+
 		}		
 		
 		float x = (float) (-r*Math.cos(rotatedLongitude));
 		float y = (float) (r*Math.sin(rotatedLongitude));
 		return new ProjectionPoint(x, y);
 	}
+
+	private ProjectionPoint computeMercator(double longitude, double latitude){
+		double x = longitude;
+		double y = Math.log(Math.tan(Math.PI/4 + latitude/2));
+		return new ProjectionPoint(y, x);
+	}
+
+
 	
 	public static double getAngularDistance(SphericalCoordinates c1, SphericalCoordinates c2){
 		double d = Math.acos(Math.sin(c1.getLatitude()) * Math.sin(c2.getLatitude()) + Math.cos(c1.getLatitude()) * Math.cos(c2.getLatitude()) * Math.cos(c1.getLongitude() - c2.getLongitude()));

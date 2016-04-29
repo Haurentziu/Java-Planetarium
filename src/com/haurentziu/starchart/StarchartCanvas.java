@@ -141,6 +141,15 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
             case KeyEvent.VK_2:     renderer.getObserver().setProjection(SphericalCoordinates.ORTOGRAPHIC_PROJECTION);
                 break;
 
+            case KeyEvent.VK_3:     renderer.getObserver().setProjection(SphericalCoordinates.AZIMUTHAL_EQUIDISTANT_PROJECTION);
+                break;
+
+            case KeyEvent.VK_4:     renderer.getObserver().setProjection(SphericalCoordinates.GNOMOIC_PROJECTION);
+                break;
+
+            case KeyEvent.VK_5:     renderer.getObserver().setProjection(SphericalCoordinates.LAMBERT_AZIMUTHAL);
+                break;
+
             case KeyEvent.VK_A:     renderer.toogleGrid();
                 break;
 

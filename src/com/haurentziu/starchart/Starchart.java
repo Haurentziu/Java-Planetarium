@@ -35,6 +35,8 @@ public class Starchart implements GLEventListener{
     private boolean isSelected = false;
     private Star selectedStar = new Star(0, 0, 0, 0, 0);
 
+    ShaderLoader shader;
+
     private int currentWarp = 8;
     private int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 0, 1, 10, 100, 1000, 3000, 5000, 10000};
 
@@ -46,6 +48,8 @@ public class Starchart implements GLEventListener{
         markings = new Markings();
         text = new TextInfo();
 
+
+
         ortoBounds = new Rectangle2D.Double();
         windowBounds = new Rectangle2D.Double();
     }
@@ -54,6 +58,11 @@ public class Starchart implements GLEventListener{
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
         glAutoDrawable.getAnimator().setUpdateFPSFrames(20, null);
+        GL2 gl = glAutoDrawable.getGL().getGL2();
+        shader = new ShaderLoader();
+        shader.vertexShader = shader.loadShader("./shader/vertex.glsl");
+        shader.fragmentShader = shader.loadShader("./shader/fragment.glsl");
+        shader.init(gl);
     }
 
     @Override
@@ -67,6 +76,7 @@ public class Starchart implements GLEventListener{
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         observer.updateTime(timeWarpLevels[currentWarp]);
         gl.glClearColor(0f, 0.075f, 0.125f, 1f);
+
 
         if(showAzGrid) {
             markings.renderAzGrid(observer, gl, ortoBounds);
@@ -107,6 +117,8 @@ public class Starchart implements GLEventListener{
 
         text.renderObserverInfo(observer, fps, timeWarpLevels[currentWarp], ortoBounds, gl);
     }
+
+
 
     @Override
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {

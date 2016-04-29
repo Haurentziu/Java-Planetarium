@@ -133,6 +133,7 @@ class DataLoader {
 				vertices.add(new MilkyWayVertex(new EquatorialCoordinates(ra, dec), move));
 				line = reader.readLine();
 			}
+			System.out.println("Loaded Milky Way");
 			return vertices;
 
 		}

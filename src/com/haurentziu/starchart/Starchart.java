@@ -1,11 +1,13 @@
 package com.haurentziu.starchart;
 
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.glu.GLU;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 /**
@@ -32,10 +34,12 @@ public class Starchart implements GLEventListener{
     private boolean showStarNames = true;
     private boolean showMilkyWay = true;
 
+    private FloatBuffer vertsBuffer;
+
     private boolean isSelected = false;
     private Star selectedStar = new Star(0, 0, 0, 0, 0);
 
-    ShaderLoader shader;
+    public ShaderLoader shader;
 
     private int currentWarp = 8;
     private int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 0, 1, 10, 100, 1000, 3000, 5000, 10000};
@@ -48,8 +52,6 @@ public class Starchart implements GLEventListener{
         markings = new Markings();
         text = new TextInfo();
 
-
-
         ortoBounds = new Rectangle2D.Double();
         windowBounds = new Rectangle2D.Double();
     }
@@ -57,12 +59,17 @@ public class Starchart implements GLEventListener{
 
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
-        glAutoDrawable.getAnimator().setUpdateFPSFrames(20, null);
-        GL2 gl = glAutoDrawable.getGL().getGL2();
+        GL3 gl = glAutoDrawable.getGL().getGL3();
+
         shader = new ShaderLoader();
         shader.vertexShader = shader.loadShader("./shader/vertex.glsl");
         shader.fragmentShader = shader.loadShader("./shader/fragment.glsl");
+        shader.geometryShader = shader.loadShader("./shader/geometry.glsl");
         shader.init(gl);
+        shader.useShader(gl);
+        setUniformVariables(gl, 1);
+
+        glAutoDrawable.getAnimator().setUpdateFPSFrames(20, null);
     }
 
     @Override
@@ -72,13 +79,27 @@ public class Starchart implements GLEventListener{
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
-        GL2 gl = glAutoDrawable.getGL().getGL2();
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-        observer.updateTime(timeWarpLevels[currentWarp]);
+        GL3 gl = glAutoDrawable.getGL().getGL3();
         gl.glClearColor(0f, 0.075f, 0.125f, 1f);
+        gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
+
+        observer.updateTime(timeWarpLevels[currentWarp]);
+        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+
+        float[] verts =
+                {
+                        -0.5f,  -0.5f,
+                        0.5f, -0.5f,
+                        -0.5f, 0.5f,
+                        0.5f, 0.5f,
+                };
+
+        sendVerts(gl, verts);
+
+        gl.glDrawArrays(GL3.GL_LINE_LOOP, 0, 4);
 
 
-        if(showAzGrid) {
+    /*    if(showAzGrid) {
             markings.renderAzGrid(observer, gl, ortoBounds);
         }
 
@@ -91,7 +112,10 @@ public class Starchart implements GLEventListener{
         }
 
         if(showMilkyWay) {
+            shader.useShader(gl);
+            setUniformVariables(gl, 1);
             sky.renderMilkyWay(observer, gl);
+            shader.disableShader(gl);
         }
 
         if(showConstellations) {
@@ -104,7 +128,11 @@ public class Starchart implements GLEventListener{
         double fps = glAutoDrawable.getAnimator().getLastFPS();
 
         if(showGround) {
-            ground.renderGround(observer, gl, ortoBounds);
+            shader.useShader(gl);
+            setUniformVariables(gl, 0);
+            ground.renderGround(observer, gl, ortoBounds, shader);
+            shader.disableShader(gl);
+
         }
 
         if(showCardinalPoints) {
@@ -116,25 +144,58 @@ public class Starchart implements GLEventListener{
         }
 
         text.renderObserverInfo(observer, fps, timeWarpLevels[currentWarp], ortoBounds, gl);
+        */
     }
 
 
 
     @Override
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
-        final GL2 gl = glAutoDrawable.getGL().getGL2();
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-
-        double aspectRatio = (double)i2/i3;
-        gl.glOrtho(-2*aspectRatio, 2*aspectRatio, -2, 2, -1, 1);
-        gl.glViewport(0, 0, i2, i3);
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-        ortoBounds.setRect(-2*aspectRatio, -2, 4*aspectRatio, 4);
-        windowBounds.setRect(0, 0, i2, i3);
-
+        final GL3 gl = glAutoDrawable.getGL().getGL3();
+        float aspectRatio = (float)i2/i3;
+        shader.setVariable(gl, "width", aspectRatio);
+        shader.setVariable(gl, "height", 1);
         observer.updateZoom(ortoBounds);
+    }
+
+   void sendVerts(GL3 gl, float[] verts){
+       IntBuffer vao = Buffers.newDirectIntBuffer(1);
+       gl.glGenVertexArrays(1, vao);
+       gl.glBindVertexArray(vao.get(0));
+
+       IntBuffer vbo = Buffers.newDirectIntBuffer(1);
+       FloatBuffer vertBuffer = Buffers.newDirectFloatBuffer(verts);
+
+       gl.glGenBuffers(1, vbo);
+
+       gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo.get(0));
+       gl.glBufferData(GL3.GL_ARRAY_BUFFER, vertBuffer.limit() * Buffers.SIZEOF_FLOAT, vertBuffer, GL3.GL_STATIC_DRAW);
+
+
+       int posAttribute = gl.glGetAttribLocation(shader.getShaderProgram(), "pos");
+       gl.glEnableVertexAttribArray(posAttribute);
+       gl.glVertexAttribPointer(posAttribute, 2, GL3.GL_FLOAT, false, 0, 0L);
+
+
+
+   }
+
+    private void setUniformVariables(GL3 gl, int transformation){
+        int zoomLoc = gl.glGetUniformLocation(shader.getShaderProgram(), "zoom");
+        int azimuthRotationLoc = gl.glGetUniformLocation(shader.getShaderProgram(), "azimuth_rotation");
+        int altitudeRotationLoc = gl.glGetUniformLocation(shader.getShaderProgram(), "altitude_rotation");
+        int sideralTimeLoc = gl.glGetUniformLocation(shader.getShaderProgram(), "sideral_time");
+        int transfTypeLoc = gl.glGetUniformLocation(shader.getShaderProgram(), "transform_type");
+        int obsLat = gl.glGetUniformLocation(shader.getShaderProgram(), "observer_latitude");
+        int obsLong = gl.glGetUniformLocation(shader.getShaderProgram(), "observer_longitude");
+
+        gl.glUniform1f(zoomLoc, (float)observer.getZoom());
+        gl.glUniform1f(azimuthRotationLoc, (float)observer.getAzRotation());
+        gl.glUniform1f(altitudeRotationLoc, (float)observer.getAltRotation());
+        gl.glUniform1f(sideralTimeLoc, (float) observer.getSideralTime());
+        gl.glUniform1i(transfTypeLoc, transformation);
+        gl.glUniform1f(obsLat, (float)observer.getLatitude());
+        gl.glUniform1f(obsLong, (float)observer.getLongitude());
     }
 
     Observer getObserver(){

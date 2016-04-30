@@ -26,9 +26,10 @@ public class SphericalCoordinates {
 		this.longitude = longitude;
 	}
 	
-	public SphericalCoordinates rotate(double alpha){
-		float rotatedLongitude = (float) Math.atan2(Math.sin(longitude)*Math.cos(alpha) - Math.tan(latitude)*Math.sin(alpha), Math.cos(longitude));
-		float rotatedLatitude = (float)Math.asin(Math.sin(latitude) * Math.cos(alpha) + Math.cos(latitude)*Math.sin(alpha)*Math.sin(longitude));
+	public SphericalCoordinates rotate(double longRot, double latRot){
+		double rotatedLongitude = Math.atan2(Math.sin(longRot - longitude)*Math.cos(latRot) - Math.tan(latitude)*Math.sin(latRot), Math.cos(longRot - longitude));
+	//	double rotatedLongitude = Math.atan2(Math.sin(longRot - longitude), Math.cos(longRot - longitude) * Math.sin(latRot) - Math.tan(latitude) * Math.cos(latRot));
+		double rotatedLatitude = Math.asin(Math.sin(latitude) * Math.cos(latRot) + Math.cos(latitude)*Math.sin(latRot)*Math.sin(longRot - longitude));
 		return new SphericalCoordinates(rotatedLongitude, rotatedLatitude);
 	}
 	
@@ -62,7 +63,7 @@ public class SphericalCoordinates {
 
 		}		
 		
-		float x = (float) (-r*Math.cos(rotatedLongitude));
+		float x = (float) ( - r*Math.cos(rotatedLongitude));
 		float y = (float) (r*Math.sin(rotatedLongitude));
 		return new ProjectionPoint(x, y);
 	}

@@ -5,6 +5,7 @@ import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.ProjectionPoint;
 import com.haurentziu.coordinates.SphericalCoordinates;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.gl2.GLUT;
 
 import java.awt.*;
@@ -42,11 +43,11 @@ public class Sky {
             if(star.getMagnitude() < MAX_MAG) {
                 EquatorialCoordinates equatorial = star.getEquatorialCoordinates();
                 HorizontalCoordinates horizontal = equatorial.toHorizontal(obs.getLongitude(), obs.getLatitude(), obs.getSideralTime());
-                if (horizontal.getAltitude() > 0 || !showGround && SphericalCoordinates.getAngularDistance(center, horizontal) < obs.getFOV()) {
+                if (horizontal.getLatitude() > 0 || !showGround && SphericalCoordinates.getAngularDistance(center, horizontal) < obs.getFOV()) {
                     ProjectionPoint projectedPoint = horizontal.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
                     projectedPoint.applyZoom(zoom);
                     star.setProjection(projectedPoint);
-                    star.setHorizontalCoordinates(horizontal);
+                //    star.setHorizontalCoordinates(horizontal);
                     Color starColor = star.getStarRGB();
                     gl.glColor3ub((byte) starColor.getRed(), (byte) starColor.getGreen(), (byte) starColor.getBlue());
                     renderCircle(projectedPoint, star.getRadius(), gl);
@@ -70,6 +71,7 @@ public class Sky {
             ArrayList<Star> startStars = c.getStartStars();
             ArrayList<Star> endStars = c.getEndStars();
 
+
             for(int j = 0; j < startStars.size(); j++){
                 EquatorialCoordinates startEq = startStars.get(j).getEquatorialCoordinates();
                 EquatorialCoordinates endEq = endStars.get(j).getEquatorialCoordinates();
@@ -77,7 +79,7 @@ public class Sky {
                 HorizontalCoordinates startAz = startEq.toHorizontal(obs.getLongitude(), obs.getLatitude(), obs.getSideralTime());
                 HorizontalCoordinates endAz = endEq.toHorizontal(obs.getLongitude(), obs.getLatitude(), obs.getSideralTime());
 
-                if(startAz.getAltitude() > 0 || endAz.getAltitude() > 0 || !showGround) {
+                if(startAz.getLatitude() > 0 || endAz.getLatitude() > 0 || !showGround) {
                     ProjectionPoint pStart = startAz.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
                     ProjectionPoint pEnd = endAz.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
 
@@ -95,23 +97,19 @@ public class Sky {
         }
     }
 
-    void renderMilkyWay(Observer obs, GL2 gl){
-        gl.glColor3f(0, 0.251f, 0.427f);
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        for(int i = 0; i < milkyWayVertices.size(); i++){
-            MilkyWayVertex milkyWayVertex = milkyWayVertices.get(i);
-            if(milkyWayVertex.isMove() && i!= 0){
-                gl.glEnd();
-                gl.glBegin(GL2.GL_LINE_STRIP);
-            }
-            HorizontalCoordinates h = milkyWayVertex.getEquatorialCoordinates().toHorizontal(obs.getLongitude(), obs.getLatitude(), obs.getSideralTime());
-            ProjectionPoint p = h.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
-            p.applyZoom(obs.getZoom());
-            gl.glVertex2d(p.getX(), p.getY());
-        }
-        gl.glEnd();
-    }
+  /*  float[] renderMilkyWay(Observer obs, GL3 gl){
+        int size = milkyWayVertices.size();
+        ArrayList<Float>
+        for(int i = 0; i < 2 * milkyWayVertices.size(); i += 2){
+            MilkyWayVertex vert = milkyWayVertices.get(i / 2);
+            if(vert.isMove()){
 
+            }
+            mwVerts[i] = (float)c.getRightAscension();
+            mwVerts[i] = (float)c.getDeclination();
+        }
+    }
+*/
     void renderSolarSystem(Observer obs, GL2 gl, Rectangle2D bounds){
         gl.glColor3f(1f, 74.9f, 0f);
         SolarSystem system = new SolarSystem();

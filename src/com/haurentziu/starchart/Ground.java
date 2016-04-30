@@ -2,10 +2,14 @@ package com.haurentziu.starchart;
 
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.ProjectionPoint;
+import com.haurentziu.utils.Utils;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.util.gl2.GLUT;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 /**
  * Created by haurentziu on 27.04.2016.
@@ -13,14 +17,15 @@ import java.awt.geom.Rectangle2D;
 
 public class Ground {
 
-    private final double GROUND_STEP = Math.PI/40;
+    private final float GROUND_STEP = (float)Math.PI/40f;
 
     public Ground(){
 
     }
 
-    void renderGround(Observer obs, GL2 gl, Rectangle2D bounds){
-        gl.glColor3f(0.25f, 0.38f, 0.17f);
+   void renderGround(Observer obs, GL3 gl, Rectangle2D bounds, ShaderLoader shader){
+        shader.useShader(gl);
+
         for(double i = 0; i < 2 * Math.PI; i += Math.PI / 20){
             for(double j = 0; j > -Math.PI/2; j -= Math.PI / 20){
                 HorizontalCoordinates c = new HorizontalCoordinates(i, j);
@@ -28,9 +33,10 @@ public class Ground {
                 renderGroundTile(tile, obs, bounds, gl);
             }
         }
+        shader.disableShader(gl);
     }
 
-    void renderCardinalPoints(Observer obs, GL2 gl, Rectangle2D bounds){
+/*    void renderCardinalPoints(Observer obs, GL2 gl, Rectangle2D bounds){
         gl.glColor3f(0.694f, 0f, 0.345f);
         String[] cardinalPoints = {"S", "W", "N", "E"};
         GLUT glut = new GLUT();
@@ -47,43 +53,37 @@ public class Ground {
         }
 
     }
-
-    private void renderGroundTile(Tile tile, Observer obs, Rectangle2D bounds, GL2 gl){
+*/
+    private void renderGroundTile(Tile tile, Observer obs, Rectangle2D bounds, GL3 gl){
         if(tile.isInBounds(obs, bounds)){
-            gl.glBegin(GL2.GL_POLYGON);
-            HorizontalCoordinates center = tile.getCenter();
-            ProjectionPoint pCenter = center.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
-            pCenter.applyZoom(obs.getZoom());
+            ArrayList<Float> vertList = new ArrayList<>();
 
             for(double i = tile.getStartAz(); i <= tile.getEndAz(); i += GROUND_STEP){
-                HorizontalCoordinates c = new HorizontalCoordinates(i, tile.getStartAlt());
-                ProjectionPoint p = c.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
-                p.applyZoom(obs.getZoom());
-                gl.glVertex2d(p.getX(), p.getY());
+                vertList.add((float)i);
+                vertList.add((float)tile.getStartAlt());
             }
 
             for(double i = tile.getStartAlt(); i > tile.getEndAlt(); i -= GROUND_STEP){
-                HorizontalCoordinates c = new HorizontalCoordinates(tile.getEndAz(), i);
-                ProjectionPoint p = c.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
-                p.applyZoom(obs.getZoom());
-                gl.glVertex2d(p.getX(), p.getY());
+                vertList.add((float)tile.getEndAz());
+                vertList.add((float)i);
             }
 
             for(double i = tile.getEndAz(); i >= tile.getStartAz(); i -= GROUND_STEP){
-                HorizontalCoordinates c = new HorizontalCoordinates(i, tile.getEndAlt());
-                ProjectionPoint p = c.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
-                p.applyZoom(obs.getZoom());
-                gl.glVertex2d(p.getX(), p.getY());
+                vertList.add((float)i);
+                vertList.add((float)tile.getEndAlt());
             }
 
             for(double i = tile.getEndAlt(); i < tile.getStartAlt(); i += GROUND_STEP){
-                HorizontalCoordinates c = new HorizontalCoordinates(tile.getStartAz(), i);
-                ProjectionPoint p = c.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
-                p.applyZoom(obs.getZoom());
-                gl.glVertex2d(p.getX(), p.getY());
+                vertList.add((float)tile.getStartAz());
+                vertList.add((float)i);
             }
-            gl.glEnd();
+            float verts[] = Utils.floatArrayList2FloatArray(vertList);
+      //      Starchart.sendVerts(gl, verts);
+            gl.glDrawArrays(GL3.GL_TRIANGLE_FAN, 0, verts.length);
+
+
         }
+
     }
 
 

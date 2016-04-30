@@ -20,9 +20,9 @@ public class ShaderLoader {
 
     private int shaderProgram;
 
-    String[] vertexShader;
-    String[] fragmentShader;
-    String[] geometryShader;
+    private String[] vertexShader;
+    private String[] fragmentShader;
+    private String[] geometryShader;
 
     String[] loadShader(String file) {
         StringBuilder sb = new StringBuilder();
@@ -55,25 +55,44 @@ public class ShaderLoader {
         }
     }
 
+    public void loadVertexShader(String file){
+        vertexShader = loadShader(file);
+    }
+
+    public void loadFragmentShader(String file){
+        fragmentShader = loadShader(file);
+    }
+
+    public void loadGeometryShader(String file){
+        geometryShader = loadShader(file);
+    }
+
+    public void loadAllShaders(String vertexFile, String geometryFile, String fragmentFile){
+        loadVertexShader(vertexFile);
+        loadGeometryShader(geometryFile);
+        loadFragmentShader(fragmentFile);
+    }
+
+
     private void attachShader(GL3 gl){
         vertexShaderProgram = gl.glCreateShader(GL3.GL_VERTEX_SHADER);
-        fragmentShaderProgram = gl.glCreateShader(GL3.GL_FRAGMENT_SHADER);
         geometryShaderProgram = gl.glCreateShader(GL3.GL_GEOMETRY_SHADER);
+        fragmentShaderProgram = gl.glCreateShader(GL3.GL_FRAGMENT_SHADER);
 
         gl.glShaderSource(vertexShaderProgram, 1, vertexShader, null, 0);
         gl.glCompileShader(vertexShaderProgram);
 
-        gl.glShaderSource(fragmentShaderProgram, 1, fragmentShader, null, 0);
-        gl.glCompileShader(fragmentShaderProgram);
-
         gl.glShaderSource(geometryShaderProgram, 1, geometryShader, null, 0);
         gl.glCompileShader(geometryShaderProgram);
+
+        gl.glShaderSource(fragmentShaderProgram, 1, fragmentShader, null, 0);
+        gl.glCompileShader(fragmentShaderProgram);
 
         shaderProgram = gl.glCreateProgram();
 
         gl.glAttachShader(shaderProgram, vertexShaderProgram);
-        gl.glAttachShader(shaderProgram, fragmentShaderProgram);
         gl.glAttachShader(shaderProgram, geometryShaderProgram);
+        gl.glAttachShader(shaderProgram, fragmentShaderProgram);
 
         gl.glLinkProgram(shaderProgram);
         gl.glValidateProgram(shaderProgram);
@@ -83,23 +102,7 @@ public class ShaderLoader {
         gl.glGetProgramiv(shaderProgram, GL3.GL_LINK_STATUS, intBuffer);
 
         if (intBuffer.get(0) != 1){
-
-            gl.glGetProgramiv(shaderProgram, GL3.GL_INFO_LOG_LENGTH, intBuffer);
-            int size = intBuffer.get(0);
-            System.err.println("Program link error: ");
-            if (size > 0){
-
-                ByteBuffer byteBuffer = ByteBuffer.allocate(size);
-                gl.glGetProgramInfoLog(shaderProgram, size, intBuffer, byteBuffer);
-                for (byte b : byteBuffer.array()){
-                    System.err.print((char) b);
-                }
-            }
-
-            else{
-                System.out.println("Unknown");
-            }
-            System.out.println();
+            System.out.println("Something is fucked up!");
             System.exit(0);
         }
 
@@ -110,11 +113,11 @@ public class ShaderLoader {
         gl.glUniform1f(location, value);
     }
 
-    public void setVariable(GL3 gl, String name, int value){
+/*    public void setVariable(GL3 gl, String name, int value){
         int location = gl.glGetUniformLocation(shaderProgram, name);
-        gl.glUniform1f(location, value);
+        gl.glUniform1i(location, value);
     }
-
+*/
     public void useShader(GL3 gl){
         gl.glUseProgram(shaderProgram);
     }

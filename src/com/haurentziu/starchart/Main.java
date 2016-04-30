@@ -29,7 +29,7 @@ public class Main {
 		StarchartCanvas canvas = new StarchartCanvas(caps);
 		canvas.setLocation(0, 0);
 
-		FPSAnimator animator = new FPSAnimator(canvas, 60);
+		FPSAnimator animator = new FPSAnimator(canvas, 120);
 		animator.start();
 	
 		Frame frame = new Frame("Java Planetarium");

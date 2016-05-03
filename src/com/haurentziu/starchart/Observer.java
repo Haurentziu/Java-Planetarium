@@ -161,11 +161,9 @@ public class Observer {
         return unixTime/(24.0 * 3600.0 * 1000.0) + 2440587.5;
     }
 
-    public void increaseFOV(double amount){
-        double newFOV = fov * amount;
-        if(newFOV <= MAX_FOV) {
-            fov *= amount;
-        }
+    public void increaseZoom(double amount){
+        zoom *= amount;
+
     }
 
     public HorizontalCoordinates getCenterHorizontal(){

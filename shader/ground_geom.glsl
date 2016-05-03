@@ -8,9 +8,6 @@ layout(triangle_strip, max_vertices = 3) out;
 uniform float width;
 uniform float height;
 
-bool isInBounds(vec4 p){
-    return p.x >= -width && p.x <= width && p.y >= -height && p.y <= height;
-}
 
 bool intesectsCircle(vec4 p1, vec4 p2, float r){
 

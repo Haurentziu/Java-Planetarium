@@ -31,6 +31,20 @@ void computeStereographic(vec4 coord, out vec4 projection){
     projection = vec4(x, y, coord.z, coord.w);
 }
 
+void computeGnomoic(vec4 coord, out vec4 projection){
+    float c = sin(altitude_rotation) * sin(coord.y) + cos(coord.y) * cos(altitude_rotation) * cos(coord.x - azimuth_rotation);
+    float x = cos(coord.y) * sin(coord.x - azimuth_rotation) / c;
+    float y = (cos(altitude_rotation) * sin(coord.y) - sin(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation))/c;
+    projection = vec4(x, y, coord.z, coord.w);
+}
+
+void computeLambertAEA(vec4 coord, out vec4 projection){
+    float k = sqrt(2 / (1 + sin(altitude_rotation) * sin(coord.y) + cos(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation)));
+    float x = k * cos(coord.y) * sin(coord.x - azimuth_rotation);
+    float y = k * (cos(altitude_rotation) * sin(coord.y) - sin(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
+    projection = vec4(x, y, coord.z, coord.w);
+}
+
 void main(void){
     vec4 coord = pos;
 

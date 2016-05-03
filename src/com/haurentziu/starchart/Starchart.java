@@ -10,6 +10,10 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import com.jogamp.opengl.util.GLBuffers;
+
+
+import static java.nio.Buffer.*;
 
 /**
  * Created by haurentziu on 27.04.2016.
@@ -34,13 +38,19 @@ public class Starchart implements GLEventListener{
     private boolean showCelestialEq = true;
     private boolean showStarNames = true;
     private boolean showMilkyWay = true;
+    private boolean showEqGrid = false;
 
     private int starNo;
     private int linesNo;
     private ArrayList<Integer> tilesNo;
-    private int groundNo ;
+    private ArrayList<Integer> gridNo;
+    private int groundNo;
+
+    private IntBuffer vbo;
+    private int bufferSize;
 
     private boolean isSelected = false;
+
     private Star selectedStar = new Star(0, 0, 0, 0, 0);
 
     private ShaderLoader starShader;
@@ -81,7 +91,7 @@ public class Starchart implements GLEventListener{
         groundShader.init(gl);
 
         markingsShader = new ShaderLoader();
-        markingsShader.loadAllShaders("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/ground_frag.glsl");
+        markingsShader.loadAllShaders("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/marking_frag.glsl");
         markingsShader.init(gl);
 
         ArrayList<Float> vertsArray = new ArrayList<>();
@@ -93,10 +103,13 @@ public class Starchart implements GLEventListener{
         linesNo = vertsArray.size()/3 - starNo;
 
         tilesNo = ground.loadGroundVerts(vertsArray);
+        groundNo = vertsArray.size()/3 - starNo - linesNo;
 
-        System.out.println(starNo);
+        gridNo = markings.loadAzGridVerts(vertsArray);
+        bufferSize = vertsArray.size();
 
         float[] verts = Utils.floatArrayList2FloatArray(vertsArray);
+        System.out.println(verts.length);
         sendVerts(gl, verts);
 
         glAutoDrawable.getAnimator().setUpdateFPSFrames(20, null);
@@ -104,10 +117,12 @@ public class Starchart implements GLEventListener{
 
     @Override
     public void dispose(GLAutoDrawable glAutoDrawable) {
+        System.out.println("Closing...");
         GL3 gl = glAutoDrawable.getGL().getGL3();
         starShader.deleteProgram(gl);
         groundShader.deleteProgram(gl);
         constellationShader.deleteProgram(gl);
+        gl.glDeleteBuffers(bufferSize, vbo);
     }
 
     @Override
@@ -129,10 +144,34 @@ public class Starchart implements GLEventListener{
         setUniformVariables(gl, starShader, 1);
         gl.glDrawArrays(GL3.GL_POINTS, 0, starNo);
 
+        int sentVerts = 0;
+        if(showAzGrid || showEqGrid) {
+            markingsShader.useShader(gl);
+        }
+
+        if(showAzGrid){
+            setUniformVariables(gl, markingsShader, 0);
+            markingsShader.setVariable(gl, "color", 0.404f, 0.302f, 0f, 1f);
+            for (int i = 0; i < gridNo.size(); i++) {
+                gl.glDrawArrays(GL3.GL_LINE_STRIP, starNo + linesNo + groundNo + sentVerts, gridNo.get(i));
+                sentVerts += gridNo.get(i);
+            }
+        }
+
+        sentVerts = 0;
+        if(showEqGrid){
+            setUniformVariables(gl, markingsShader, 1);
+            markingsShader.setVariable(gl, "color", 0.118f, 0.565f, 1f, 1f);
+            for (int i = 0; i < gridNo.size(); i++) {
+                gl.glDrawArrays(GL3.GL_LINE_STRIP, starNo + linesNo + groundNo + sentVerts, gridNo.get(i));
+                sentVerts += gridNo.get(i);
+            }
+        }
+
         if(showGround) {
             groundShader.useShader(gl);
             setUniformVariables(gl, groundShader, 0);
-            int sentVerts = 0;
+            sentVerts = 0;
             for (int i = 0; i < tilesNo.size(); i++) {
                 gl.glDrawArrays(GL3.GL_TRIANGLE_FAN, starNo + linesNo + sentVerts, tilesNo.get(i));
                 sentVerts += tilesNo.get(i);
@@ -143,8 +182,6 @@ public class Starchart implements GLEventListener{
 
 
     }
-
-
 
     @Override
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
@@ -163,6 +200,9 @@ public class Starchart implements GLEventListener{
         groundShader.setVariable(gl, "width", aspectRatio);
         groundShader.setVariable(gl, "height", 1f);
 
+        markingsShader.useShader(gl);
+        markingsShader.setVariable(gl, "width", aspectRatio);
+        markingsShader.setVariable(gl, "height", 1f);
 
         ortoBounds.setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         windowBounds.setRect(0, 0, i2, i3);
@@ -175,7 +215,7 @@ public class Starchart implements GLEventListener{
        gl.glGenVertexArrays(1, vao);
        gl.glBindVertexArray(vao.get(0));
 
-       IntBuffer vbo = Buffers.newDirectIntBuffer(1);
+       vbo = Buffers.newDirectIntBuffer(1);
        FloatBuffer vertBuffer = Buffers.newDirectFloatBuffer(verts);
 
        gl.glGenBuffers(1, vbo);
@@ -188,7 +228,7 @@ public class Starchart implements GLEventListener{
        gl.glEnableVertexAttribArray(posAttribute);
        gl.glVertexAttribPointer(posAttribute, 3, GL3.GL_FLOAT, false, 0, 0L);
 
-
+       vertBuffer.clear();
 
    }
 
@@ -237,7 +277,7 @@ public class Starchart implements GLEventListener{
         }
     }
 
-    void toogleGrid(){
+    void toogleAzGrid(){
         showAzGrid = !showAzGrid;
     }
 
@@ -245,8 +285,8 @@ public class Starchart implements GLEventListener{
         showEcliptic = !showEcliptic;
     }
 
-    void toogleCelestialEq(){
-        showCelestialEq = !showCelestialEq;
+    void toogleEqGrid(){
+        showEqGrid = !showEqGrid;
     }
 
     void toogleStarNames(){

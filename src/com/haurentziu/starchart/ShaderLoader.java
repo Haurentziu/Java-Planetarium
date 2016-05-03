@@ -113,6 +113,11 @@ public class ShaderLoader {
         gl.glUniform1f(location, value);
     }
 
+    public void setVariable(GL3 gl, String name, float value1, float value2, float value3, float value4){
+        int location = gl.glGetUniformLocation(shaderProgram, name);
+        gl.glUniform4f(location, value1, value2, value3, value4);
+    }
+
 
     public void setVariable(GL3 gl, String name, int value){
         int location = gl.glGetUniformLocation(shaderProgram, name);

@@ -34,7 +34,7 @@ public class Sky {
         milkyWayVertices = loader.loadMilkyWay();
     }
 
-    void loadStarsVerts(GL3 gl, ArrayList<Float> verts){
+    void loadStarsVerts(ArrayList<Float> verts){
         for(int  i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
             if(star.getMagnitude() < 6){
@@ -47,7 +47,7 @@ public class Sky {
         }
     }
 
-    void loadConstellationVerts(GL3 gl, ArrayList<Float> verts){
+    void loadConstellationVerts(ArrayList<Float> verts){
         for(int i = 0; i < constellationsArray.size(); i++) {
             Constellation c = constellationsArray.get(i);
 

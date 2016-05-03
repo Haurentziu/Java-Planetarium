@@ -28,8 +28,8 @@ public class Observer {
     private byte projection;
 
     private static final double MAX_FOV = Math.PI;
-    private static final double MIN_ALT_ROTATE = - Math.PI;
-    private static final double MAX_ALT_ROTATE = 0;
+    private static final double MIN_ALT_ROTATE = - Math.PI/2;
+    private static final double MAX_ALT_ROTATE = Math.PI/2;
 
     Observer(double longitude, double latitude, double sideralTime, double azRotation, double altRotation, byte projection, double zoom){
         setZoom(zoom);
@@ -49,7 +49,7 @@ public class Observer {
         setLongitude(Math.toRadians(-26));
 
         setAzimuthRotation(0);
-        setAltRotation(-Math.PI/2);
+        setAltRotation(Math.PI/4);
 
         setProjection(SphericalCoordinates.STEREOGRAPHIC_PROJECTION);
         setFOV(Math.PI/2);

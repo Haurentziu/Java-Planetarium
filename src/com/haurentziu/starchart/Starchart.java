@@ -3,8 +3,10 @@ package com.haurentziu.starchart;
 import com.haurentziu.utils.Utils;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.*;
+import com.jogamp.opengl.util.GLBuffers;
 
 import java.awt.geom.Rectangle2D;
+import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -34,15 +36,17 @@ public class Starchart implements GLEventListener{
     private boolean showMilkyWay = true;
 
     private int starNo;
-
-    private int programLoc;
     private int linesNo;
+    private ArrayList<Integer> tilesNo;
+    private int groundNo ;
 
     private boolean isSelected = false;
     private Star selectedStar = new Star(0, 0, 0, 0, 0);
 
-    public ShaderLoader starShader;
-    public ShaderLoader constellationShader;
+    private ShaderLoader starShader;
+    private ShaderLoader constellationShader;
+    private ShaderLoader groundShader;
+    private ShaderLoader markingsShader;
 
     private int currentWarp = 8;
     private int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 0, 1, 10, 100, 1000, 3000, 5000, 10000};
@@ -72,13 +76,25 @@ public class Starchart implements GLEventListener{
         constellationShader.loadAllShaders("./shader/vertex.glsl", "./shader/const_geom.glsl", "./shader/const_frag.glsl");
         constellationShader.init(gl);
 
+        groundShader = new ShaderLoader();
+        groundShader.loadAllShaders("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
+        groundShader.init(gl);
+
+        markingsShader = new ShaderLoader();
+        markingsShader.loadAllShaders("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/ground_frag.glsl");
+        markingsShader.init(gl);
+
         ArrayList<Float> vertsArray = new ArrayList<>();
 
-        sky.loadStarsVerts(gl, vertsArray);
+        sky.loadStarsVerts(vertsArray);
         starNo = vertsArray.size()/3;
 
-        sky.loadConstellationVerts(gl, vertsArray);
+        sky.loadConstellationVerts(vertsArray);
         linesNo = vertsArray.size()/3 - starNo;
+
+        tilesNo = ground.loadGroundVerts(vertsArray);
+
+        System.out.println(starNo);
 
         float[] verts = Utils.floatArrayList2FloatArray(vertsArray);
         sendVerts(gl, verts);
@@ -88,7 +104,10 @@ public class Starchart implements GLEventListener{
 
     @Override
     public void dispose(GLAutoDrawable glAutoDrawable) {
-
+        GL3 gl = glAutoDrawable.getGL().getGL3();
+        starShader.deleteProgram(gl);
+        groundShader.deleteProgram(gl);
+        constellationShader.deleteProgram(gl);
     }
 
     @Override
@@ -98,17 +117,28 @@ public class Starchart implements GLEventListener{
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         observer.updateTime(timeWarpLevels[currentWarp]);
 
-        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+    //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
 
         if(showConstellations) {
             constellationShader.useShader(gl);
-            setUniformVariables(gl, constellationShader, 1f);
-            gl.glDrawArrays(GL3.GL_LINES, starNo, starNo + 1 + linesNo);
+            setUniformVariables(gl, constellationShader, 1);
+            gl.glDrawArrays(GL3.GL_LINES, starNo, linesNo);
         }
 
         starShader.useShader(gl);
-        setUniformVariables(gl, starShader, 1f);
+        setUniformVariables(gl, starShader, 1);
         gl.glDrawArrays(GL3.GL_POINTS, 0, starNo);
+
+        if(showGround) {
+            groundShader.useShader(gl);
+            setUniformVariables(gl, groundShader, 0);
+            int sentVerts = 0;
+            for (int i = 0; i < tilesNo.size(); i++) {
+                gl.glDrawArrays(GL3.GL_TRIANGLE_FAN, starNo + linesNo + sentVerts, tilesNo.get(i));
+                sentVerts += tilesNo.get(i);
+            }
+        }
+
 
 
 
@@ -123,11 +153,16 @@ public class Starchart implements GLEventListener{
 
         starShader.useShader(gl);
         starShader.setVariable(gl, "width", aspectRatio);
-        starShader.setVariable(gl, "height", 1);
+        starShader.setVariable(gl, "height", 1f);
 
         constellationShader.useShader(gl);
         constellationShader.setVariable(gl, "width", aspectRatio);
-        constellationShader.setVariable(gl, "height", 1);
+        constellationShader.setVariable(gl, "height", 1f);
+
+        groundShader.useShader(gl);
+        groundShader.setVariable(gl, "width", aspectRatio);
+        groundShader.setVariable(gl, "height", 1f);
+
 
         ortoBounds.setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         windowBounds.setRect(0, 0, i2, i3);
@@ -157,7 +192,7 @@ public class Starchart implements GLEventListener{
 
    }
 
-    private void setUniformVariables(GL3 gl, ShaderLoader shader, float transformation){
+    private void setUniformVariables(GL3 gl, ShaderLoader shader, int transformation){
         shader.setVariable(gl, "zoom", (float)observer.getZoom());
         shader.setVariable(gl, "azimuth_rotation", (float)observer.getAzRotation());
         shader.setVariable(gl, "altitude_rotation", (float)observer.getAltRotation());

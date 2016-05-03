@@ -23,8 +23,9 @@ void main(){
         float i;
 
        for(i =  0; i <= 6.5; i += 0.5){
-            float x = center.x + 0.5*log2(2 * zoom) * radius * cos(i) / width;
-            float y = center.y + 0.5*log2(2 * zoom) * radius * sin(i) / height;
+            float zoomed_radius = (log(zoom) + 1) * radius;
+            float x = center.x + zoomed_radius * cos(i) / width;
+            float y = center.y + zoomed_radius * sin(i) / height;
 
             gl_Position = vec4(x, y, 0, 1);
             EmitVertex();

@@ -11,6 +11,7 @@ import java.awt.geom.Rectangle2D;
 /**
  * Created by haurentziu on 28.04.2016.
  */
+
 public class Markings {
 
     private final static double STEP_GRID = Math.PI/20;

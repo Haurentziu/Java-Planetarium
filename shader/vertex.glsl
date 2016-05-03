@@ -11,9 +11,25 @@ uniform float observer_longitude;
 uniform float width;
 uniform float height;
 
-uniform float transform_type; //0: horizontal -> projection, 1: equatorial -> projection
+uniform int transform_type = 1; //0: horizontal -> projection, 1: equatorial -> projection
+uniform int projection_type = 0;
+
+/*
+number  |   type
+--------|-----------------
+0       |   stereographic
+1       |   gnomonic
+*/
 
 in vec4 pos;
+
+
+void computeStereographic(vec4 coord, out vec4 projection){
+    float k = 2 / (1 + sin(altitude_rotation) * sin(coord.y) + cos(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
+    float x = k * cos(coord.y) * sin(coord.x - azimuth_rotation);
+    float y = k * (cos(altitude_rotation) * sin(coord.y) - sin(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
+    projection = vec4(x, y, coord.z, coord.w);
+}
 
 void main(void){
     vec4 coord = pos;
@@ -25,18 +41,16 @@ void main(void){
         coord = vec4(azimuth, altitude, coord.z, 1);
     }
 
+    vec4 projection;
+    computeStereographic(coord, projection);
 
-
-    float rotated_longitude = atan(sin(coord.x + azimuth_rotation)*cos(altitude_rotation) - tan(coord.y)*sin(altitude_rotation), cos(coord.x + azimuth_rotation));
-    float rotated_latitude = asin(sin(coord.y) * cos(altitude_rotation) + cos(coord.y)*sin(altitude_rotation)*sin(coord.x + azimuth_rotation));
-
-    float r = 1.0 / tan((3.1415/2.0 - rotated_latitude) / 2.0);
-
-    float x = - zoom * r * cos(rotated_longitude);
-    float y = zoom * r * sin(rotated_longitude);
-
-    vec4 projection = vec4(x / width, y / height, coord.z, 1);
-
-    gl_Position = projection;
+    gl_Position = vec4(zoom * projection.x / width, zoom * projection.y / height, projection.z, projection.w);
 
 }  
+
+vec4 computeStereographic(vec4 coord){
+    float k = 2 / (1 + sin(altitude_rotation) * sin(coord.y) + cos(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
+    float x = k * cos(coord.y) * sin(coord.x - azimuth_rotation);
+    float y = k * (cos(altitude_rotation) * sin(coord.y) - sin(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
+    return vec4(x, y, coord.z, coord.w);
+}

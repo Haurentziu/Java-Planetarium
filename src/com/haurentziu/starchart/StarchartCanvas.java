@@ -114,8 +114,8 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
         initX = mouseEvent.getX();
         initY = mouseEvent.getY();
 
-        double rotAz = renderer.getBounds().getWidth() * Math.PI/2 * distanceX / (renderer.getWindowBounds().getWidth() * renderer.getObserver().getZoom());
-        double rotAlt = - renderer.getBounds().getHeight() * Math.PI/2 * distanceY / (renderer.getWindowBounds().getHeight() * renderer.getObserver().getZoom());
+        double rotAz = - renderer.getBounds().getWidth() * Math.PI/4 * distanceX / (renderer.getWindowBounds().getWidth() * renderer.getObserver().getZoom());
+        double rotAlt = renderer.getBounds().getHeight() * Math.PI/4 * distanceY / (renderer.getWindowBounds().getHeight() * renderer.getObserver().getZoom());
         renderer.getObserver().increaseRotation(rotAz, rotAlt);
 
     }

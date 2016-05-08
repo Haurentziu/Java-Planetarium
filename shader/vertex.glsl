@@ -1,5 +1,8 @@
 /* VERTEX SHADER */
 #version 330
+
+#define obliquity 0.4084071
+
 uniform float altitude_rotation;
 uniform float azimuth_rotation;
 uniform float zoom;
@@ -12,6 +15,15 @@ uniform float width;
 uniform float height;
 
 uniform int transform_type = 1; //0: horizontal -> projection, 1: equatorial -> projection
+
+/*
+number  |   transformation
+--------|----------------------------
+0       |horizontal -> projection
+1       |equatorial -> projection
+2       |ecliptical -> projection
+*/
+
 uniform int projection_type = 0;
 
 /*
@@ -48,7 +60,13 @@ void computeLambertAEA(vec4 coord, out vec4 projection){
 void main(void){
     vec4 coord = pos;
 
-    if(transform_type == 1){
+    if(transform_type == 2){
+        float declination = asin(sin(coord.y) * cos(obliquity) + cos(coord.y) * sin(obliquity) * sin(coord.x));
+        float right_ascension = atan(sin(coord.x) * cos(obliquity) - tan(coord.y) * sin(obliquity), cos(coord.x));
+        coord = vec4(right_ascension, declination, coord.z, 1);
+    }
+
+    if(transform_type > 0){
         float hour_angle = sideral_time - coord.x - observer_longitude;
         float altitude = asin(sin(coord.y) * sin(observer_latitude) + cos(coord.y) * cos(observer_latitude) * cos(hour_angle));
         float azimuth = atan(sin(hour_angle), cos(hour_angle) * sin(observer_latitude) - tan(coord.y) * cos(observer_latitude));

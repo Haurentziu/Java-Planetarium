@@ -3,23 +3,17 @@ package com.haurentziu.starchart;
 import com.haurentziu.utils.Utils;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.util.GLBuffers;
 
 import java.awt.geom.Rectangle2D;
-import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import com.jogamp.opengl.util.GLBuffers;
-
-
-import static java.nio.Buffer.*;
 
 /**
  * Created by haurentziu on 27.04.2016.
  */
 
-public class Starchart implements GLEventListener{
+public class GLStarchart implements GLEventListener{
 
     private Rectangle2D ortoBounds;
     private Rectangle2D windowBounds;
@@ -37,15 +31,14 @@ public class Starchart implements GLEventListener{
     private boolean showEcliptic = true;
     private boolean showCelestialEq = true;
     private boolean showStarNames = true;
-    private boolean showMilkyWay = true;
     private boolean showEqGrid = false;
 
     private int starNo;
     private int linesNo;
-    private ArrayList<Integer> tilesNo;
     private ArrayList<Integer> gridNo;
     private int groundNo;
-
+    private int circleNo;
+    private int totalGridNo;
     private IntBuffer vbo;
     private int bufferSize;
 
@@ -53,19 +46,17 @@ public class Starchart implements GLEventListener{
 
     private Star selectedStar = new Star(0, 0, 0, 0, 0);
 
-    private ShaderLoader starShader;
-    private ShaderLoader constellationShader;
-    private ShaderLoader groundShader;
-    private ShaderLoader markingsShader;
+    private Shader starShader;
+    private Shader constellationShader;
+    private Shader markingsShader;
 
     private int currentWarp = 8;
     private int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 0, 1, 10, 100, 1000, 3000, 5000, 10000};
 
-    public Starchart(){
+    public GLStarchart(){
         observer = new Observer();
 
         sky = new Sky();
-        ground = new Ground();
         markings = new Markings();
         text = new TextInfo();
 
@@ -78,19 +69,17 @@ public class Starchart implements GLEventListener{
     public void init(GLAutoDrawable glAutoDrawable) {
         GL3 gl = glAutoDrawable.getGL().getGL3();
 
-        starShader = new ShaderLoader();
+        starShader = new Shader();
         starShader.loadAllShaders("./shader/vertex.glsl", "./shader/stars_geom.glsl", "./shader/star_frag.glsl");
         starShader.init(gl);
 
-        constellationShader = new ShaderLoader();
+        constellationShader = new Shader();
         constellationShader.loadAllShaders("./shader/vertex.glsl", "./shader/const_geom.glsl", "./shader/const_frag.glsl");
         constellationShader.init(gl);
 
-        groundShader = new ShaderLoader();
-        groundShader.loadAllShaders("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
-        groundShader.init(gl);
+        ground = new Ground(gl);
 
-        markingsShader = new ShaderLoader();
+        markingsShader = new Shader();
         markingsShader.loadAllShaders("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/marking_frag.glsl");
         markingsShader.init(gl);
 
@@ -102,15 +91,18 @@ public class Starchart implements GLEventListener{
         sky.loadConstellationVerts(vertsArray);
         linesNo = vertsArray.size()/3 - starNo;
 
-        tilesNo = ground.loadGroundVerts(vertsArray);
+        ground.loadGroundVerts(vertsArray);
         groundNo = vertsArray.size()/3 - starNo - linesNo;
 
         gridNo = markings.loadAzGridVerts(vertsArray);
+        totalGridNo = vertsArray.size()/3 - starNo - groundNo - linesNo;
+        circleNo = markings.renderGreatCircle(vertsArray);
+
         bufferSize = vertsArray.size();
 
         float[] verts = Utils.floatArrayList2FloatArray(vertsArray);
-        System.out.println(verts.length);
-        sendVerts(gl, verts);
+    //    System.out.println(verts.length);
+        sendVerts(gl, verts, "pos");
 
         glAutoDrawable.getAnimator().setUpdateFPSFrames(20, null);
     }
@@ -120,7 +112,7 @@ public class Starchart implements GLEventListener{
         System.out.println("Closing...");
         GL3 gl = glAutoDrawable.getGL().getGL3();
         starShader.deleteProgram(gl);
-        groundShader.deleteProgram(gl);
+        ground.getShader().deleteProgram(gl);
         constellationShader.deleteProgram(gl);
         gl.glDeleteBuffers(bufferSize, vbo);
     }
@@ -132,21 +124,11 @@ public class Starchart implements GLEventListener{
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         observer.updateTime(timeWarpLevels[currentWarp]);
 
-    //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
-
-        if(showConstellations) {
-            constellationShader.useShader(gl);
-            setUniformVariables(gl, constellationShader, 1);
-            gl.glDrawArrays(GL3.GL_LINES, starNo, linesNo);
-        }
-
-        starShader.useShader(gl);
-        setUniformVariables(gl, starShader, 1);
-        gl.glDrawArrays(GL3.GL_POINTS, 0, starNo);
-
+        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
         int sentVerts = 0;
-        if(showAzGrid || showEqGrid) {
+        if(showAzGrid || showEqGrid || showCelestialEq || showEcliptic) {
             markingsShader.useShader(gl);
+
         }
 
         if(showAzGrid){
@@ -161,25 +143,40 @@ public class Starchart implements GLEventListener{
         sentVerts = 0;
         if(showEqGrid){
             setUniformVariables(gl, markingsShader, 1);
-            markingsShader.setVariable(gl, "color", 0.118f, 0.565f, 1f, 1f);
+            markingsShader.setVariable(gl, "color", 0.365f, 0.541f, 659f, 1f);
             for (int i = 0; i < gridNo.size(); i++) {
                 gl.glDrawArrays(GL3.GL_LINE_STRIP, starNo + linesNo + groundNo + sentVerts, gridNo.get(i));
                 sentVerts += gridNo.get(i);
             }
         }
 
-        if(showGround) {
-            groundShader.useShader(gl);
-            setUniformVariables(gl, groundShader, 0);
-            sentVerts = 0;
-            for (int i = 0; i < tilesNo.size(); i++) {
-                gl.glDrawArrays(GL3.GL_TRIANGLE_FAN, starNo + linesNo + sentVerts, tilesNo.get(i));
-                sentVerts += tilesNo.get(i);
-            }
+        if(showCelestialEq){
+            setUniformVariables(gl, markingsShader, 1);
+            markingsShader.setVariable(gl, "color", 1f, 0f, 0f, 1f);
+            gl.glDrawArrays(GL3.GL_LINE_STRIP, starNo + linesNo + groundNo + totalGridNo, circleNo);
         }
 
+        if(showEcliptic){
+            setUniformVariables(gl, markingsShader, 2);
+            markingsShader.setVariable(gl, "color", 0.741f, 0.718f, 0.42f, 1f);
+            gl.glDrawArrays(GL3.GL_LINE_STRIP, starNo + linesNo + groundNo + totalGridNo, circleNo);
+        }
 
+        if(showConstellations) {
+            constellationShader.useShader(gl);
+            setUniformVariables(gl, constellationShader, 1);
+            gl.glDrawArrays(GL3.GL_LINES, starNo, linesNo);
+        }
 
+        starShader.useShader(gl);
+        setUniformVariables(gl, starShader, 1);
+        gl.glDrawArrays(GL3.GL_POINTS, 0, starNo);
+
+        if(showGround) {
+            ground.getShader().useShader(gl);
+            setUniformVariables(gl, ground.getShader(), 0);
+            ground.render(gl, 0);
+        }
 
     }
 
@@ -188,29 +185,24 @@ public class Starchart implements GLEventListener{
         final GL3 gl = glAutoDrawable.getGL().getGL3();
         float aspectRatio = (float)i2/i3;
 
-        starShader.useShader(gl);
-        starShader.setVariable(gl, "width", aspectRatio);
-        starShader.setVariable(gl, "height", 1f);
-
-        constellationShader.useShader(gl);
-        constellationShader.setVariable(gl, "width", aspectRatio);
-        constellationShader.setVariable(gl, "height", 1f);
-
-        groundShader.useShader(gl);
-        groundShader.setVariable(gl, "width", aspectRatio);
-        groundShader.setVariable(gl, "height", 1f);
-
-        markingsShader.useShader(gl);
-        markingsShader.setVariable(gl, "width", aspectRatio);
-        markingsShader.setVariable(gl, "height", 1f);
+        setSize(gl, starShader, aspectRatio, 1f);
+        setSize(gl, constellationShader, aspectRatio, 1f);
+        setSize(gl, ground.getShader(), aspectRatio, 1f);
+        setSize(gl, markingsShader, aspectRatio, 1f);
 
         ortoBounds.setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         windowBounds.setRect(0, 0, i2, i3);
         observer.updateZoom(ortoBounds);
     }
 
+    void setSize(GL3 gl, Shader shader, float width, float height){
+        shader.useShader(gl);
+        shader.setVariable(gl, "width", width);
+        shader.setVariable(gl, "height", height);
+    }
 
-   void sendVerts(GL3 gl, float[] verts){
+
+   void sendVerts(GL3 gl, float[] verts, String name){
        IntBuffer vao = Buffers.newDirectIntBuffer(1);
        gl.glGenVertexArrays(1, vao);
        gl.glBindVertexArray(vao.get(0));
@@ -224,15 +216,14 @@ public class Starchart implements GLEventListener{
        gl.glBufferData(GL3.GL_ARRAY_BUFFER, vertBuffer.limit() * Buffers.SIZEOF_FLOAT, vertBuffer, GL3.GL_STATIC_DRAW);
 
 
-       int posAttribute = gl.glGetAttribLocation(starShader.getShaderProgram(), "pos");
+       int posAttribute = gl.glGetAttribLocation(starShader.getShaderProgram(), name);
        gl.glEnableVertexAttribArray(posAttribute);
        gl.glVertexAttribPointer(posAttribute, 3, GL3.GL_FLOAT, false, 0, 0L);
-
        vertBuffer.clear();
 
    }
 
-    private void setUniformVariables(GL3 gl, ShaderLoader shader, int transformation){
+    private void setUniformVariables(GL3 gl, Shader shader, int transformation){
         shader.setVariable(gl, "zoom", (float)observer.getZoom());
         shader.setVariable(gl, "azimuth_rotation", (float)observer.getAzRotation());
         shader.setVariable(gl, "altitude_rotation", (float)observer.getAltRotation());
@@ -293,8 +284,12 @@ public class Starchart implements GLEventListener{
         showStarNames = !showStarNames;
     }
 
+    void toogleCelestialEq(){
+        showCelestialEq = !showCelestialEq;
+    }
+
     void toogleMilkyWay(){
-        showMilkyWay = !showMilkyWay;
+      //  showMilkyWay = !showMilkyWay;
     }
 
     void setSelected(boolean isSelected){

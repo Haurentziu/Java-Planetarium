@@ -16,9 +16,11 @@ bool isInBounds(vec4 p){
 void main() {
     bool is_visible = isInBounds(gl_in[0].gl_Position) || isInBounds(gl_in[1].gl_Position);
     if(is_visible){
-        for(int i = 0; i < gl_in.length(); i++){
-            gl_Position = gl_in[i].gl_Position;
-            EmitVertex();
-        }
+        gl_Position = gl_in[0].gl_Position;
+        EmitVertex();
+        gl_Position = gl_in[1].gl_Position;
+        EmitVertex();
     }
+
+    EndPrimitive();
 }

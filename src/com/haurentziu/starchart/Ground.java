@@ -1,14 +1,8 @@
 package com.haurentziu.starchart;
 
 import com.haurentziu.coordinates.HorizontalCoordinates;
-import com.haurentziu.coordinates.ProjectionPoint;
-import com.haurentziu.utils.Utils;
-import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GL4;
-import com.jogamp.opengl.util.gl2.GLUT;
 
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 /**
@@ -19,43 +13,46 @@ public class Ground {
 
     private final float GROUND_STEP = (float)Math.PI/40f;
 
-    public Ground(){
+    private ArrayList<Integer> tilesVertsNo;
+    private int vertStart;
+    private Shader shader;
 
+    Ground(GL3 gl){
+        shader = new Shader();
+        shader.loadAllShaders("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
+        shader.init(gl);
+        tilesVertsNo = new ArrayList<>();
     }
 
-   ArrayList<Integer> loadGroundVerts(ArrayList<Float> vertList){
+    void render(GL3 gl, int start){
+        int sentVerts = vertStart;
+        for (int i = 0; i < tilesVertsNo.size(); i++) {
+            gl.glDrawArrays(GL3.GL_TRIANGLE_FAN, sentVerts, tilesVertsNo.get(i));
+            sentVerts += tilesVertsNo.get(i);
+        }
+    }
+
+    Shader getShader(){
+        return shader;
+    }
+
+
+
+   void loadGroundVerts(ArrayList<Float> vertList){
         int originalSize = vertList.size();
-        ArrayList<Integer> tilesNo = new ArrayList<>();
+        vertStart = originalSize / 3;
         for(double i = 0; i < 2 * Math.PI/1; i += Math.PI / 20){
             for(double j = 0; j > -Math.PI/2; j -= Math.PI / 20){
                 HorizontalCoordinates c = new HorizontalCoordinates(i, j);
                 Tile tile = new Tile(c, Math.PI/20 + 0.0001, Math.PI/20 + 0.0001);
                 renderGroundTile(tile, vertList);
-                tilesNo.add((vertList.size() - originalSize)/3);
+                tilesVertsNo.add((vertList.size() - originalSize)/3);
                 originalSize = vertList.size();
             }
         }
-       return tilesNo;
     }
 
-/*    void renderCardinalPoints(Observer obs, GL2 gl, Rectangle2D bounds){
-        gl.glColor3f(0.694f, 0f, 0.345f);
-        String[] cardinalPoints = {"S", "W", "N", "E"};
-        GLUT glut = new GLUT();
-        for(int i = 0; i < 4; i++){
-            HorizontalCoordinates hc = new HorizontalCoordinates(i*Math.PI/2, 0);
-            ProjectionPoint p = hc.toProjection(obs.getAzRotation(), obs.getAltRotation(), obs.getProjection());
-            p.applyZoom(obs.getZoom());
 
-            if(bounds.contains(p)) {
-                gl.glRasterPos2d(p.getX(), p.getY());
-                glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, cardinalPoints[i]);
-            }
-
-        }
-
-    }
-*/
     private void renderGroundTile(Tile tile, ArrayList<Float> vertList){
             HorizontalCoordinates c = tile.getCenter();
             vertList.add((float)c.getAzimuth());

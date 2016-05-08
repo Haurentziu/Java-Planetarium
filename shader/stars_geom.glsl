@@ -23,7 +23,7 @@ void main(){
         float i;
 
        for(i =  0; i <= 6.5; i += 0.5){
-            float zoomed_radius = (log(zoom) + 1) * radius;
+            float zoomed_radius = (zoom/2 + 1) * radius;
             float x = center.x + zoomed_radius * cos(i) / width;
             float y = center.y + zoomed_radius * sin(i) / height;
 

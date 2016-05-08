@@ -13,7 +13,7 @@ import java.nio.IntBuffer;
 /**
  * Created by haurentziu on 29.04.2016.
  */
-public class ShaderLoader {
+public class Shader {
     private int vertexShaderProgram;
     private int fragmentShaderProgram;
     private int geometryShaderProgram;

@@ -27,17 +27,45 @@ public class Sky {
     private final ArrayList<Constellation> constellationsArray;
     private final ArrayList<MilkyWayVertex> milkyWayVertices;
 
+    private int starVertStart;
+    private int constVertStart;
+
+    private Shader starShader;
+    private Shader constShader;
+
+
     public Sky(){
-        DataLoader loader = new DataLoader();
+       DataLoader loader = new DataLoader();
         starsArray = loader.loadStars();
         constellationsArray = loader.loadConstellations(starsArray);
         milkyWayVertices = loader.loadMilkyWay();
+
+       /*  starShader = new Shader();
+        starShader.loadAllShaders("./shader/vertex.glsl", "./shader/stars_geom.glsl", "./shader/star_frag.glsl");
+        starShader.init(gl);
+
+        constShader = new Shader();
+        constShader.loadAllShaders("./shader/vertex.glsl", "./shader/const_geom.glsl", "./shader/const_frag.glsl");
+        constShader.init(gl);*/
+    }
+
+    Shader getStarShader(){
+        return starShader;
+    }
+
+    Shader getconstellationShader(){
+        return  constShader;
+    }
+
+    void renderStars(GL3 gl){
+
     }
 
     void loadStarsVerts(ArrayList<Float> verts){
+        starVertStart = verts.size() / 3;
         for(int  i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
-            if(star.getMagnitude() < 6){
+            if(star.getMagnitude() < 6.5){
                 EquatorialCoordinates eq = star.getEquatorialCoordinates();
                 verts.add((float)eq.getRightAscension());
                 verts.add((float)eq.getDeclination());
@@ -47,7 +75,21 @@ public class Sky {
         }
     }
 
+    void loadStarColors(ArrayList<Float> color){
+        for(int i = 0; i < starsArray.size(); i++){
+            Star star = starsArray.get(i);
+            if(star.getMagnitude() < 6.5){
+                Color starColor = star.getStarRGB();
+                color.add(starColor.getRed() / 255f);
+                color.add(starColor.getGreen() / 255f);
+                color.add(starColor.getBlue() / 255f);
+
+            }
+        }
+    }
+
     void loadConstellationVerts(ArrayList<Float> verts){
+//        constellationVertStart = verts.size() / 3;
         for(int i = 0; i < constellationsArray.size(); i++) {
             Constellation c = constellationsArray.get(i);
 

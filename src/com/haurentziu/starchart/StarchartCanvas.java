@@ -16,14 +16,14 @@ import java.util.ArrayList;
 
 public class StarchartCanvas extends GLCanvas implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener{
 
-    private Starchart renderer;
+    private GLStarchart renderer;
 
     private int initX, initY;
     private boolean isDragging;
 
     StarchartCanvas(GLCapabilities caps){
         super(caps);
-        renderer = new Starchart();
+        renderer = new GLStarchart();
 
         addGLEventListener(renderer);
 
@@ -171,6 +171,9 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
 
             case KeyEvent.VK_E:     renderer.toogleEqGrid();
                 break;
+
+            case KeyEvent.VK_Q:     renderer.toogleCelestialEq();
+                                    break;
 
             case KeyEvent.VK_S:     renderer.toogleEcliptic();
                 break;

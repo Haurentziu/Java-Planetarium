@@ -14,7 +14,7 @@ bool intesectsCircle(vec4 p1, vec4 p2, float r){
     float m = (p1.y - p2.y)/(p1.x - p2.x);
     float n = p2.y - m * p2.x;
     float distance = abs(n)/sqrt(m * m + 1);
-    return distance <= r;
+    return distance < r;
 }
 
 void main(){

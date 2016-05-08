@@ -4,6 +4,8 @@ import com.haurentziu.coordinates.*;
 import com.haurentziu.planets.Earth;
 
 public class SolarSystem {
+	private int startVertex, endVertex;
+
 	public SolarSystem(){
 		
 	}
@@ -16,15 +18,15 @@ public class SolarSystem {
 		double obliquity = computeObliquityOfTheEcliptic(jde);
 		EquatorialCoordinates earthEquatorial = earthEcliptical.toEquatorialCoordinates(obliquity);
 		return earthEquatorial;
-	//	return null;
-		
+	}
+
+	void setVertices(int startVertex, int endVertex){
+		this.startVertex = startVertex;
+		this.endVertex = endVertex;
 	}
 	
 	static double computeObliquityOfTheEcliptic(double jde){
-	//	double tau = (jde - 2451545.0)/365250.0;
 		double obliquity = 0.4093197552;
-		//TODO add more terms
-		
 		return obliquity;
 	}
 }

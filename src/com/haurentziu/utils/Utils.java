@@ -1,5 +1,7 @@
 package com.haurentziu.utils;
 
+import java.util.ArrayList;
+
 /**
  * Created by haurentziu on 28.04.2016.
  */
@@ -29,6 +31,16 @@ public final class Utils {
             s = String.format("%d\u00b0 %02d\u2032 %.2f\u2033", degrees, minutes, seconds);
 
         return s;
+    }
+
+    public static float[] floatArrayList2FloatArray(ArrayList<Float> array){
+        int size = array.size();
+        float[] newArray = new float[size];
+        for(int i = 0; i < size; i++){
+            newArray[i] = array.get(i);
+        }
+        return newArray;
+
     }
 
 

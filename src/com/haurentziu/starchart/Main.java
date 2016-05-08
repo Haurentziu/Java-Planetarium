@@ -24,12 +24,12 @@ public class Main {
 	static int width = 950, height = 950;
 	public static void main(String[] args){
 		GLProfile glp = GLProfile.getDefault();
-		GLCapabilities caps = new GLCapabilities(glp);
+		GLCapabilities caps = new GLCapabilities(glp.get(GLProfile.GL3));
 		caps.setAlphaBits(8);
 		StarchartCanvas canvas = new StarchartCanvas(caps);
 		canvas.setLocation(0, 0);
 
-		FPSAnimator animator = new FPSAnimator(canvas, 60);
+		FPSAnimator animator = new FPSAnimator(canvas, 120);
 		animator.start();
 	
 		Frame frame = new Frame("Java Planetarium");

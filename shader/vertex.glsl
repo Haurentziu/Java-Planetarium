@@ -34,7 +34,9 @@ number  |   type
 */
 
 in vec4 pos;
+in vec3 color;
 
+out vec3 geom_color;
 
 void computeStereographic(vec4 coord, out vec4 projection){
     float k = 2 / (1 + sin(altitude_rotation) * sin(coord.y) + cos(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
@@ -58,6 +60,8 @@ void computeLambertAEA(vec4 coord, out vec4 projection){
 }
 
 void main(void){
+    geom_color = color;
+
     vec4 coord = pos;
 
     if(transform_type == 2){

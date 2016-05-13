@@ -10,6 +10,9 @@ uniform float width;
 uniform float height;
 uniform float zoom;
 
+in vec3 geom_color[];
+out vec3 frag_color;
+
 bool isInBounds(vec4 p){
     return p.x >= -width && p.x <= width && p.y >= -height && p.y <= height;
 }
@@ -28,12 +31,14 @@ void main(){
             float y = center.y + zoomed_radius * sin(i) / height;
 
             gl_Position = vec4(x, y, 0, 1);
+            frag_color = geom_color[0];
             EmitVertex();
 
             gl_Position = center;
+            frag_color = geom_color[0];
             EmitVertex();
         }
     }
-
     EndPrimitive();
+
 }

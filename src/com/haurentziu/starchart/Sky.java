@@ -83,7 +83,6 @@ public class Sky {
                 color.add(starColor.getRed() / 255f);
                 color.add(starColor.getGreen() / 255f);
                 color.add(starColor.getBlue() / 255f);
-
             }
         }
     }
@@ -124,7 +123,7 @@ public class Sky {
         }
     }
 */
-    void renderSolarSystem(Observer obs, GL2 gl, Rectangle2D bounds){
+ /*   void renderSolarSystem(Observer obs, GL2 gl, Rectangle2D bounds){
         gl.glColor3f(1f, 74.9f, 0f);
         SolarSystem system = new SolarSystem();
         EquatorialCoordinates sunEq = system.computeSunEquatorial(obs.getJDE());
@@ -134,7 +133,7 @@ public class Sky {
         renderCircle(sunPoint, 0.07, gl);
     }
 
-
+*/
     void renderCircle(Point2D p, double radius, GL2 gl){
         gl.glBegin(GL2.GL_POLYGON);
 

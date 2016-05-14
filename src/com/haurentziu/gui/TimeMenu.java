@@ -15,7 +15,6 @@ public class TimeMenu extends GLJPanel {
     public TimeMenu(){
         setOpaque(false);
         setBackground(new Color(0, 0, 0, 0));
-
         setBounds(200, 200, 200, 200);
 
         setVisible(true);

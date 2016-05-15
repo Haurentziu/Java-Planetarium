@@ -16,14 +16,14 @@ import java.util.ArrayList;
 
 public class StarchartCanvas extends GLCanvas implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener{
 
-    private Starchart renderer;
+    private GLStarchart renderer;
 
     private int initX, initY;
     private boolean isDragging;
 
     StarchartCanvas(GLCapabilities caps){
         super(caps);
-        renderer = new Starchart();
+        renderer = new GLStarchart();
 
         addGLEventListener(renderer);
 
@@ -39,12 +39,10 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
     public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
         int moves = mouseWheelEvent.getWheelRotation();
         if(moves < 0){
-            renderer.getObserver().increaseFOV(1/1.1);
-            renderer.getObserver().updateZoom(renderer.getBounds());
+            renderer.getObserver().increaseZoom(1.1);
         }
         else{
-            renderer.getObserver().increaseFOV(1.1);
-            renderer.getObserver().updateZoom(renderer.getBounds());
+            renderer.getObserver().increaseZoom(1/1.1);
         }
     }
 
@@ -114,8 +112,8 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
         initX = mouseEvent.getX();
         initY = mouseEvent.getY();
 
-        double rotAz = renderer.getBounds().getWidth() * Math.PI/2 * distanceX / (renderer.getWindowBounds().getWidth() * renderer.getObserver().getZoom());
-        double rotAlt = - renderer.getBounds().getHeight() * Math.PI/2 * distanceY / (renderer.getWindowBounds().getHeight() * renderer.getObserver().getZoom());
+        double rotAz = - renderer.getBounds().getWidth() * Math.PI/4 * distanceX / (renderer.getWindowBounds().getWidth() * renderer.getObserver().getZoom());
+        double rotAlt = renderer.getBounds().getHeight() * Math.PI/4 * distanceY / (renderer.getWindowBounds().getHeight() * renderer.getObserver().getZoom());
         renderer.getObserver().increaseRotation(rotAz, rotAlt);
 
     }
@@ -150,7 +148,7 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
             case KeyEvent.VK_5:     renderer.getObserver().setProjection(SphericalCoordinates.LAMBERT_AZIMUTHAL);
                 break;
 
-            case KeyEvent.VK_A:     renderer.toogleGrid();
+            case KeyEvent.VK_A:     renderer.toogleAzGrid();
                 break;
 
             case KeyEvent.VK_C:     renderer.toogleConstellations();
@@ -171,8 +169,11 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
            case KeyEvent.VK_N:      renderer.toogleStarNames();
                 break;
 
-            case KeyEvent.VK_E:     renderer.toogleCelestialEq();
+            case KeyEvent.VK_E:     renderer.toogleEqGrid();
                 break;
+
+            case KeyEvent.VK_Q:     renderer.toogleCelestialEq();
+                                    break;
 
             case KeyEvent.VK_S:     renderer.toogleEcliptic();
                 break;

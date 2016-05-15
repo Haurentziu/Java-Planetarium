@@ -49,7 +49,7 @@ public class Tile {
     }
 
     HorizontalCoordinates getCenter(){
-        return new HorizontalCoordinates(c.getAzimuth() + width/2, c.getAltitude() + height/2);
+        return new HorizontalCoordinates(c.getAzimuth() + width/2, c.getAltitude() - height/2);
     }
 
 

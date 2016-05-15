@@ -54,7 +54,7 @@ public class Star{
 	}
 	
 	float getRadius(){
-		return  (float)(24*Math.pow(1.4, -magnitude)/Main.height);
+		return  (float)(18*Math.pow(1.4, -magnitude)/Main.height);
 	}
 	
 	int getHipparcos(){
@@ -85,7 +85,7 @@ public class Star{
 
 		float hsb[] = new float[3];
 		Color.RGBtoHSB((int) (r * 255), (int) (g * 255), (int) (b * 255), hsb);
-		int rgb = Color.HSBtoRGB(hsb[0], 1.2f*hsb[1], hsb[2]);
+		int rgb = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
 		Color color = new Color(rgb);
 		return color;
 	}

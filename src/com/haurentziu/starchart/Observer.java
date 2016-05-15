@@ -20,6 +20,8 @@ public class Observer {
     private double longitude;
     private double fov;
 
+    private final double SIDERAL_DAY_MS = 23.9344699 * 3600 * 1000;
+
     private long unixTime;
     private Timer t;
 
@@ -28,8 +30,8 @@ public class Observer {
     private byte projection;
 
     private static final double MAX_FOV = Math.PI;
-    private static final double MIN_ALT_ROTATE = - Math.PI;
-    private static final double MAX_ALT_ROTATE = 0;
+    private static final double MIN_ALT_ROTATE = - Math.PI/2;
+    private static final double MAX_ALT_ROTATE = Math.PI/2;
 
     Observer(double longitude, double latitude, double sideralTime, double azRotation, double altRotation, byte projection, double zoom){
         setZoom(zoom);
@@ -49,7 +51,7 @@ public class Observer {
         setLongitude(Math.toRadians(-26));
 
         setAzimuthRotation(0);
-        setAltRotation(-Math.PI/2);
+        setAltRotation(Math.PI/4);
 
         setProjection(SphericalCoordinates.STEREOGRAPHIC_PROJECTION);
         setFOV(Math.PI/2);
@@ -57,6 +59,8 @@ public class Observer {
         unixTime = System.currentTimeMillis();
         setSideralTime();
     }
+
+
 
     public void setZoom(double zoom){
         this.zoom = zoom;
@@ -138,9 +142,14 @@ public class Observer {
         return unixTime;
     }
 
+    public void setUnixTime(long unixTime){
+        this.unixTime = unixTime;
+    }
+
 
     public void updateTime(int warp){
         double deltaT = t.getDeltaTime();
+    //    double deltaT = SIDERAL_DAY_MS;
         unixTime += warp * deltaT;
         sideralTime += 15 * Math.PI * warp * deltaT / (180.0 * 3600000.0);
 
@@ -161,11 +170,9 @@ public class Observer {
         return unixTime/(24.0 * 3600.0 * 1000.0) + 2440587.5;
     }
 
-    public void increaseFOV(double amount){
-        double newFOV = fov * amount;
-        if(newFOV <= MAX_FOV) {
-            fov *= amount;
-        }
+    public void increaseZoom(double amount){
+        zoom *= amount;
+
     }
 
     public HorizontalCoordinates getCenterHorizontal(){

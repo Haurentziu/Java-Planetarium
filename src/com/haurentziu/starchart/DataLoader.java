@@ -56,7 +56,7 @@ class DataLoader {
 			System.out.println("Loaded Stars");
 		}
 		catch(Exception ex){
-			System.out.println("Could not load stars!");
+			System.out.println("Could not load the stars!");
 			System.exit(0);
 		}
 		
@@ -94,7 +94,7 @@ class DataLoader {
 			return constellations;
 		}
 		catch(Exception ex){
-			System.out.println("Could not load constellation lines");
+			System.out.println("Could not load the constellation lines");
 			System.exit(0);
 			return null;
 		}
@@ -119,6 +119,28 @@ class DataLoader {
 		return null;
 	}
 
+	ArrayList<MessierObject> loadMessierObjects(){
+		try{
+			ArrayList<MessierObject> messierObjects = new ArrayList<>();
+			BufferedReader reader = new BufferedReader(new FileReader("./res/messier.csv"));
+			String line = reader.readLine();
+			while(line != null){
+				String[] data = line.split(",");
+				double ra = Math.toRadians(Float.parseFloat(data[2]) * 15);
+				double dec = Math.toRadians(Float.parseFloat(data[3]));
+				messierObjects.add(new MessierObject(data[0], ra, dec, data[1]));
+				line = reader.readLine();
+			}
+			return messierObjects;
+		}
+		catch (Exception ex){
+			System.out.println("Could not load the messier objects");
+			System.exit(0);
+			return null;
+		}
+
+	}
+
 	ArrayList<MilkyWayVertex> loadMilkyWay() {
 		try{
 			ArrayList<MilkyWayVertex> vertices = new ArrayList<>();
@@ -140,7 +162,7 @@ class DataLoader {
 
 		catch (Exception ex){
 			ex.printStackTrace();
-			System.out.println("Could not load Milky Way vertices");
+			System.out.println("Could not load the Milky Way vertices");
 			System.exit(0);
 			return null;
 		}

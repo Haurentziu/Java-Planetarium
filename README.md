@@ -6,18 +6,14 @@ Open Source planetarium program made by Haurentziu using Java and JOGL
 
 ###Controls
 
-* 1 - stereographic projection
-* 2 - ortographic projection
 * C - show/hide constellation lines
 * A - show/hide azimuthal grid
-* P - show/hide cardinal points
+* E - show/hide equatorial grid
 * G - show/hide ground
-* N - show/hide star names
-* E - show/hide celestial equator
+* Q - show/hide celestial equator
 * S - show/hide ecliptic
-* M - show/hide Milky Way
 * Right Arrow - increase time speed
-* Left Arrows - decrease time speed
+* Left Arrow - decrease time speed
 
 ###Features
 

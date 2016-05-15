@@ -51,6 +51,7 @@ public class GLStarchart implements GLEventListener{
     private Shader starShader;
     private Shader constellationShader;
     private Shader markingsShader;
+    private Shader messierShader;
 
     private IntBuffer vertexArray = IntBuffer.allocate(1);
     private IntBuffer colorArray = IntBuffer.allocate(1);
@@ -83,6 +84,10 @@ public class GLStarchart implements GLEventListener{
         starShader = new Shader();
         starShader.loadAllShaders("./shader/vertex.glsl", "./shader/stars_geom.glsl", "./shader/star_frag.glsl");
         starShader.init(gl);
+
+        messierShader = new Shader();
+        messierShader.loadAllShaders("./shader/vertex.glsl", "./shader/messier_geom.glsl", "./shader/messier_frag.glsl");
+        messierShader.init(gl);
 
         constellationShader = new Shader();
         constellationShader.loadAllShaders("./shader/vertex.glsl", "./shader/const_geom.glsl", "./shader/const_frag.glsl");
@@ -218,12 +223,14 @@ public class GLStarchart implements GLEventListener{
             setUniformVariables(gl, constellationShader, 1);
             gl.glDrawArrays(GL3.GL_LINES, starNo, linesNo);
         }
+        if(showDSO){
+            messierShader.useShader(gl);
+            setUniformVariables(gl, messierShader, 1);
+            gl.glDrawArrays(GL3.GL_POINTS, starNo + linesNo + groundNo + totalGridNo + circleNo, messierNo);
+        }
 
         starShader.useShader(gl);
         setUniformVariables(gl, starShader, 1);
-        if(showDSO){
-            gl.glDrawArrays(GL3.GL_POINTS, starNo + linesNo + groundNo + totalGridNo + circleNo, messierNo);
-        }
         gl.glDrawArrays(GL3.GL_POINTS, 1, starNo);
 
         system.updateSystem(gl, buffers, observer.getJDE());
@@ -247,6 +254,7 @@ public class GLStarchart implements GLEventListener{
         setSize(gl, constellationShader, aspectRatio, 1f);
         setSize(gl, ground.getShader(), aspectRatio, 1f);
         setSize(gl, markingsShader, aspectRatio, 1f);
+        setSize(gl, messierShader, aspectRatio, 1f);
 
         ortoBounds.setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         windowBounds.setRect(0, 0, i2, i3);

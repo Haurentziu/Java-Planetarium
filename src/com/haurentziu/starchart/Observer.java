@@ -20,6 +20,8 @@ public class Observer {
     private double longitude;
     private double fov;
 
+    private final double SIDERAL_DAY_MS = 23.9344699 * 3600 * 1000;
+
     private long unixTime;
     private Timer t;
 
@@ -57,6 +59,8 @@ public class Observer {
         unixTime = System.currentTimeMillis();
         setSideralTime();
     }
+
+
 
     public void setZoom(double zoom){
         this.zoom = zoom;
@@ -138,9 +142,14 @@ public class Observer {
         return unixTime;
     }
 
+    public void setUnixTime(long unixTime){
+        this.unixTime = unixTime;
+    }
+
 
     public void updateTime(int warp){
         double deltaT = t.getDeltaTime();
+    //    double deltaT = SIDERAL_DAY_MS;
         unixTime += warp * deltaT;
         sideralTime += 15 * Math.PI * warp * deltaT / (180.0 * 3600000.0);
 

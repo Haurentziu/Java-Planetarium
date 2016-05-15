@@ -33,6 +33,7 @@ public class GLStarchart implements GLEventListener{
     private boolean showCelestialEq = true;
     private boolean showStarNames = true;
     private boolean showEqGrid = false;
+    private boolean showDSO = true;
 
     private int starNo;
     private int linesNo;
@@ -40,6 +41,8 @@ public class GLStarchart implements GLEventListener{
     private int groundNo;
     private int circleNo;
     private int totalGridNo;
+    private int messierNo;
+
 
     private boolean isSelected = false;
 
@@ -48,16 +51,18 @@ public class GLStarchart implements GLEventListener{
     private Shader starShader;
     private Shader constellationShader;
     private Shader markingsShader;
+    private Shader messierShader;
 
     private IntBuffer vertexArray = IntBuffer.allocate(1);
     private IntBuffer colorArray = IntBuffer.allocate(1);
+    private IntBuffer buffers = IntBuffer.allocate(2);
     private int vertexArraySize;
     private int colorArraySize;
 
     private int currentWarp = 8;
     private int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 0, 1, 10, 100, 1000, 3000, 5000, 10000};
 
-    public GLStarchart(){
+    GLStarchart(){
         observer = new Observer();
 
         sky = new Sky();
@@ -80,6 +85,10 @@ public class GLStarchart implements GLEventListener{
         starShader.loadAllShaders("./shader/vertex.glsl", "./shader/stars_geom.glsl", "./shader/star_frag.glsl");
         starShader.init(gl);
 
+        messierShader = new Shader();
+        messierShader.loadAllShaders("./shader/vertex.glsl", "./shader/messier_geom.glsl", "./shader/messier_frag.glsl");
+        messierShader.init(gl);
+
         constellationShader = new Shader();
         constellationShader.loadAllShaders("./shader/vertex.glsl", "./shader/const_geom.glsl", "./shader/const_frag.glsl");
         constellationShader.init(gl);
@@ -91,6 +100,10 @@ public class GLStarchart implements GLEventListener{
         markingsShader.init(gl);
 
         ArrayList<Float> vertsList = new ArrayList<>();
+
+        vertsList.add(0f);
+        vertsList.add(0f);
+        vertsList.add(0.4f);
 
         sky.loadStarsVerts(vertsList);
         starNo = vertsList.size()/3;
@@ -104,14 +117,18 @@ public class GLStarchart implements GLEventListener{
         gridNo = markings.loadAzGridVerts(vertsList);
         totalGridNo = vertsList.size()/3 - starNo - groundNo - linesNo;
         circleNo = markings.renderGreatCircle(vertsList);
+        messierNo = sky.loadMessier(vertsList);
 
         float[] verts = Utils.floatArrayList2FloatArray(vertsList);
         vertexArraySize = verts.length;
-        IntBuffer buffers = IntBuffer.allocate(2);
 
         FloatBuffer vertexFB = FloatBuffer.wrap(verts);
 
         ArrayList<Float> colorList = new ArrayList<>();
+        colorList.add(1f);
+        colorList.add(0.965f);
+        colorList.add(0f);
+
         sky.loadStarColors(colorList);
 
         float colors[] = Utils.floatArrayList2FloatArray(colorList);
@@ -122,7 +139,7 @@ public class GLStarchart implements GLEventListener{
 
         //vertex
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
-        gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * verts.length, vertexFB, GL3.GL_STATIC_DRAW);
+        gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * verts.length, vertexFB, GL3.GL_DYNAMIC_DRAW);
 
         //colors
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(1));
@@ -145,13 +162,14 @@ public class GLStarchart implements GLEventListener{
 
     @Override
     public void dispose(GLAutoDrawable glAutoDrawable) {
-        System.out.println("Closing...");
+        System.err.println("Closing application...");
         GL3 gl = glAutoDrawable.getGL().getGL3();
         starShader.deleteProgram(gl);
         ground.getShader().deleteProgram(gl);
         constellationShader.deleteProgram(gl);
-        gl.glDeleteBuffers(vertexArraySize, vertexArray);
-        gl.glDeleteBuffers(colorArraySize, colorArray);
+        gl.glDeleteVertexArrays(vertexArraySize, vertexArray);
+        gl.glDeleteVertexArrays(colorArraySize, colorArray);
+        gl.glDeleteBuffers(2, buffers);
     }
 
     @Override
@@ -162,7 +180,7 @@ public class GLStarchart implements GLEventListener{
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         observer.updateTime(timeWarpLevels[currentWarp]);
 
-        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+    //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
         int sentVerts = 0;
         if(showAzGrid || showEqGrid || showCelestialEq || showEcliptic) {
             markingsShader.useShader(gl);
@@ -205,10 +223,19 @@ public class GLStarchart implements GLEventListener{
             setUniformVariables(gl, constellationShader, 1);
             gl.glDrawArrays(GL3.GL_LINES, starNo, linesNo);
         }
+        if(showDSO){
+            messierShader.useShader(gl);
+            setUniformVariables(gl, messierShader, 1);
+            gl.glDrawArrays(GL3.GL_POINTS, starNo + linesNo + groundNo + totalGridNo + circleNo, messierNo);
+        }
 
         starShader.useShader(gl);
         setUniformVariables(gl, starShader, 1);
-        gl.glDrawArrays(GL3.GL_POINTS, 0, starNo);
+        gl.glDrawArrays(GL3.GL_POINTS, 1, starNo);
+
+        system.updateSystem(gl, buffers, observer.getJDE());
+        setUniformVariables(gl, starShader, 2);
+        gl.glDrawArrays(GL3.GL_POINTS, 0, 1);
 
         if(showGround) {
             ground.getShader().useShader(gl);
@@ -227,13 +254,14 @@ public class GLStarchart implements GLEventListener{
         setSize(gl, constellationShader, aspectRatio, 1f);
         setSize(gl, ground.getShader(), aspectRatio, 1f);
         setSize(gl, markingsShader, aspectRatio, 1f);
+        setSize(gl, messierShader, aspectRatio, 1f);
 
         ortoBounds.setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         windowBounds.setRect(0, 0, i2, i3);
         observer.updateZoom(ortoBounds);
     }
 
-    void setSize(GL3 gl, Shader shader, float width, float height){
+    private void setSize(GL3 gl, Shader shader, float width, float height){
         shader.useShader(gl);
         shader.setVariable(gl, "width", width);
         shader.setVariable(gl, "height", height);

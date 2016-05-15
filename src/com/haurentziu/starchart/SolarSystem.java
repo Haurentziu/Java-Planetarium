@@ -26,19 +26,22 @@ public class SolarSystem {
 		return earthEquatorial;
 	}
 
-	void updateSystem(GL3 gl, double jde){
-
+	void updateSystem(GL3 gl, IntBuffer buffers, double jde){
 		Earth earth = new Earth();
 		RectangularCoordinates earthRect = earth.computeEarthCoordinates(jde);
 		earthRect.changeOrigin(0, 0, 0);
 		EclipticCoordinates earthEcliptical = earthRect.toEclipticCoordinates();
-
-		float[] vertices = {
-				(float)earthEcliptical.getLongitude(), (float)earthEcliptical.getLatitude(), -4f,
+		float[] vertices = new float[]{
+				(float)earthEcliptical.getLongitude(), (float)earthEcliptical.getLatitude(), 0.06f,
 		};
 
 		arraySize = vertices.length;
 		FloatBuffer systemFB = FloatBuffer.wrap(vertices);
+		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
+		gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, 0, 4 * vertices.length, systemFB);
+
+	/*	gl.glGenBuffers(1, buffers);
+
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
 		gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * vertices.length, systemFB, GL3.GL_STREAM_DRAW);
 
@@ -52,12 +55,7 @@ public class SolarSystem {
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
 		gl.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, 0, 0);
 
-		if(initialized) {
-			gl.glDeleteBuffers(3, vertexArray);
-		}
-		else {
-			initialized = true;
-		}
+		gl.glDeleteVertexArrays(3, vertexArray);*/
 
 	}
 	

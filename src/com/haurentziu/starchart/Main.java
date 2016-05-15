@@ -3,6 +3,7 @@ package com.haurentziu.starchart;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.security.acl.Group;
 
 import com.haurentziu.gui.ChartMenuBar;
 import com.haurentziu.gui.TimeMenu;
@@ -29,14 +30,15 @@ public class Main {
 		GLProfile glp = GLProfile.getDefault();
 		GLCapabilities caps = new GLCapabilities(glp.get(GLProfile.GL3));
 		caps.setAlphaBits(8);
-		StarchartCanvas canvas = new StarchartCanvas(caps);
+		final StarchartCanvas canvas = new StarchartCanvas(caps);
 		ToolBar toolBar = new ToolBar(caps);
 		canvas.setLocation(0, 0);
-
 		FPSAnimator animator = new FPSAnimator(canvas, 120);
 		animator.start();
 	
-		JFrame frame = new JFrame("Java Planetarium");
+		final Frame frame = new JFrame("Java Planetarium");
+
+		TimeMenu tm = new TimeMenu();
 
 		if(fullScreen){
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -44,17 +46,15 @@ public class Main {
 		}
 
 		frame.add(canvas);
-	//	frame.add(toolBar);
 		frame.pack();
-
 		frame.setSize(width, height);
 		frame.setVisible(true);
 		
-		
-		
+
 		
 		frame.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){
+				canvas.destroy();
 				System.exit(0);
 			}
 		});

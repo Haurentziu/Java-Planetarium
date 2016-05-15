@@ -21,11 +21,12 @@ import java.util.ArrayList;
 public class Sky {
 
     private static final double CIRCLE_STEP = 0.5;
-    public  static final float MAX_MAG = 5.3f;
+    public static final float MAX_MAG = 5.3f;
 
     private final ArrayList<Star> starsArray;
     private final ArrayList<Constellation> constellationsArray;
     private final ArrayList<MilkyWayVertex> milkyWayVertices;
+    private final ArrayList<MessierObject> messierObjects;
 
     private int starVertStart;
     private int constVertStart;
@@ -39,14 +40,8 @@ public class Sky {
         starsArray = loader.loadStars();
         constellationsArray = loader.loadConstellations(starsArray);
         milkyWayVertices = loader.loadMilkyWay();
+        messierObjects = loader.loadMessierObjects();
 
-       /*  starShader = new Shader();
-        starShader.loadAllShaders("./shader/vertex.glsl", "./shader/stars_geom.glsl", "./shader/star_frag.glsl");
-        starShader.init(gl);
-
-        constShader = new Shader();
-        constShader.loadAllShaders("./shader/vertex.glsl", "./shader/const_geom.glsl", "./shader/const_frag.glsl");
-        constShader.init(gl);*/
     }
 
     Shader getStarShader(){
@@ -75,6 +70,14 @@ public class Sky {
         }
     }
 
+    int loadMessier(ArrayList<Float> verts){
+        int origSize = verts.size();
+        for(int i = 0; i < messierObjects.size(); i++){
+            messierObjects.get(i).load(verts);
+        }
+        return verts.size() - origSize;
+    }
+
     void loadStarColors(ArrayList<Float> color){
         for(int i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
@@ -88,7 +91,6 @@ public class Sky {
     }
 
     void loadConstellationVerts(ArrayList<Float> verts){
-//        constellationVertStart = verts.size() / 3;
         for(int i = 0; i < constellationsArray.size(); i++) {
             Constellation c = constellationsArray.get(i);
 
@@ -134,18 +136,7 @@ public class Sky {
     }
 
 */
-    void renderCircle(Point2D p, double radius, GL2 gl){
-        gl.glBegin(GL2.GL_POLYGON);
 
-        for(double i = 0; i <= 2 * Math.PI; i+= CIRCLE_STEP){
-            double vertX = p.getX() + radius * Math.cos(i);
-            double vertY = p.getY() + radius * Math.sin(i);
-            gl.glVertex2d(vertX, vertY);
-        }
-
-        gl.glEnd();
-
-    }
 
     ArrayList<Star> getStars(){
         return starsArray;

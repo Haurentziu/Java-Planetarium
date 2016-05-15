@@ -75,7 +75,7 @@ public class Sky {
         for(int i = 0; i < messierObjects.size(); i++){
             messierObjects.get(i).load(verts);
         }
-        return verts.size() - origSize;
+        return (verts.size() - origSize) / 3;
     }
 
     void loadStarColors(ArrayList<Float> color){
@@ -112,19 +112,23 @@ public class Sky {
         }
     }
 
-  /*  float[] renderMilkyWay(Observer obs, GL3 gl){
-        int size = milkyWayVertices.size();
-        ArrayList<Float>
-        for(int i = 0; i < 2 * milkyWayVertices.size(); i += 2){
-            MilkyWayVertex vert = milkyWayVertices.get(i / 2);
-            if(vert.isMove()){
+    ArrayList<Integer> loadMilkyWayVerts(ArrayList<Float> verts){
+        int origSize = verts.size();
+        ArrayList<Integer> vertNo = new ArrayList<>();
 
+        for(int i = 0; i < milkyWayVertices.size(); i++){
+            MilkyWayVertex vert = milkyWayVertices.get(i);
+            if(vert.isMove()){
+                vertNo.add((verts.size() - origSize) / 3);
+                origSize = verts.size();
             }
-            mwVerts[i] = (float)c.getRightAscension();
-            mwVerts[i] = (float)c.getDeclination();
+            vert.load(verts);
         }
+
+        vertNo.add((verts.size() - origSize) / 3);
+        return vertNo;
     }
-*/
+
  /*   void renderSolarSystem(Observer obs, GL2 gl, Rectangle2D bounds){
         gl.glColor3f(1f, 74.9f, 0f);
         SolarSystem system = new SolarSystem();

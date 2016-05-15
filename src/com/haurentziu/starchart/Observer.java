@@ -149,9 +149,11 @@ public class Observer {
 
     public void updateTime(int warp){
         double deltaT = t.getDeltaTime();
-    //    double deltaT = SIDERAL_DAY_MS;
+        //double deltaT = 24 * 365.0/366.0 * 3600 * 1000;
         unixTime += warp * deltaT;
-        sideralTime += 15 * Math.PI * warp * deltaT / (180.0 * 3600000.0);
+        sideralTime += 15 * Math.PI * warp * deltaT / (180.0 * 3600.0 * 1000.0) * 366.0/365.0; //convert to sideral;
+        if(sideralTime > 2*Math.PI) sideralTime -= 2*Math.PI;
+        System.out.println(sideralTime);
 
     }
 

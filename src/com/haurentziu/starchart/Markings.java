@@ -21,8 +21,9 @@ public class Markings {
     private final static double STEP_LINE = Math.PI/30;
 
     Markings(){
-
     }
+
+
 
      ArrayList<Integer> loadAzGridVerts(ArrayList<Float> vertList){
         ArrayList<Integer> gridNo = new ArrayList<>();

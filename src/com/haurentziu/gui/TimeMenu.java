@@ -18,7 +18,7 @@ import java.util.Calendar;
 
 public class TimeMenu extends JDialog  implements Runnable, ChangeListener{
 
-    private boolean isVisible = true;
+    private boolean isVisible = false;
 
     private JSpinner hour = new JSpinner();
     private JSpinner minute = new JSpinner();

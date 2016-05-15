@@ -34,10 +34,13 @@ public class GLStarchart implements GLEventListener{
     private boolean showStarNames = true;
     private boolean showEqGrid = false;
     private boolean showDSO = true;
+    private boolean showMilkyWay = true;
 
     private int starNo;
     private int linesNo;
     private ArrayList<Integer> gridNo;
+    private ArrayList<Integer> milkyWayNo;
+    private int totalMW;
     private int groundNo;
     private int circleNo;
     private int totalGridNo;
@@ -119,6 +122,8 @@ public class GLStarchart implements GLEventListener{
         circleNo = markings.renderGreatCircle(vertsList);
         messierNo = sky.loadMessier(vertsList);
 
+        milkyWayNo = sky.loadMilkyWayVerts(vertsList);
+
         float[] verts = Utils.floatArrayList2FloatArray(vertsList);
         vertexArraySize = verts.length;
 
@@ -182,7 +187,7 @@ public class GLStarchart implements GLEventListener{
 
     //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
         int sentVerts = 0;
-        if(showAzGrid || showEqGrid || showCelestialEq || showEcliptic) {
+        if(showAzGrid || showEqGrid || showCelestialEq || showEcliptic || showMilkyWay) {
             markingsShader.useShader(gl);
 
         }
@@ -218,11 +223,22 @@ public class GLStarchart implements GLEventListener{
             gl.glDrawArrays(GL3.GL_LINE_STRIP, starNo + linesNo + groundNo + totalGridNo, circleNo);
         }
 
+        if(showMilkyWay){
+            setUniformVariables(gl, markingsShader, 1);
+            markingsShader.setVariable(gl, "color", 0f, 0.31f, 0.533f, 1f);
+            sentVerts = starNo + linesNo + groundNo + totalGridNo + circleNo + messierNo;
+            for(int i = 0; i < milkyWayNo.size(); i++){
+                gl.glDrawArrays(GL3.GL_LINE_STRIP, sentVerts, milkyWayNo.get(i));
+                sentVerts += milkyWayNo.get(i);
+            }
+        }
+
         if(showConstellations) {
             constellationShader.useShader(gl);
             setUniformVariables(gl, constellationShader, 1);
             gl.glDrawArrays(GL3.GL_LINES, starNo, linesNo);
         }
+
         if(showDSO){
             messierShader.useShader(gl);
             setUniformVariables(gl, messierShader, 1);
@@ -335,7 +351,11 @@ public class GLStarchart implements GLEventListener{
     }
 
     void toogleMilkyWay(){
-      //  showMilkyWay = !showMilkyWay;
+        showMilkyWay = !showMilkyWay;
+    }
+
+    void toogleDSO(){
+        showDSO = !showDSO;
     }
 
     void setSelected(boolean isSelected){

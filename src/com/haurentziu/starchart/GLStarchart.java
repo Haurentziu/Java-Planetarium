@@ -186,8 +186,7 @@ public class GLStarchart implements GLEventListener{
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
         observer.updateTime(timeWarpLevels[currentWarp]);
 
-    //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
-    //    System.out.println("uaie 6");
+        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
         int sentVerts = 0;
         if(showAzGrid || showEqGrid || showCelestialEq || showEcliptic || showMilkyWay) {
             markingsShader.useShader(gl);
@@ -254,10 +253,10 @@ public class GLStarchart implements GLEventListener{
         setUniformVariables(gl, starShader, 1);
         gl.glDrawArrays(GL3.GL_POINTS, 1, starNo);
 
-    /*    system.updateSystem(gl, buffers, observer.getJDE());
+        system.updateSystem(gl, buffers, observer.getJDE());
         setUniformVariables(gl, starShader, 2);
         gl.glDrawArrays(GL3.GL_POINTS, 0, 1);
-*/
+
         if(showGround) {
             ground.getShader().useShader(gl);
             gl.glBindVertexArray(vertexArray.get(0));

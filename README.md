@@ -12,6 +12,8 @@ Open Source planetarium program made by Haurentziu using Java and JOGL
 * G - show/hide ground
 * Q - show/hide celestial equator
 * S - show/hide ecliptic
+* M - show/hide Milky Way
+* D - show/hide deep space objects
 * Right Arrow - increase time speed
 * Left Arrow - decrease time speed
 

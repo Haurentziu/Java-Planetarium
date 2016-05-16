@@ -128,6 +128,7 @@ public class GLStarchart implements GLEventListener{
         vertexArraySize = verts.length;
 
         FloatBuffer vertexFB = FloatBuffer.wrap(verts);
+        vertexFB.rewind();
 
         ArrayList<Float> colorList = new ArrayList<>();
         colorList.add(1f);
@@ -138,29 +139,29 @@ public class GLStarchart implements GLEventListener{
 
         float colors[] = Utils.floatArrayList2FloatArray(colorList);
         FloatBuffer colorFB = FloatBuffer.wrap(colors);
+        colorFB.rewind();
         colorArraySize = colors.length;
 
         gl.glGenBuffers(2, buffers);
-
-        //vertex
-        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
-        gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * verts.length, vertexFB, GL3.GL_DYNAMIC_DRAW);
-
-        //colors
-        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(1));
-        gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * colors.length, colorFB, GL3.GL_STREAM_DRAW);
+        gl.glBindVertexArray(buffers.get(0));
 
         gl.glGenVertexArrays(1, vertexArray);
         gl.glBindVertexArray(vertexArray.get(0));
 
-        gl.glGenVertexArrays(1, colorArray);
-        gl.glBindVertexArray(colorArray.get(0));
+        //vertex
+        gl.glEnableVertexAttribArray(0);
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
+        gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * verts.length, vertexFB, GL3.GL_DYNAMIC_DRAW);
+        gl.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, 0, 0L);
 
-        for(int i = 0; i < 2; i++) {
-            gl.glEnableVertexAttribArray(i);
-            gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(i));
-            gl.glVertexAttribPointer(i, 3, GL3.GL_FLOAT, false, 0, 0);
-        }
+        //colors
+        gl.glEnableVertexAttribArray(1);
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(1));
+        gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * colors.length, colorFB, GL3.GL_STREAM_DRAW);
+        gl.glVertexAttribPointer(1, 3, GL3.GL_FLOAT, false, 0, 0L);
+
+        colorFB.clear();
+        vertexFB.clear();
 
         glAutoDrawable.getAnimator().setUpdateFPSFrames(20, null);
     }
@@ -182,14 +183,15 @@ public class GLStarchart implements GLEventListener{
         GL3 gl = glAutoDrawable.getGL().getGL3();
 
         gl.glClearColor(0f, 0.075f, 0.125f, 1f);
-        gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
+        gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
         observer.updateTime(timeWarpLevels[currentWarp]);
 
     //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+    //    System.out.println("uaie 6");
         int sentVerts = 0;
         if(showAzGrid || showEqGrid || showCelestialEq || showEcliptic || showMilkyWay) {
             markingsShader.useShader(gl);
-
+            gl.glBindVertexArray(vertexArray.get(0));
         }
 
         if(showAzGrid){
@@ -235,26 +237,30 @@ public class GLStarchart implements GLEventListener{
 
         if(showConstellations) {
             constellationShader.useShader(gl);
+            gl.glBindVertexArray(vertexArray.get(0));
             setUniformVariables(gl, constellationShader, 1);
             gl.glDrawArrays(GL3.GL_LINES, starNo, linesNo);
         }
 
         if(showDSO){
             messierShader.useShader(gl);
+            gl.glBindVertexArray(vertexArray.get(0));
             setUniformVariables(gl, messierShader, 1);
             gl.glDrawArrays(GL3.GL_POINTS, starNo + linesNo + groundNo + totalGridNo + circleNo, messierNo);
         }
 
         starShader.useShader(gl);
+        gl.glBindVertexArray(vertexArray.get(0));
         setUniformVariables(gl, starShader, 1);
         gl.glDrawArrays(GL3.GL_POINTS, 1, starNo);
 
-        system.updateSystem(gl, buffers, observer.getJDE());
+    /*    system.updateSystem(gl, buffers, observer.getJDE());
         setUniformVariables(gl, starShader, 2);
         gl.glDrawArrays(GL3.GL_POINTS, 0, 1);
-
+*/
         if(showGround) {
             ground.getShader().useShader(gl);
+            gl.glBindVertexArray(vertexArray.get(0));
             setUniformVariables(gl, ground.getShader(), 0);
             ground.render(gl, 0);
         }

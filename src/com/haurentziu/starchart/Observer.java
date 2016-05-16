@@ -153,8 +153,6 @@ public class Observer {
         unixTime += warp * deltaT;
         sideralTime += 15 * Math.PI * warp * deltaT / (180.0 * 3600.0 * 1000.0) * 366.0/365.0; //convert to sideral;
         if(sideralTime > 2*Math.PI) sideralTime -= 2*Math.PI;
-        System.out.println(sideralTime);
-
     }
 
     private void setSideralTime(){

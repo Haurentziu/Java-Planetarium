@@ -20,11 +20,10 @@ bool isInBounds(vec4 p){
 void main(){
 
     vec4 center = gl_in[0].gl_Position;
-    float radius = center.z / 2;
+    float zoomed_radius = (zoom/2 + 1) * center.z / 2;
 
-    if(isInBounds(center)){
+    if(isInBounds(center) && zoomed_radius > 0.0018){
        for(float i =  0; i <= 6.5; i += 0.5){
-            float zoomed_radius = (zoom/2 + 1) * radius;
             float x = center.x + zoomed_radius * cos(i) / width;
             float y = center.y + zoomed_radius * sin(i) / height;
 

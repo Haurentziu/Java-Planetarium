@@ -60,14 +60,14 @@ public class Sky {
         starVertStart = verts.size() / 3;
         for(int  i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
-            if(star.getMagnitude() < 6.5){
+         //   if(star.getMagnitude() < 10){
                 EquatorialCoordinates eq = star.getEquatorialCoordinates();
                 verts.add((float)eq.getRightAscension());
                 verts.add((float)eq.getDeclination());
                 verts.add(star.getRadius());
 
             }
-        }
+       // }
     }
 
     int loadMessier(ArrayList<Float> verts){
@@ -81,13 +81,13 @@ public class Sky {
     void loadStarColors(ArrayList<Float> color){
         for(int i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
-            if(star.getMagnitude() < 6.5){
+        //    if(star.getMagnitude() < 10){
                 Color starColor = star.getStarRGB();
                 color.add(starColor.getRed() / 255f);
                 color.add(starColor.getGreen() / 255f);
                 color.add(starColor.getBlue() / 255f);
             }
-        }
+     //   }
     }
 
     void loadConstellationVerts(ArrayList<Float> verts){

@@ -41,7 +41,7 @@ public class Star{
 		return horizontal;
 	}
 
-	EquatorialCoordinates getEquatorialCoordinates(){
+	public EquatorialCoordinates getEquatorialCoordinates(){
 		return equatorial;
 	}
 
@@ -49,7 +49,7 @@ public class Star{
 		return projection;
 	}
 
-	float getMagnitude(){
+	public float getMagnitude(){
 		return magnitude;
 	}
 	
@@ -68,7 +68,7 @@ public class Star{
 
 
 	/* stack overflow interpolation table http://stackoverflow.com/questions/21977786/star-b-v-color-index-to-apparent-rgb-color */
-	Color getStarRGB(){ // RGB <0,1> <- BV <-0.4,+2.0> [-]
+	public Color getStarRGB(){ // RGB <0,1> <- BV <-0.4,+2.0> [-]
 		double r, g, b;
 
 		double t;  r=0.0; g=0.0; b=0.0; if (bv<-0.4) bv=-0.4f; if (bv >= 2.0) bv= 1.9f;

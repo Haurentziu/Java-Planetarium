@@ -21,7 +21,7 @@ public class MilkyWayVertex {
         return equatorialCoordinates;
     }
 
-    void load(ArrayList<Float> verts){
+    public void load(ArrayList<Float> verts){
         verts.add((float)equatorialCoordinates.getRightAscension());
         verts.add((float)equatorialCoordinates.getDeclination());
         verts.add(0f);

@@ -18,11 +18,11 @@ public class Constellation {
 		this.lineStart = lineStart;
 	}
 
-	ArrayList<Star> getStartStars(){
+	public ArrayList<Star> getStartStars(){
 		return lineStart;
 	}
 
-	ArrayList<Star> getEndStars(){
+	public ArrayList<Star> getEndStars(){
 		return lineEnd;
 	}
 

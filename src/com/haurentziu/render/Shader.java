@@ -1,4 +1,4 @@
-package com.haurentziu.starchart;
+package com.haurentziu.render;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -24,7 +24,7 @@ public class Shader {
     private String[] fragmentShader;
     private String[] geometryShader;
 
-    String[] loadShader(String file) {
+    private String[] loadShader(String file) {
         StringBuilder sb = new StringBuilder();
 
         try {
@@ -45,7 +45,7 @@ public class Shader {
         return new String[]{sb.toString()};
     }
 
-    public void init(GL3 gl){
+    void init(GL3 gl){
         try{
             attachShader(gl);
         }
@@ -55,19 +55,19 @@ public class Shader {
         }
     }
 
-    public void loadVertexShader(String file){
+    void loadVertexShader(String file){
         vertexShader = loadShader(file);
     }
 
-    public void loadFragmentShader(String file){
+    void loadFragmentShader(String file){
         fragmentShader = loadShader(file);
     }
 
-    public void loadGeometryShader(String file){
+    void loadGeometryShader(String file){
         geometryShader = loadShader(file);
     }
 
-    public void loadAllShaders(String vertexFile, String geometryFile, String fragmentFile){
+    void loadAllShaders(String vertexFile, String geometryFile, String fragmentFile){
         loadVertexShader(vertexFile);
         loadGeometryShader(geometryFile);
         loadFragmentShader(fragmentFile);
@@ -108,36 +108,31 @@ public class Shader {
 
     }
 
-    public void setVariable(GL3 gl, String name, float value){
+    void setVariable(GL3 gl, String name, float value){
         int location = gl.glGetUniformLocation(shaderProgram, name);
         gl.glUniform1f(location, value);
     }
 
-    public void setVariable(GL3 gl, String name, float value1, float value2, float value3, float value4){
+    void setVariable(GL3 gl, String name, float value1, float value2, float value3, float value4){
         int location = gl.glGetUniformLocation(shaderProgram, name);
         gl.glUniform4f(location, value1, value2, value3, value4);
     }
 
 
-    public void setVariable(GL3 gl, String name, int value){
+    void setVariable(GL3 gl, String name, int value){
         int location = gl.glGetUniformLocation(shaderProgram, name);
         gl.glUniform1i(location, value);
     }
 
-    public void deleteProgram(GL3 gl){
+    void deleteProgram(GL3 gl){
         gl.glDeleteProgram(shaderProgram);
     }
 
-    public void useShader(GL3 gl){
+    void useShader(GL3 gl){
         gl.glUseProgram(shaderProgram);
     }
 
-    public void disableShader(GL3 gl){
+    void disableShader(GL3 gl){
         gl.glUseProgram(0);
     }
-
-    public int getShaderProgram(){
-        return shaderProgram;
-    }
-
 }

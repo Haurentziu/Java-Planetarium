@@ -106,7 +106,7 @@ public class Observer {
         zoom = maxSize/d;
     }
 
-    double getZoom(){
+    public double getZoom(){
         return zoom;
     }
 
@@ -144,6 +144,10 @@ public class Observer {
 
     public void setUnixTime(long unixTime){
         this.unixTime = unixTime;
+    }
+
+    public float getMaxMagnitude(){
+        return (float)(Math.log(zoom)/Math.log(2) + 6.5);
     }
 
 

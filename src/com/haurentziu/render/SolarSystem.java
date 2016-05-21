@@ -1,7 +1,8 @@
-package com.haurentziu.starchart;
+package com.haurentziu.render;
 
 import com.haurentziu.coordinates.*;
 import com.haurentziu.planets.Earth;
+import com.haurentziu.starchart.Observer;
 import com.jogamp.opengl.GL3;
 
 import java.nio.FloatBuffer;
@@ -9,13 +10,15 @@ import java.nio.IntBuffer;
 
 public class SolarSystem {
 	private int arraySize;
-	private IntBuffer vertexArray = IntBuffer.allocate(1);
-	private IntBuffer buffers = IntBuffer.allocate(1);
-	boolean initialized = false;
 
-	public SolarSystem(){
+	public void render(GL3 gl, Shader shader, IntBuffer buffer, double jde){
+		updateSystem(gl, buffer, jde);
+		shader.setVariable(gl, "vertex_type", 0);
+		shader.setVariable(gl, "transform_type", 2);
+		gl.glDrawArrays(GL3.GL_POINTS, 0, 1);
 	}
-	
+
+
 	private EquatorialCoordinates computeSunEquatorial(double jde){
 		Earth earth = new Earth();
 		RectangularCoordinates earthRect = earth.computeEarthCoordinates(jde);
@@ -26,37 +29,19 @@ public class SolarSystem {
 		return earthEquatorial;
 	}
 
-	void updateSystem(GL3 gl, IntBuffer buffers, double jde){
+	private void updateSystem(GL3 gl, IntBuffer buffers, double jde){
 		Earth earth = new Earth();
 		RectangularCoordinates earthRect = earth.computeEarthCoordinates(jde);
 		earthRect.changeOrigin(0, 0, 0);
 		EclipticCoordinates earthEcliptical = earthRect.toEclipticCoordinates();
 		float[] vertices = new float[]{
-				(float)earthEcliptical.getLongitude(), (float)earthEcliptical.getLatitude(), 0.06f,
+				(float)earthEcliptical.getLongitude(), (float)earthEcliptical.getLatitude(), -3f,
 		};
 
-		arraySize = vertices.length;
+		arraySize = vertices.length / 3;
 		FloatBuffer systemFB = FloatBuffer.wrap(vertices);
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
 		gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, 0, 4 * vertices.length, systemFB);
-
-	/*	gl.glGenBuffers(1, buffers);
-
-		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
-		gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * vertices.length, systemFB, GL3.GL_STREAM_DRAW);
-
-		gl.glGenVertexArrays(1, vertexArray);
-		gl.glBindVertexArray(vertexArray.get(0));
-
-		gl.glGenVertexArrays(1, vertexArray);
-		gl.glBindVertexArray(vertexArray.get(0));
-
-		gl.glEnableVertexAttribArray(0);
-		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
-		gl.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, 0, 0);
-
-		gl.glDeleteVertexArrays(3, vertexArray);*/
-
 	}
 	
 	static double computeObliquityOfTheEcliptic(double jde){

@@ -1,6 +1,8 @@
-package com.haurentziu.starchart;
+package com.haurentziu.render;
 
 import com.haurentziu.coordinates.HorizontalCoordinates;
+import com.haurentziu.starchart.Observer;
+import com.haurentziu.starchart.Tile;
 import com.jogamp.opengl.GL3;
 
 import java.util.ArrayList;
@@ -9,22 +11,22 @@ import java.util.ArrayList;
  * Created by haurentziu on 27.04.2016.
  */
 
-public class Ground {
+public class Ground extends Renderer{
 
-    private final float GROUND_STEP = (float)Math.PI/40f;
+    private final static float GROUND_STEP = (float)Math.PI/40f;
 
     private ArrayList<Integer> tilesVertsNo;
     private int vertStart;
-    private Shader shader;
 
-    Ground(GL3 gl){
-        shader = new Shader();
-        shader.loadAllShaders("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
-        shader.init(gl);
-        tilesVertsNo = new ArrayList<>();
+    public Ground(String vertShader, String geomShader, String fragShader){
+          super(vertShader, geomShader, fragShader);
     }
 
-    void render(GL3 gl, int start){
+    public void render(GL3 gl, Observer observer){
+        shader.useShader(gl);
+        super.setObserver(gl, observer);
+        shader.setVariable(gl, "transform_type", 0);
+        shader.setVariable(gl, "vertex_type", 0);
         int sentVerts = vertStart;
         for (int i = 0; i < tilesVertsNo.size(); i++) {
             gl.glDrawArrays(GL3.GL_TRIANGLE_FAN, sentVerts, tilesVertsNo.get(i));
@@ -32,20 +34,15 @@ public class Ground {
         }
     }
 
-    Shader getShader(){
-        return shader;
-    }
-
-
-
-   void loadGroundVerts(ArrayList<Float> vertList){
+   public void loadVertices(ArrayList<Float> vertList){
+        tilesVertsNo = new ArrayList<>();
         int originalSize = vertList.size();
         vertStart = originalSize / 3;
         for(double i = 0; i < 2 * Math.PI/1; i += Math.PI / 20){
             for(double j = 0; j > -Math.PI/2; j -= Math.PI / 20){
                 HorizontalCoordinates c = new HorizontalCoordinates(i, j);
                 Tile tile = new Tile(c, Math.PI/20 + 0.0001, Math.PI/20 + 0.0001);
-                renderGroundTile(tile, vertList);
+                loadGroundTile(tile, vertList);
                 tilesVertsNo.add((vertList.size() - originalSize)/3);
                 originalSize = vertList.size();
             }
@@ -53,7 +50,7 @@ public class Ground {
     }
 
 
-    private void renderGroundTile(Tile tile, ArrayList<Float> vertList){
+    private void loadGroundTile(Tile tile, ArrayList<Float> vertList){
             HorizontalCoordinates c = tile.getCenter();
             vertList.add((float)c.getAzimuth());
             vertList.add((float)c.getAltitude());

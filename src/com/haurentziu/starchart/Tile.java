@@ -18,25 +18,25 @@ public class Tile {
     private HorizontalCoordinates c;
     private double width, height;
 
-    Tile(HorizontalCoordinates c, double width, double height){
+    public Tile(HorizontalCoordinates c, double width, double height){
         this.c = c;
         this.width = width;
         this.height = height;
     }
 
-    double getStartAz(){
+    public double getStartAz(){
         return c.getAzimuth();
     }
 
-    double getStartAlt(){
+    public double getStartAlt(){
         return c.getAltitude();
     }
 
-    double getEndAz(){
+    public double getEndAz(){
         return c.getAzimuth() + width;
     }
 
-    double getEndAlt(){
+    public double getEndAlt(){
         return c.getAltitude() - height;
     }
 
@@ -48,7 +48,7 @@ public class Tile {
         return height;
     }
 
-    HorizontalCoordinates getCenter(){
+    public HorizontalCoordinates getCenter(){
         return new HorizontalCoordinates(c.getAzimuth() + width/2, c.getAltitude() - height/2);
     }
 

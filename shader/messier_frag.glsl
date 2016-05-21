@@ -4,10 +4,9 @@
 uniform float width;
 uniform float height;
 
-in vec3 frag_color;
-out vec4 outColor;
-
+out vec4 outputColor;
 
 void main(){
     gl_FragColor = vec4(0, 0.296, 0, 1.0);
+ //    outputColor = texture(messierTex, fragmentUV).rgba;
 }

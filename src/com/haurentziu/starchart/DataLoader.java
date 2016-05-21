@@ -13,13 +13,13 @@ import java.util.ArrayList;
  */
 
 
-class DataLoader {
+public class DataLoader {
 	
-	DataLoader(){
+	public DataLoader(){
 		
 	}
 	
-	ArrayList<Star> loadStars(){
+	public ArrayList<Star> loadStars(){
 		ArrayList stars = new ArrayList<>();
 		
 		try{
@@ -63,7 +63,7 @@ class DataLoader {
 		return stars;
 	}
 	
-	ArrayList<Constellation> loadConstellations(ArrayList<Star> stars){
+	public ArrayList<Constellation> loadConstellations(ArrayList<Star> stars){
 		try{
 			BufferedReader reader = new BufferedReader(new FileReader("./res/constellations.csv"));
 			String line = reader.readLine();
@@ -119,7 +119,7 @@ class DataLoader {
 		return null;
 	}
 
-	ArrayList<MessierObject> loadMessierObjects(){
+	public ArrayList<MessierObject> loadMessierObjects(){
 		try{
 			ArrayList<MessierObject> messierObjects = new ArrayList<>();
 			BufferedReader reader = new BufferedReader(new FileReader("./res/messier.csv"));
@@ -141,7 +141,7 @@ class DataLoader {
 
 	}
 
-	ArrayList<MilkyWayVertex> loadMilkyWay() {
+	public ArrayList<MilkyWayVertex> loadMilkyWay() {
 		try{
 			ArrayList<MilkyWayVertex> vertices = new ArrayList<>();
 

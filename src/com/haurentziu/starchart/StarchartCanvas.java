@@ -49,37 +49,7 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
 
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
-        if(mouseEvent.getButton() == MouseEvent.BUTTON1){
-            int x = mouseEvent.getX();
-            int y = mouseEvent.getY();
 
-            Rectangle2D orto = renderer.getBounds();
-            Rectangle2D window = renderer.getWindowBounds();
-            Observer obs = renderer.getObserver();
-            double zoom = obs.getZoom();
-
-            ArrayList<Star> stars = renderer.getStars();
-
-            double ortoX = (- 1 / 2.0 + x / window.getWidth()) * orto.getWidth();
-            double ortoY = (1 / 2.0 - y / window.getHeight()) * orto.getHeight();
-
-            for(int i = 0; i < stars.size(); i++){
-                Star star = stars.get(i);
-                if(star.getMagnitude() < Sky.MAX_MAG){
-                    ProjectionPoint projection = star.getProjection();
-
-                    if(Point2D.distance(ortoX, ortoY, projection.getX(), projection.getY()) < star.getRadius()){
-                        System.out.println(i);
-                        renderer.setSelected(true);
-                        renderer.setSelectedStar(star);
-                        break;
-                    }
-                }
-            }
-        }
-        else{
-            renderer.setSelected(false);
-        }
 
     }
 
@@ -173,7 +143,7 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
                 break;
 
             case KeyEvent.VK_Q:     renderer.toogleCelestialEq();
-                                    break;
+                break;
 
             case KeyEvent.VK_S:     renderer.toogleEcliptic();
                 break;

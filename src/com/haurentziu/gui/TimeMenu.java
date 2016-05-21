@@ -18,8 +18,6 @@ import java.util.Calendar;
 
 public class TimeMenu extends JDialog  implements Runnable, ChangeListener{
 
-    private boolean isVisible = false;
-
     private JSpinner hour = new JSpinner();
     private JSpinner minute = new JSpinner();
     private JSpinner second = new JSpinner();
@@ -46,7 +44,6 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener{
         update();
         setSize(410, 115);
         setAlwaysOnTop(true);
-        setVisible(isVisible);
         setResizable(false);
         setTitle("Date & Time");
         JPanel jp = new JPanel();
@@ -89,7 +86,7 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener{
     }
 
     void tooglVisibilty(){
-        isVisible = !isVisible;
+        this.setVisible(!this.isVisible());
     }
 
     @Override

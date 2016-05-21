@@ -97,12 +97,12 @@ public class Markings extends Renderer{
         shader.setVariable(gl, "vertex_type", 0);
 
         if(renderAzGrid){
-            shader.setVariable(gl, "color", 0.404f, 0.302f, 0f, 1f);
+            shader.setVariable(gl, "color", 0.404f, 0.302f, 0f, 0.6f);
             renderGrid(gl, 0);
         }
 
         if(renderEqGrid){
-            shader.setVariable(gl, "color", 0.365f, 0.541f, 659f, 1f);
+            shader.setVariable(gl, "color", 0.365f, 0.541f, 659f, 0.6f);
             renderGrid(gl, 1);
         }
 
@@ -124,7 +124,7 @@ public class Markings extends Renderer{
 
     private void renderMilkyWay(GL3 gl){
         shader.setVariable(gl, "transform_type", 1);
-        shader.setVariable(gl, "color", 0f, 0.31f, 0.533f, 1f);
+        shader.setVariable(gl, "color", 0f, 0.31f, 0.533f, 0.4f);
         int sentVerts = mwVertStart;
         for(int i = 0; i < mwVertNumbers.size(); i++){
             gl.glDrawArrays(GL3.GL_LINE_STRIP, sentVerts, mwVertNumbers.get(i));

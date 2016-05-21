@@ -4,6 +4,7 @@ import com.haurentziu.starchart.DataLoader;
 import com.haurentziu.starchart.MessierObject;
 import com.haurentziu.starchart.Observer;
 import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.util.texture.Texture;
 
 import java.util.ArrayList;
 
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 
 public class DeepSpaceObjects extends Renderer{
     private final ArrayList<MessierObject> messierObjects;
+    private Texture texture;
     private int vertStart;
     private int vertNumber;
 
@@ -20,6 +22,19 @@ public class DeepSpaceObjects extends Renderer{
         super(vertShader, geomShader, fragShader);
         DataLoader loader = new DataLoader();
         messierObjects = loader.loadMessierObjects();
+    }
+
+    @Override
+    public void initialize(GL3 gl){
+        shader.init(gl);
+        texture = loadTexture(gl, "./res/textures/dso.png");
+    }
+
+    @Override
+    public void delete(GL3 gl){
+        shader.deleteProgram(gl);
+        texture.destroy(gl);
+
     }
 
     public void loadVertices(ArrayList<Float> verts){
@@ -32,10 +47,19 @@ public class DeepSpaceObjects extends Renderer{
 
     public void render(GL3 gl, Observer observer){
         shader.useShader(gl);
+        gl.glEnable(GL3.GL_TEXTURE_2D);
+        gl.glActiveTexture(GL3.GL_TEXTURE0);
+        texture.enable(gl);
+        texture.bind(gl);
         super.setObserver(gl, observer);
+        shader.setVariable(gl, "myTexture", 0);
+
         shader.setVariable(gl, "transform_type", 1);
         shader.setVariable(gl, "vertex_type", 0);
         gl.glDrawArrays(GL3.GL_POINTS, vertStart, vertNumber);
+        texture.disable(gl);
     }
+
+
 
 }

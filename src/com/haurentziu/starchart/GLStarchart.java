@@ -104,7 +104,7 @@ public class GLStarchart implements GLEventListener{
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
         observer.updateTime(timeWarpLevels[currentWarp]);
 
-    //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
 
         if(showMilkyWay || showEqGrid || showAzGrid || showEcliptic || showCelestialEq){
             markings.renderAll(gl, observer, showMilkyWay, showAzGrid, showEqGrid, showCelestialEq, showEcliptic);
@@ -122,6 +122,7 @@ public class GLStarchart implements GLEventListener{
         if(showGround) {
             ground.render(gl, observer);
         }
+
 
     }
 

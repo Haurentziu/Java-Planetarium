@@ -2,6 +2,10 @@ package com.haurentziu.render;
 
 import com.haurentziu.starchart.Observer;
 import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureIO;
+
+import java.io.File;
 
 /**
  * Created by haurentziu on 20.05.2016.
@@ -48,6 +52,22 @@ public class Renderer {
     public void setLocation(GL3 gl, float longitude, float latitude){
         shader.setVariable(gl, "observer_latitude", latitude);
         shader.setVariable(gl, "observer_longitude", longitude);
+    }
+
+    public Texture loadTexture(GL3 gl, String path){
+        Texture texture = null;
+        try{
+            texture = TextureIO.newTexture(new File(path), false);
+            texture.setTexParameteri(gl, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
+            texture.setTexParameteri(gl, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);
+            texture.setTexParameteri(gl, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
+            texture.setTexParameteri(gl, GL3.GL_TEXTURE_WRAP_T, GL3.GL_CLAMP_TO_EDGE);
+
+        }
+        catch (Exception ex){
+            System.out.printf("Could not load the texture located at %s \n", path);
+        }
+        return texture;
     }
 
     public void delete(GL3 gl){

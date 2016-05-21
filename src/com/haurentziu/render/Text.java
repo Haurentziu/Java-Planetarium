@@ -2,9 +2,6 @@ package com.haurentziu.render;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
-
-import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -50,19 +47,6 @@ public class Text{
         texture.disable(gl);
     }
 
-    private void loadTexture(GL3 gl){
-        try{
-            texture = TextureIO.newTexture(new File("./res/textures/uaie.png"), false);
-            texture.setTexParameteri(gl, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
-            texture.setTexParameteri(gl, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);
-            texture.setTexParameteri(gl, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
-            texture.setTexParameteri(gl, GL3.GL_TEXTURE_WRAP_T, GL3.GL_CLAMP_TO_EDGE);
-
-        }
-        catch (Exception ex){
-            System.out.println("Am facut-o de uaieie");
-        }
-    }
 
     public void loadTexCoord(ArrayList<Float> verts){
         verts.add(0f);
@@ -74,7 +58,5 @@ public class Text{
         verts.add(4f);
         verts.add(0f);
     }
-
-
 
 }

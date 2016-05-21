@@ -2,7 +2,7 @@
 
 Open Source planetarium program made by Haurentziu using Java and JOGL
 
-![Java Planetarium](http://i.imgur.com/x2PUdZf.png)
+![Java Planetarium](http://i.imgur.com/ARBk1t0.png)
 
 ###Controls
 

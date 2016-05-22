@@ -7,23 +7,20 @@ public class RectangularCoordinates {
 		this.y = y;
 		this.z = z;
 	}
-	
-	public void changeOrigin(RectangularCoordinates origin){
-		x = origin.getX() - x;
-		y = origin.getY() - y;
-		z = origin.getZ() - z;
+
+	public void invert(){
+		x = - x;
+		y = - y;
+		z = - z;
 	}
-	
-	public void changeOrigin(double xOrigin, double yOrigin, double zOrigin){
-		x = xOrigin - x;
-		y = yOrigin - y;
-		z = zOrigin - z;
+
+	public void addCoordinates(RectangularCoordinates r){
+		x += r.getX();
+		y += r.getY();
+		z += r.getZ();
 	}
-	
-	public void rotateCoordinates(double angle){ //rotates only around the x axis
-		
-	}
-	
+
+
 	public EclipticCoordinates toEclipticCoordinates(){
 		double longitude = Math.atan2(y, x);
 		double latitude = Math.atan2(z, Math.sqrt(x*x + y*y));

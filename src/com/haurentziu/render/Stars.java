@@ -26,10 +26,6 @@ public class Stars extends Renderer{
 
     public void loadVertices(ArrayList<Float> verts){
         vertStart = verts.size() / 3;
-        verts.add(0f);
-        verts.add(0f);
-        verts.add(-3f);
-
         for(int  i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
             EquatorialCoordinates eq = star.getEquatorialCoordinates();
@@ -41,10 +37,6 @@ public class Stars extends Renderer{
     }
 
     public void loadColor(ArrayList<Float> color){
-        color.add(1f);
-        color.add(0.965f);
-        color.add(0f);
-
         for(int i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
             Color starColor = star.getStarRGB();
@@ -60,7 +52,7 @@ public class Stars extends Renderer{
         shader.setVariable(gl, "transform_type", 1);
         shader.setVariable(gl, "vertex_type", 1);
         shader.setVariable(gl, "max_mag", maxMagnitude);
-        gl.glDrawArrays(GL3.GL_POINTS, vertStart + 1, vertsNumber - 1);
+        gl.glDrawArrays(GL3.GL_POINTS, vertStart, vertsNumber);
     }
 
 

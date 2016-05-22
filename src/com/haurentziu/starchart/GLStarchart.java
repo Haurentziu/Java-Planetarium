@@ -1,5 +1,7 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.planets.VSOPLoader;
+import com.haurentziu.planets.VSOPVariable;
 import com.haurentziu.render.*;
 
 import com.haurentziu.render.Markings;
@@ -69,6 +71,8 @@ public class GLStarchart implements GLEventListener{
         ArrayList<Float> vertsList = new ArrayList<>();
         ArrayList<Float> colorList = new ArrayList<>();
 
+        solarSystem.loadVertices(vertsList);
+        solarSystem.loadColor(colorList);
         stars.loadVertices(vertsList);
         stars.loadColor(colorList);
         constellations.loadVertices(vertsList);

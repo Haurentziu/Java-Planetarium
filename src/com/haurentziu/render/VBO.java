@@ -36,23 +36,16 @@ public class VBO {
     public void init(GL3 gl, ArrayList<Float> vertList, ArrayList<Float> colorList){
         float verts[] = Utils.floatArrayList2FloatArray(vertList);
         float colors[] = Utils.floatArrayList2FloatArray(colorList);
-    //    float tex[] = Utils.floatArrayList2FloatArray(textureList);
         vertexArraySize = verts.length;
         colorArraySize = colors.length;
-     //   texArraySize = tex.length;
 
         FloatBuffer vertexFB = FloatBuffer.wrap(verts);
         vertexFB.rewind();
         FloatBuffer colorFB = FloatBuffer.wrap(colors);
         colorFB.rewind();
-    //    FloatBuffer texFB = FloatBuffer.wrap(tex);
-     //   texFB.rewind();
 
         gl.glGenBuffers(3, buffers);
         gl.glBindVertexArray(buffers.get(0));
-
-    /*    gl.glGenBuffers(1, texArray);
-        gl.glBindVertexArray(texArray.get(0));*/
 
         gl.glGenBuffers(1, vertexArray);
         gl.glBindVertexArray(vertexArray.get(0));
@@ -71,12 +64,6 @@ public class VBO {
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(1));
         gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * colors.length, colorFB, GL3.GL_STREAM_DRAW);
         gl.glVertexAttribPointer(1, 3, GL3.GL_FLOAT, false, 0, 0L);
-
-        //texture
-   /*     gl.glEnableVertexAttribArray(2);
-        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(2));
-        gl.glBufferData(GL3.GL_ARRAY_BUFFER, 4 * tex.length, texFB, GL3.GL_STREAM_DRAW);
-        gl.glVertexAttribPointer(2, 2, GL3.GL_FLOAT, false, 0, 0L);*/
 
         vertexFB.clear();
      //   texFB.clear();

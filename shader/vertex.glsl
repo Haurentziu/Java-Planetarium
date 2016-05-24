@@ -41,6 +41,7 @@ layout(location = 1) in vec3 color;
 out vec3 geom_color;
 out float draw;
 
+
 void computeStereographic(vec4 coord, out vec4 projection){
     float k = 2 / (1 + sin(altitude_rotation) * sin(coord.y) + cos(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
     float x = k * cos(coord.y) * sin(coord.x - azimuth_rotation);
@@ -66,7 +67,6 @@ void main(void){
     if(vertex_type != 1 || pos.z < max_mag){
         geom_color = color;
         vec4 coord = vec4(pos, 1);
-
         if(transform_type == 2){
             float declination = asin(sin(coord.y) * cos(obliquity) + cos(coord.y) * sin(obliquity) * sin(coord.x));
             float right_ascension = atan(sin(coord.x) * cos(obliquity) - tan(coord.y) * sin(obliquity), cos(coord.x));
@@ -94,9 +94,3 @@ void main(void){
 
 }  
 
-vec4 computeStereographic(vec4 coord){
-    float k = 2 / (1 + sin(altitude_rotation) * sin(coord.y) + cos(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
-    float x = k * cos(coord.y) * sin(coord.x - azimuth_rotation);
-    float y = k * (cos(altitude_rotation) * sin(coord.y) - sin(altitude_rotation) * cos(coord.y) * cos(coord.x - azimuth_rotation));
-    return vec4(x, y, coord.z, coord.w);
-}

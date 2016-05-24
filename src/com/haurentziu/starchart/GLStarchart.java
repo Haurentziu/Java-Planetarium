@@ -37,6 +37,7 @@ public class GLStarchart implements GLEventListener{
     private Markings markings;
     private Ground ground;
     private SolarSystem solarSystem;
+    private AstroText astroText;
     private VBO vbo;
 
     private int currentWarp = 8;
@@ -51,6 +52,7 @@ public class GLStarchart implements GLEventListener{
         messierObjects = new DeepSpaceObjects("./shader/vertex.glsl", "./shader/messier_geom.glsl", "./shader/messier_frag.glsl");
         markings = new Markings("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/marking_frag.glsl");
         ground = new Ground("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
+        astroText = new AstroText("./shader/vertex.glsl", "./shader/text_geom.glsl", "./shader/text_frag.glsl");
         solarSystem = new SolarSystem();
 
         ortoBounds = new Rectangle2D.Double();

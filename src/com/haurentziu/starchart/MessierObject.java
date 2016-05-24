@@ -21,6 +21,23 @@ public class MessierObject {
     public void load(ArrayList<Float> verts){
         verts.add((float)equatorial.getRightAscension());
         verts.add((float)equatorial.getDeclination());
-        verts.add(0.05f);
+        switch(type)
+        {
+            case "Globular Cluster":    verts.add(3/6f);
+                break;
+
+            case "Open Cluster":        verts.add(1/6f);
+                break;
+
+            case "Nebula":              verts.add(2/6f);
+                break;
+
+            case "Galaxy":              verts.add(4/6f);
+                break;
+
+            case "Spiral Galaxy":       verts.add(4/6f);
+                break;
+
+        }
     }
 }

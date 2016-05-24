@@ -11,7 +11,9 @@ uniform float height;
 uniform float zoom;
 uniform float radius = 0.005;
 
+out float start;
 out vec2 fragUV;
+
 
 bool isInBounds(vec4 p){
     return p.x >= -width && p.x <= width && p.y >= -height && p.y <= height;
@@ -19,23 +21,27 @@ bool isInBounds(vec4 p){
 
 void main(){
     vec4 center = gl_in[0].gl_Position;
-    float sprite_width = 0.012 / width;
-    float sprite_height = 0.012 / height;
+    float sprite_width = 0.0155 / width;
+    float sprite_height = 0.0155 / height;
 
     gl_Position = vec4(center.x - sprite_width, center.y - sprite_height , center.z, center.w);
     fragUV = vec2(0, 0);
+    start = center.z;
     EmitVertex();
 
     gl_Position = vec4(center.x - sprite_width, center.y + sprite_height , center.z, center.w);
     fragUV = vec2(0, 1);
+    start = center.z;
     EmitVertex();
 
     gl_Position = vec4(center.x + sprite_width, center.y - sprite_height , center.z, center.w);
     fragUV = vec2(1, 0);
+    start = center.z;
     EmitVertex();
 
     gl_Position = vec4(center.x + sprite_width, center.y + sprite_height , center.z, center.w);
     fragUV = vec2(1, 1);
+    start = center.z;
     EmitVertex();
 
     EndPrimitive();

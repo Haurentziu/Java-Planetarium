@@ -9,21 +9,21 @@ out vec2 fragUV;
 
 void main(){
     vec4 center = gl_in[0].gl_Position;
-    float uaie = 0.05;
+    float size = 0.05;
 
-    gl_Position = vec4(center.x - uaie, center.y - uaie, center.z, center.w);
+    gl_Position = vec4(center.x - size, center.y - size, center.z, center.w);
     fragUV = vec2(0, 0);
     EmitVertex();
 
-    gl_Position = vec4(center.x - uaie, center.y + uaie, center.z, center.w);
+    gl_Position = vec4(center.x - size, center.y + size, center.z, center.w);
     fragUV = vec2(0, 1);
     EmitVertex();
 
-    gl_Position = vec4(center.x + uaie, center.y - uaie, center.z, center.w);
+    gl_Position = vec4(center.x + size, center.y - size, center.z, center.w);
     fragUV = vec2(1, 0);
     EmitVertex();
 
-    gl_Position = vec4(center.x + uaie, center.y + uaie, center.z, center.w);
+    gl_Position = vec4(center.x + size, center.y + size, center.z, center.w);
     fragUV = vec2(1, 1);
     EmitVertex();
 

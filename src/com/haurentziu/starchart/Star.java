@@ -54,7 +54,7 @@ public class Star{
 	}
 	
 	float getRadius(){
-		return  (float)(18*Math.pow(1.4, -magnitude)/Main.height);
+		return  (float)(18*Math.pow(1.4, -magnitude)/800);
 	}
 	
 	int getHipparcos(){

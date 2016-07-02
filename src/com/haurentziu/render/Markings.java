@@ -119,6 +119,7 @@ public class Markings extends Renderer{
             shader.setVariable(gl, "color", 0.741f, 0.718f, 0.42f, 1f);
             renderEquator(gl, 2);
         }
+        shader.disableShader(gl);
 
     }
 

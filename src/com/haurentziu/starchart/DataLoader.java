@@ -141,6 +141,8 @@ public class DataLoader {
 
 	}
 
+
+
 	public ArrayList<MilkyWayVertex> loadMilkyWay() {
 		try{
 			ArrayList<MilkyWayVertex> vertices = new ArrayList<>();

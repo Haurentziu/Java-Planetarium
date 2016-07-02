@@ -7,6 +7,7 @@ import java.util.ArrayList;
 /**
  * Created by haurentziu on 15.05.2016.
  */
+
 public class MessierObject {
     private String name;
     private EquatorialCoordinates equatorial;

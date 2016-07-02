@@ -46,7 +46,6 @@ public class Observer {
 
     Observer(){
         setZoom(2);
-        setSideralTime(1.2);
         setLatitude(Math.toRadians(46));
         setLongitude(Math.toRadians(-26));
 
@@ -144,6 +143,7 @@ public class Observer {
 
     public void setUnixTime(long unixTime){
         this.unixTime = unixTime;
+        setSideralTime();
     }
 
     public float getMaxMagnitude(){

@@ -1,10 +1,8 @@
 package com.haurentziu.render;
 
 import com.haurentziu.coordinates.*;
-import com.haurentziu.planets.Earth;
 import com.haurentziu.planets.Planet;
 import com.haurentziu.planets.VSOPLoader;
-import com.haurentziu.starchart.Observer;
 import com.jogamp.opengl.GL3;
 
 import java.nio.FloatBuffer;

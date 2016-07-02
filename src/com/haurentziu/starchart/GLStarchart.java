@@ -18,18 +18,19 @@ public class GLStarchart implements GLEventListener{
 
     private Rectangle2D ortoBounds;
     private Rectangle2D windowBounds;
-    private Observer observer;
+    public static Observer observer;
 
-    private boolean showGround = true;
-    private boolean showCardinalPoints = true;
-    private boolean showConstellations = true;
-    private boolean showAzGrid = false;
-    private boolean showEcliptic = true;
-    private boolean showCelestialEq = true;
-    private boolean showStarNames = true;
-    private boolean showEqGrid = false;
-    private boolean showDSO = true;
-    private boolean showMilkyWay = true;
+    public static boolean showGround = true; //
+    public static boolean showCardinalPoints = true;
+    public static boolean showConstellations = true; //
+    public static boolean showAzGrid = false; //
+    public static boolean showEcliptic = true;  //
+    public static boolean showCelestialEq = true; //
+    public static boolean showStarNames = true;
+    public static boolean showEqGrid = false; //
+    public static boolean showDSO = true; //
+    public static boolean showMilkyWay = true;
+    public static boolean isPaused = false;
 
     private Stars stars;
     private Constellations constellations;
@@ -40,13 +41,12 @@ public class GLStarchart implements GLEventListener{
     private AstroText astroText;
     private VBO vbo;
 
-    private int currentWarp = 8;
-    private int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 0, 1, 10, 100, 1000, 3000, 5000, 10000};
+    public static int currentWarp = 7;
+    public static int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 1, 10, 100, 1000, 3000, 5000, 10000};
 
     GLStarchart(){
         observer = new Observer();
         vbo = new VBO();
-
         stars = new Stars("./shader/vertex.glsl", "./shader/stars_geom.glsl", "./shader/star_frag.glsl");
         constellations = new Constellations("./shader/vertex.glsl", "./shader/const_geom.glsl", "./shader/const_frag.glsl");
         messierObjects = new DeepSpaceObjects("./shader/vertex.glsl", "./shader/messier_geom.glsl", "./shader/messier_frag.glsl");
@@ -58,7 +58,6 @@ public class GLStarchart implements GLEventListener{
         ortoBounds = new Rectangle2D.Double();
         windowBounds = new Rectangle2D.Double();
     }
-
 
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
@@ -82,7 +81,7 @@ public class GLStarchart implements GLEventListener{
         markings.loadAllVertices(vertsList);
         ground.loadVertices(vertsList);
 
-        vbo.init(gl, vertsList, colorList);
+        vbo.init(gl, vertsList,  colorList);
 
         glAutoDrawable.getAnimator().setUpdateFPSFrames(20, null);
     }
@@ -108,9 +107,15 @@ public class GLStarchart implements GLEventListener{
 
         gl.glClearColor(0f, 0.075f, 0.125f, 1f);
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
-        observer.updateTime(timeWarpLevels[currentWarp]);
 
-        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+        if(isPaused) {
+            observer.updateTime(0);
+        }
+        else{
+            observer.updateTime(timeWarpLevels[currentWarp]);
+        }
+
+    //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
 
         if(showMilkyWay || showEqGrid || showAzGrid || showEcliptic || showCelestialEq){
             markings.renderAll(gl, observer, showMilkyWay, showAzGrid, showEqGrid, showCelestialEq, showEcliptic);
@@ -120,7 +125,10 @@ public class GLStarchart implements GLEventListener{
            messierObjects.render(gl, observer);
         }
 
-        constellations.render(gl, observer);
+        if(showConstellations) {
+            constellations.render(gl, observer);
+        }
+
         stars.render(gl, observer.getMaxMagnitude(), observer);
 
         solarSystem.render(gl, stars.getShader(), vbo.getBuffers(), observer.getJDE());
@@ -160,51 +168,58 @@ public class GLStarchart implements GLEventListener{
         return windowBounds;
     }
 
-    void changeWarp(int amount){
+    public static void changeWarp(int amount){
         int newWarp = amount + currentWarp;
         if(newWarp >= 0 && newWarp < timeWarpLevels.length){
             currentWarp = newWarp;
-            System.out.println(timeWarpLevels[currentWarp]);
         }
     }
 
-    void toogleGround(){
+    public static void tooglePause(){
+        isPaused = !isPaused;
+    }
+
+    public static void setDefault(){
+        currentWarp = 7;
+    }
+
+    public static void toogleGround(){
         showGround = !showGround;
     }
 
-    void tooglePoints(){
+    public static void tooglePoints(){
         showCardinalPoints = !showCardinalPoints;
     }
 
-    void toogleConstellations(){
+    public static void toogleConstellations(){
         showConstellations = !showConstellations;
     }
 
-    void toogleAzGrid(){
+    public static void toogleAzGrid(){
         showAzGrid = !showAzGrid;
     }
 
-    void toogleEcliptic(){
+    public static void toogleEcliptic(){
         showEcliptic = !showEcliptic;
     }
 
-    void toogleEqGrid(){
+    public static void toogleEqGrid(){
         showEqGrid = !showEqGrid;
     }
 
-    void toogleStarNames(){
+    public static void toogleStarNames(){
         showStarNames = !showStarNames;
     }
 
-    void toogleCelestialEq(){
+    public static void toogleCelestialEq(){
         showCelestialEq = !showCelestialEq;
     }
 
-    void toogleMilkyWay(){
+    public static void toogleMilkyWay(){
         showMilkyWay = !showMilkyWay;
     }
 
-    void toogleDSO(){
+    public static void toogleDSO(){
         showDSO = !showDSO;
     }
 }

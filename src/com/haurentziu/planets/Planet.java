@@ -22,5 +22,16 @@ public class Planet {
         return new RectangularCoordinates(xPos, yPos, zPos);
     }
 
+    public VSOPVariable getX(){
+        return x;
+    }
+
+    public VSOPVariable getY(){
+        return y;
+    }
+
+    public VSOPVariable getZ(){
+        return z;
+    }
 
 }

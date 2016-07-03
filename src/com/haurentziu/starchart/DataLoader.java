@@ -63,12 +63,12 @@ public class DataLoader {
 		return stars;
 	}
 	
-	public ArrayList<Constellation> loadConstellations(ArrayList<Star> stars){
+	public ArrayList<ConstellationLines> loadConstellations(ArrayList<Star> stars){
 		try{
 			BufferedReader reader = new BufferedReader(new FileReader("./res/constellations.csv"));
 			String line = reader.readLine();
 
-			ArrayList<Constellation> constellations = new ArrayList<>();
+			ArrayList<ConstellationLines> constellations = new ArrayList<>();
 
 			while(line != null){
 				String s[] = line.split(" ");
@@ -86,7 +86,7 @@ public class DataLoader {
 					endLines.add(endStar);
 				}
 
-				constellations.add(new Constellation(startLines, endLines));
+				constellations.add(new ConstellationLines(startLines, endLines));
 				line = reader.readLine();
 			}
 			System.out.println("Loaded Constellation Lines");
@@ -141,6 +141,38 @@ public class DataLoader {
 
 	}
 
+	public ArrayList<BoundaryLine> loadConstellationBoundaries(){
+		try{
+			String lastConst = " ";
+			ArrayList<BoundaryLine> bounds = new ArrayList<>();
+			BufferedReader reader = new BufferedReader(new FileReader("./res/bounds.csv"));
+			String line = reader.readLine();
+			while(line != null) {
+				String data[] = line.split(",");
+				if(!lastConst.equals(data[2])){
+					data[3] = "O";
+				}
+				else{
+					data[3] = "I";
+				}
+				double ra = Math.toRadians(Double.parseDouble(data[0]) * 15.0);
+				double dec = Math.toRadians(Double.parseDouble(data[1]));
+				bounds.add(new BoundaryLine(ra, dec, data[2], data[3]));
+				lastConst = data[2];
+				line = reader.readLine();
+
+			}
+			System.out.println("Loaded Constellation Boundaries");
+			return bounds;
+
+		}
+		catch (Exception ex){
+			ex.printStackTrace();
+			System.out.println("Could not load the Milky Way vertices");
+			System.exit(0);
+			return null;
+		}
+	}
 
 
 	public ArrayList<MilkyWayVertex> loadMilkyWay() {

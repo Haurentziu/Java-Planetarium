@@ -40,6 +40,7 @@ public class Stars extends Renderer{
 
     public void loadVertices(ArrayList<Float> verts){
         vertStart = verts.size() / 3;
+
         for(int  i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
             EquatorialCoordinates eq = star.getEquatorialCoordinates();
@@ -60,7 +61,7 @@ public class Stars extends Renderer{
         }
     }
 
-    public void render(GL3 gl, float maxMagnitude, Observer observer){
+    public void render(GL3 gl, Observer observer){
         shader.useShader(gl);
         gl.glEnable(GL3.GL_TEXTURE_2D);
         gl.glActiveTexture(GL3.GL_TEXTURE0);
@@ -69,10 +70,9 @@ public class Stars extends Renderer{
         super.setObserver(gl, observer);
         shader.setVariable(gl, "transform_type", 1);
         shader.setVariable(gl, "vertex_type", 1);
-        shader.setVariable(gl, "max_mag", maxMagnitude);
+        shader.setVariable(gl, "max_mag", observer.getMaxMagnitude());
         texture.disable(gl);
         gl.glDrawArrays(GL3.GL_POINTS, vertStart, vertsNumber);
-        shader.disableShader(gl);
     }
 
 

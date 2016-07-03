@@ -1,7 +1,7 @@
 package com.haurentziu.render;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
-import com.haurentziu.starchart.Constellation;
+import com.haurentziu.starchart.ConstellationLines;
 import com.haurentziu.starchart.DataLoader;
 import com.haurentziu.starchart.Observer;
 import com.haurentziu.starchart.Star;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 
 public class Constellations extends Renderer{
-    private ArrayList<Constellation> constellationsArray;
+    private ArrayList<ConstellationLines> constellationsArray;
     private int vertStart;
     private int vertNumber;
 
@@ -30,7 +30,7 @@ public class Constellations extends Renderer{
     public void loadVertices(ArrayList<Float> verts){
         vertStart = verts.size() / 3;
         for(int i = 0; i < constellationsArray.size(); i++) {
-            Constellation c = constellationsArray.get(i);
+            ConstellationLines c = constellationsArray.get(i);
 
             ArrayList<Star> startStars = c.getStartStars();
             ArrayList<Star> endStars = c.getEndStars();

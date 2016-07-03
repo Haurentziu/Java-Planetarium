@@ -20,17 +20,18 @@ public class GLStarchart implements GLEventListener{
     private Rectangle2D windowBounds;
     public static Observer observer;
 
-    public static boolean showGround = true; //
+    public static boolean showGround = true;
     public static boolean showCardinalPoints = true;
-    public static boolean showConstellations = true; //
-    public static boolean showAzGrid = false; //
-    public static boolean showEcliptic = true;  //
-    public static boolean showCelestialEq = true; //
+    public static boolean showConstellations = true;
+    public static boolean showAzGrid = false;
+    public static boolean showEcliptic = true;
+    public static boolean showCelestialEq = true;
     public static boolean showStarNames = true;
-    public static boolean showEqGrid = false; //
-    public static boolean showDSO = true; //
+    public static boolean showEqGrid = false;
+    public static boolean showDSO = true;
     public static boolean showMilkyWay = true;
     public static boolean isPaused = false;
+    public static boolean showBounds = false;
 
     private Stars stars;
     private Constellations constellations;
@@ -118,7 +119,7 @@ public class GLStarchart implements GLEventListener{
     //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
 
         if(showMilkyWay || showEqGrid || showAzGrid || showEcliptic || showCelestialEq){
-            markings.renderAll(gl, observer, showMilkyWay, showAzGrid, showEqGrid, showCelestialEq, showEcliptic);
+            markings.renderAll(gl, observer, showBounds, showMilkyWay, showAzGrid, showEqGrid, showCelestialEq, showEcliptic);
         }
 
         if(showDSO){
@@ -129,8 +130,7 @@ public class GLStarchart implements GLEventListener{
             constellations.render(gl, observer);
         }
 
-        stars.render(gl, observer.getMaxMagnitude(), observer);
-
+        stars.render(gl, observer);
         solarSystem.render(gl, stars.getShader(), vbo.getBuffers(), observer.getJDE());
 
         if(showGround) {
@@ -219,7 +219,12 @@ public class GLStarchart implements GLEventListener{
         showMilkyWay = !showMilkyWay;
     }
 
+    public static void toogleBounds(){
+        showBounds = !showBounds;
+    }
+
     public static void toogleDSO(){
         showDSO = !showDSO;
     }
+
 }

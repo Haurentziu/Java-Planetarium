@@ -27,6 +27,8 @@ public class SolarSystem {
 		planets[5] = loader.readVSOP("./res/vsop87/VSOP87C.ura");
 		planets[6] = loader.readVSOP("./res/vsop87/VSOP87C.nep");
 
+
+
 	}
 
 	public void render(GL3 gl, Shader shader, IntBuffer buffer, double jde){
@@ -73,9 +75,9 @@ public class SolarSystem {
 		colors.add(1f);
 		colors.add(0.5f);
 
-	/*	colors.add(0.8f);
+		colors.add(0.8f);
 		colors.add(0.7f);
-		colors.add(0.2f);*/
+		colors.add(0.2f);
 	}
 
 
@@ -89,6 +91,7 @@ public class SolarSystem {
 		vertices[0] = (float)earthEcliptical.getLongitude();
 		vertices[1] = (float)earthEcliptical.getLatitude();
 		vertices[2] = -3f;
+
 		for(int i = 0; i < planets.length; i++) {
 			RectangularCoordinates rect = planets[i].getRectangularCoordinates(tau);
 			rect.addCoordinates(earthRect);
@@ -97,9 +100,9 @@ public class SolarSystem {
 			vertices[3*i + 3] = (float)ecliptical.getLongitude();
 			vertices[3*i + 4] = (float)ecliptical.getLatitude();
 			vertices[3*i + 5] = mags[i];
-		}
 
-	//	System.out.println(Math.toDegrees(vertices[3 * 7]));
+
+		}
 
 		arraySize = vertices.length / 3;
 		FloatBuffer systemFB = FloatBuffer.wrap(vertices);

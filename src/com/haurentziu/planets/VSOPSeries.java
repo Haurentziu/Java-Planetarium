@@ -34,4 +34,16 @@ public class VSOPSeries {
         return result;
     }
 
+    public ArrayList<Double> getATerm(){
+        return aTerm;
+    }
+
+    public ArrayList<Double> getBTerm(){
+        return bTerm;
+    }
+
+    public ArrayList<Double> getCTerm(){
+        return cTerm;
+    }
+
 }

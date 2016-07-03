@@ -33,8 +33,11 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
     boolean shouldUpdate = true;
 
     private JSpinner focusedJspinner;
+    private Calendar lastValidCalendar;
 
     public TimeMenu(){
+        updateAll();
+        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         createGUI();
         Thread thread = new Thread(this);
         thread.start();
@@ -66,8 +69,7 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
     }
 
     void createGUI(){
-        updateAll();
-        setSize(410, 115);
+        setSize(490, 105);
         setAlwaysOnTop(true);
         setResizable(false);
         setTitle("Date & Time");
@@ -85,69 +87,54 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
         year.setFont(new Font("SansSerif", Font.PLAIN , 25));
         year.setEditor(new JSpinner.NumberEditor(year,"#"));
 
-        disableArrows(hour);
-        disableArrows(minute);
-        disableArrows(second);
-
-        disableArrows(day);
-        disableArrows(month);
-        disableArrows(year);
+        Font labelFont = new Font("SansSerif", Font.PLAIN, 20);
 
         jp.add(hour);
-        jp.add(new JLabel(":"));
+        jp.add(createJLabel(":", labelFont));
         jp.add(minute);
-        jp.add(new JLabel(":"));
+        jp.add(createJLabel(":", labelFont));
         jp.add(second);
+        jp.add(Box.createHorizontalStrut(10));
         jp.add(day);
-        jp.add(new JLabel("/"));
+        jp.add(createJLabel("/", labelFont));
         jp.add(month);
-        jp.add(new JLabel("/"));
+        jp.add(createJLabel("/", labelFont));
         jp.add(year);
         add(jp);
         jp.setVisible(true);
     }
 
-    void updateAll(){
-        updateHours();
-        updateMinutes();
-        updateSeconds();
-        updateDays();
-        updateMoths();
-        updateYear();
+    public void updateAll(){
+        lastValidCalendar = Calendar.getInstance();
+        setSpinnerValues(lastValidCalendar);
     }
 
-    void updateHours(){
-        Calendar calendar = Calendar.getInstance();
+    JLabel createJLabel(String text, Font font){
+        JLabel label = new JLabel(text);
+        label.setFont(font);
+        return label;
+    }
+
+    public void setSpinnerValues(Calendar calendar){
+        year.setValue(calendar.get(Calendar.YEAR));
+        month.setValue(calendar.get(Calendar.MONTH) + 1);
+        day.setValue(calendar.get(Calendar.DAY_OF_MONTH));
+
         hour.setValue(calendar.get(Calendar.HOUR_OF_DAY));
-    }
-
-    void updateMinutes(){
-        Calendar calendar = Calendar.getInstance();
         minute.setValue(calendar.get(Calendar.MINUTE));
-    }
-
-    void updateSeconds(){
-        Calendar calendar = Calendar.getInstance();
         second.setValue(calendar.get(Calendar.SECOND));
     }
 
-    void updateDays(){
+    public void setSpinnerValues(long unixTime){
         Calendar calendar = Calendar.getInstance();
-        day.setValue(calendar.get(Calendar.DAY_OF_MONTH));
+        calendar.setTimeInMillis(unixTime);
+        setSpinnerValues(calendar);
     }
 
-    void updateMoths(){
-        Calendar calendar = Calendar.getInstance();
-        month.setValue(calendar.get(Calendar.MONTH));
-    }
 
-    void updateYear(){
-        Calendar calendar = Calendar.getInstance();
-        year.setValue(calendar.get(Calendar.YEAR));
-    }
 
     void setProprieties(JSpinner j){
-        j.setPreferredSize(new Dimension(40 ,40));
+        j.setPreferredSize(new Dimension(50 ,40));
         j.setFont(new Font("SansSerif", Font.PLAIN , 25));
     }
 
@@ -158,15 +145,73 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
     @Override
     public void stateChanged(ChangeEvent changeEvent) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, (Integer)hour.getValue());
-        calendar.set(Calendar.MINUTE, (Integer)minute.getValue());
-        calendar.set(Calendar.SECOND, (Integer)second.getValue());
-        calendar.set(Calendar.DAY_OF_MONTH, (Integer)day.getValue());
-        calendar.set(Calendar.MONTH, (Integer)month.getValue());
         calendar.set(Calendar.YEAR, (Integer)year.getValue());
-        long unixTime = calendar.getTimeInMillis();
+
+        boolean isValid = true;
+
+        int monthValue = (Integer)month.getValue() - 1;
+        if(monthValue >= calendar.getActualMinimum(Calendar.MONTH) && monthValue <= calendar.getActualMaximum(Calendar.MONTH)){
+            calendar.set(Calendar.MONTH, monthValue);
+        }
+        else {
+        //    System.out.printf("Invalid month: %d\n", monthValue);
+            isValid = false;
+        }
+
+        int dayValue = (Integer)day.getValue();
+        if(dayValue >= calendar.getActualMinimum(Calendar.DAY_OF_MONTH) && dayValue <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH)){
+            calendar.set(Calendar.DAY_OF_MONTH, dayValue);
+        }
+        else {
+            System.out.printf("Invalid day: %d\n", dayValue);
+            isValid = false;
+        }
+
+        int hourValue = (Integer)hour.getValue();
+        if(hourValue >= calendar.getActualMinimum(Calendar.HOUR_OF_DAY) && hourValue <= calendar.getActualMaximum(Calendar.HOUR_OF_DAY)){
+            calendar.set(Calendar.HOUR_OF_DAY, hourValue);
+        }
+        else {
+            System.out.printf("Invalid hour: %d\n", hourValue);
+            isValid = false;
+        }
+
+        int minuteValue = (Integer)minute.getValue();
+        if(minuteValue >= calendar.getActualMinimum(Calendar.MINUTE) && minuteValue <= calendar.getActualMaximum(Calendar.MINUTE)){
+            calendar.set(Calendar.MINUTE, minuteValue);
+        }
+        else {
+            System.out.printf("Invalid minute: %d\n", minuteValue);
+            isValid = false;
+        }
+
+        int secondValue = (Integer)second.getValue();
+        if(secondValue >= calendar.getActualMinimum(Calendar.SECOND) && minuteValue <= calendar.getActualMaximum(Calendar.SECOND)){
+            calendar.set(Calendar.SECOND, secondValue);
+        }
+        else {
+            System.out.printf("Invalid second: %d\n", secondValue);
+            isValid = false;
+        }
+
+        long unixTime;
+        if(isValid) {
+            unixTime = calendar.getTimeInMillis();
+            lastValidCalendar = calendar;
+        }
+        else{
+            unixTime = lastValidCalendar.getTimeInMillis();
+            setSpinnerValues(lastValidCalendar);
+            System.err.println("Invalid Time!");
+        }
+
+
+        Calendar updatedCalendar = Calendar.getInstance();
+        updatedCalendar.setTimeInMillis(unixTime);
+
+        setSpinnerValues(updatedCalendar);
         GLStarchart.observer.setUnixTime(unixTime);
-        System.out.println(unixTime);
+
     }
 
     void disableArrows(JSpinner spinner){
@@ -185,7 +230,7 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
     public void run() {
         while(true) {
             if(shouldUpdate) {
-             //   updateAll();
+                //updateAll();
             }
             try {
                 Thread.sleep(10);
@@ -195,6 +240,7 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
             }
         }
     }
+
 
     @Override
     public void focusGained(FocusEvent e) {

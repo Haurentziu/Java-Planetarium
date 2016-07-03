@@ -1,6 +1,6 @@
 #Java Planetarium
 
-Open Source planetarium program made by Haurentziu using Java and JOGL
+Open Source planetarium software programmed in Java and JOGL
 
 ![Java Planetarium](http://i.imgur.com/ARBk1t0.png)
 
@@ -14,6 +14,7 @@ Open Source planetarium program made by Haurentziu using Java and JOGL
 * S - show/hide ecliptic
 * M - show/hide Milky Way
 * D - show/hide deep space objects
+* B - show/hide constellations boundaries
 * Right Arrow - increase time speed
 * Left Arrow - decrease time speed
 

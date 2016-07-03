@@ -4,7 +4,6 @@ import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.ProjectionPoint;
 import com.haurentziu.coordinates.SphericalCoordinates;
-import com.haurentziu.utils.Utils;
 
 import java.awt.geom.Rectangle2D;
 
@@ -35,17 +34,18 @@ public class Observer {
 
     Observer(double longitude, double latitude, double sideralTime, double azRotation, double altRotation, byte projection, double zoom){
         setZoom(zoom);
-        setSideralTime(sideralTime);
+        computeSideralTime(sideralTime);
         setLatitude(latitude);
         setLongitude(longitude);
         setAzimuthRotation(azRotation);
         setAltRotation(altRotation);
         setProjection(projection);
-        setSideralTime();
+        computeSideralTime();
     }
 
     Observer(){
         setZoom(2);
+        computeSideralTime(1.2);
         setLatitude(Math.toRadians(46));
         setLongitude(Math.toRadians(-26));
 
@@ -55,8 +55,7 @@ public class Observer {
         setProjection(SphericalCoordinates.STEREOGRAPHIC_PROJECTION);
         setFOV(Math.PI/2);
         t = new Timer();
-        unixTime = System.currentTimeMillis();
-        setSideralTime();
+        setTimeNow();
     }
 
 
@@ -65,7 +64,7 @@ public class Observer {
         this.zoom = zoom;
     }
 
-    public void setSideralTime(double sideralTime){
+    public void computeSideralTime(double sideralTime){
         this.sideralTime = sideralTime;
     }
 
@@ -141,9 +140,13 @@ public class Observer {
         return unixTime;
     }
 
+    public void setTimeNow(){
+        setUnixTime(System.currentTimeMillis());
+    }
+
     public void setUnixTime(long unixTime){
         this.unixTime = unixTime;
-        setSideralTime();
+        computeSideralTime();
     }
 
     public float getMaxMagnitude(){
@@ -159,7 +162,7 @@ public class Observer {
         if(sideralTime > 2*Math.PI) sideralTime -= 2*Math.PI;
     }
 
-    private void setSideralTime(){
+    private void computeSideralTime(){
         double jde = getJDE();
         double T = (jde - 2451545.0)/36525.0;
         double LST0 = 280.46061837 + 360.98564736629 * (jde - 2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;

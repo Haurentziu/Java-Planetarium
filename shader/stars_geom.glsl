@@ -29,22 +29,8 @@ void main(){
     float sprite_width = zoomed_radius / width;
     float sprite_height = zoomed_radius / height;
 
-  /*  float sprite_width = 0.1155 ;
-    float sprite_height = 0.1155 ;*/
 
     if(isInBounds(center) && draw[0] > 0.5){
-     /*  for(float i =  0; i <= 6.5; i += 0.5){
-            float x = center.x + zoomed_radius * cos(i) / width;
-            float y = center.y + zoomed_radius * sin(i) / height;
-
-            gl_Position = vec4(x, y, 0, 1);
-            frag_color = geom_color[0];
-            EmitVertex();
-
-            gl_Position = vec4(center.xy, 0, 1);
-            frag_color = geom_color[0];
-            EmitVertex();
-        }*/
 
         gl_Position = vec4(center.x - sprite_width, center.y - sprite_height , 0, center.w);
         fragUV = vec2(0, 0);

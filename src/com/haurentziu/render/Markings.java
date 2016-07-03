@@ -1,5 +1,6 @@
 package com.haurentziu.render;
 
+import com.haurentziu.starchart.BoundaryLine;
 import com.haurentziu.starchart.DataLoader;
 import com.haurentziu.starchart.MilkyWayVertex;
 import com.haurentziu.starchart.Observer;
@@ -15,12 +16,16 @@ public class Markings extends Renderer{
     private final static double STEP_GRID = Math.PI/18;
 
     private final ArrayList<MilkyWayVertex> milkyWayVertices;
+    private final ArrayList<BoundaryLine> constellationBoundaries;
 
     private int mwVertStart;
     private ArrayList<Integer> mwVertNumbers;
 
     private int gridVertStart;
     private ArrayList<Integer> gridVertNumbers;
+
+    private int constelBoundsStart;
+    private ArrayList<Integer> constelBoundsNumbers;
 
     private int equatorVertStart;
     private int equatorVertNumber;
@@ -29,12 +34,29 @@ public class Markings extends Renderer{
         super(vertShader, geomShader, fragShader);
         DataLoader loader = new DataLoader();
         milkyWayVertices = loader.loadMilkyWay();
+        constellationBoundaries = loader.loadConstellationBoundaries();
     }
 
     public void loadAllVertices(ArrayList<Float> verts){
         loadMWVertices(verts);
         loadGridVertices(verts);
         loadEquatorVertices(verts);
+        loadConstelBounds(verts);
+    }
+
+    private void loadConstelBounds(ArrayList<Float> verts){
+        constelBoundsNumbers = new ArrayList<>();
+        constelBoundsStart = verts.size() / 3;
+        int originalSize = verts.size();
+        for(int i = 0; i < constellationBoundaries.size(); i++){
+            BoundaryLine bound = constellationBoundaries.get(i);
+            if(bound.isOriginal()){
+                constelBoundsNumbers.add((verts.size() - originalSize) / 3);
+                originalSize = verts.size();
+            }
+            bound.loadVertex(verts);
+        }
+        constelBoundsNumbers.add((verts.size() - originalSize) / 3);
     }
 
     private void loadMWVertices(ArrayList<Float> verts){
@@ -91,10 +113,14 @@ public class Markings extends Renderer{
         equatorVertNumber =  verts.size() / 3 - equatorVertStart;
     }
 
-    public void renderAll(GL3 gl, Observer observer, boolean renderMilkyWay, boolean renderAzGrid, boolean renderEqGrid, boolean renderEquator, boolean renderEcliptic){
+    public void renderAll(GL3 gl, Observer observer, boolean renderBounds, boolean renderMilkyWay, boolean renderAzGrid, boolean renderEqGrid, boolean renderEquator, boolean renderEcliptic){
         shader.useShader(gl);
         setObserver(gl, observer);
         shader.setVariable(gl, "vertex_type", 0);
+
+        if(renderBounds) {
+            renderBoundaries(gl);
+        }
 
         if(renderAzGrid){
             shader.setVariable(gl, "color", 0.404f, 0.302f, 0f, 0.6f);
@@ -111,7 +137,7 @@ public class Markings extends Renderer{
         }
 
         if(renderEquator){
-            shader.setVariable(gl, "color", 1f, 0f, 0f, 1f);
+            shader.setVariable(gl, "color", 0.6f, 0f, 0.3f, 1f);
             renderEquator(gl, 1);
         }
 
@@ -119,6 +145,7 @@ public class Markings extends Renderer{
             shader.setVariable(gl, "color", 0.741f, 0.718f, 0.42f, 1f);
             renderEquator(gl, 2);
         }
+
         shader.disableShader(gl);
 
     }
@@ -132,6 +159,18 @@ public class Markings extends Renderer{
             sentVerts += mwVertNumbers.get(i);
         }
     }
+
+    private void renderBoundaries(GL3 gl){
+        shader.setVariable(gl, "transform_type", 1);
+        shader.setVariable(gl, "color", 1f, 0f, 0f, 0.5f);
+        int sentVerts = constelBoundsStart;
+        for(int i = 0; i < constelBoundsNumbers.size(); i++){
+            gl.glDrawArrays(GL3.GL_LINE_STRIP, sentVerts, constelBoundsNumbers.get(i));
+            sentVerts += constelBoundsNumbers.get(i);
+        }
+
+    }
+
 
     private void renderGrid(GL3 gl, int type){
         shader.setVariable(gl, "transform_type", type);

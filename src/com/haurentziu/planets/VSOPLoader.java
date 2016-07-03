@@ -40,9 +40,9 @@ public class VSOPLoader {
                 }
 
                 else {
-                    double a = Double.parseDouble(line.substring(84, 97));
-                    double b = Double.parseDouble(line.substring(98, 111));
-                    double c = Double.parseDouble(line.substring(112, 131));
+                    double a = Double.parseDouble(line.substring(83, 97).replaceAll("\\s",""));
+                    double b = Double.parseDouble(line.substring(97, 111).replaceAll("\\s",""));
+                    double c = Double.parseDouble(line.substring(111, 131).replaceAll("\\s",""));
                     series.addTerm(a, b, c);
                 }
 

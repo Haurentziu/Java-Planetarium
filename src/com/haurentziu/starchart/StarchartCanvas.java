@@ -1,12 +1,14 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.coordinates.ProjectionPoint;
 import com.haurentziu.coordinates.SphericalCoordinates;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.awt.GLCanvas;
-import com.jogamp.opengl.awt.GLJPanel;
 
 import java.awt.event.*;
-
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 /**
  * Created by haurentziu on 27.04.2016.
@@ -24,6 +26,7 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
         renderer = new GLStarchart();
 
         addGLEventListener(renderer);
+
         addMouseWheelListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -133,7 +136,7 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
             case KeyEvent.VK_P:	    renderer.tooglePoints();
                 break;
 
-           case KeyEvent.VK_N:      renderer.toogleStarNames();
+            case KeyEvent.VK_N:      renderer.toogleStarNames();
                 break;
 
             case KeyEvent.VK_E:     renderer.toogleEqGrid();
@@ -149,6 +152,9 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
                 break;
 
             case KeyEvent.VK_D:     renderer.toogleDSO();
+                break;
+
+            case KeyEvent.VK_B:     renderer.toogleBounds();
                 break;
         }
     }

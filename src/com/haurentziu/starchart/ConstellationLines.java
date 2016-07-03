@@ -8,12 +8,12 @@ import java.util.ArrayList;
  *
  */
 
-public class Constellation {
+public class ConstellationLines {
 
 	private ArrayList<Star> lineStart;
 	private ArrayList<Star> lineEnd;
 	
-	Constellation(ArrayList<Star> lineStart, ArrayList<Star> lineEnd){
+	ConstellationLines(ArrayList<Star> lineStart, ArrayList<Star> lineEnd){
 		this.lineEnd = lineEnd;
 		this.lineStart = lineStart;
 	}

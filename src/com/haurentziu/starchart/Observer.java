@@ -46,8 +46,8 @@ public class Observer {
     Observer(){
         setZoom(2);
         computeSideralTime(1.2);
-        setLatitude(Math.toRadians(46));
-        setLongitude(Math.toRadians(-26));
+        setLatitude(Math.toRadians(46.9300));
+        setLongitude(Math.toRadians(-26.3780));
 
         setAzimuthRotation(0);
         setAltRotation(Math.PI/4);

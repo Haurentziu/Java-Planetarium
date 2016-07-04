@@ -28,18 +28,26 @@ public class BarButton extends JButton implements MouseListener{
             System.out.printf("Could not find the image located at %s\n", imagePath);
         }
 
+        createButton(new ImageIcon(image), toolTipText, listener);
+
+    }
+
+    public BarButton(ImageIcon icon, String toolTipText, ActionListener listener){
+
+        createButton(icon, toolTipText, listener);
+    }
+
+    private void createButton(ImageIcon icon, String toolTipText, ActionListener listener){
         setBorder(new LineBorder(NORMAL_COLOR));
         setBackground(NORMAL_COLOR);
         setFocusable(false);
         setContentAreaFilled(false);
         setOpaque(false);
         setFocusPainted(false);
-        setIcon(new ImageIcon(image));
+        setIcon(icon);
         setToolTipText(toolTipText);
-
         addActionListener(listener);
         addMouseListener(this);
-
     }
 
     @Override

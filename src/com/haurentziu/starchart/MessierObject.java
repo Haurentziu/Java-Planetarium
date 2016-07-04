@@ -24,19 +24,19 @@ public class MessierObject {
         verts.add((float)equatorial.getDeclination());
         switch(type)
         {
-            case "Globular Cluster":    verts.add(3/6f);
+            case "Globular Cluster":    verts.add(0/6f);
                 break;
 
             case "Open Cluster":        verts.add(1/6f);
                 break;
 
-            case "Nebula":              verts.add(2/6f);
+            case "Nebula":              verts.add(3/6f);
                 break;
 
             case "Galaxy":              verts.add(4/6f);
                 break;
 
-            case "Spiral Galaxy":       verts.add(4/6f);
+            case "Spiral Galaxy":       verts.add(5/6f);
                 break;
 
         }

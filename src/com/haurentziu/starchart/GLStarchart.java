@@ -116,7 +116,7 @@ public class GLStarchart implements GLEventListener{
             observer.updateTime(timeWarpLevels[currentWarp]);
         }
 
-    //    System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+        //System.out.println(glAutoDrawable.getAnimator().getLastFPS());
 
         if(showMilkyWay || showEqGrid || showAzGrid || showEcliptic || showCelestialEq){
             markings.renderAll(gl, observer, showBounds, showMilkyWay, showAzGrid, showEqGrid, showCelestialEq, showEcliptic);

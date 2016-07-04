@@ -67,6 +67,7 @@ void main(void){
     if(vertex_type != 1 || pos.z < max_mag){
         geom_color = color;
         vec4 coord = vec4(pos, 1);
+
         if(transform_type == 2){
             float declination = asin(sin(coord.y) * cos(obliquity) + cos(coord.y) * sin(obliquity) * sin(coord.x));
             float right_ascension = atan(sin(coord.x) * cos(obliquity) - tan(coord.y) * sin(obliquity), cos(coord.x));

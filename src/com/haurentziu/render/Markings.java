@@ -12,8 +12,10 @@ import java.util.ArrayList;
  * Created by haurentziu on 20.05.2016.
  */
 public class Markings extends Renderer{
-    private final static double STEP_LINE = Math.PI/30;
-    private final static double STEP_GRID = Math.PI/18;
+    private final static double STEP_LINE_VERTICAL = (Math.PI - 0.00001)/30;
+    private final static double STEP_LINE_HORIZONTAL = Math.PI/30;
+    private final static double STEP_GRID_VERTICAL = (Math.PI - 0.00001)/18;
+    private final static double STEP_GRID_HORIZONTAL = Math.PI/18;
 
     private final ArrayList<MilkyWayVertex> milkyWayVertices;
     private final ArrayList<BoundaryLine> constellationBoundaries;
@@ -80,8 +82,8 @@ public class Markings extends Renderer{
         gridVertNumbers = new ArrayList<>();
         gridVertStart = verts.size() / 3;
         int originalSize = verts.size();
-        for(float i = 0; i < 2* Math.PI; i += STEP_GRID){
-            for(float j = -(float)Math.PI / 2; j < (float)Math.PI / 2; j += STEP_LINE){
+        for(float i = 0; i < 2* Math.PI; i += STEP_GRID_HORIZONTAL){
+            for(float j = (float)( -Math.PI / 2 + 0.00001); j < (float)Math.PI / 2; j += STEP_LINE_VERTICAL){
                 verts.add(i);
                 verts.add(j);
                 verts.add(0f);
@@ -92,12 +94,14 @@ public class Markings extends Renderer{
 
         originalSize = verts.size();
 
-        for(float i = -(float)Math.PI / 2; i < (float)Math.PI / 2; i += STEP_GRID){
-            for(float j = 0; j < 2 * Math.PI; j += STEP_LINE){
+
+        for(float i = -(float)Math.PI / 2 + 0.00001f; i < (float)Math.PI / 2; i += STEP_GRID_VERTICAL){
+            for(float j = 0; j < 2 * Math.PI; j += STEP_LINE_HORIZONTAL){
                 verts.add(j);
                 verts.add(i);
                 verts.add(0f);
             }
+
             gridVertNumbers.add((verts.size() - originalSize)/3);
             originalSize = verts.size();
         }
@@ -105,7 +109,7 @@ public class Markings extends Renderer{
 
     private void loadEquatorVertices(ArrayList<Float> verts){
         equatorVertStart = verts.size() / 3;
-        for(float i = 0; i < 2*Math.PI; i += STEP_LINE){
+        for(float i = 0; i < 2*Math.PI; i += STEP_LINE_HORIZONTAL){
             verts.add(i);
             verts.add(0f);
             verts.add(0f);
@@ -174,7 +178,7 @@ public class Markings extends Renderer{
 
     private void renderGrid(GL3 gl, int type){
         shader.setVariable(gl, "transform_type", type);
-        int sentVerts = gridVertStart;
+        int sentVerts = gridVertStart ;
         for (int i = 0; i < gridVertNumbers.size(); i++) {
             gl.glDrawArrays(GL3.GL_LINE_STRIP, sentVerts, gridVertNumbers.get(i));
             sentVerts += gridVertNumbers.get(i);

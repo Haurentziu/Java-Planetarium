@@ -48,6 +48,7 @@ public class Main {
 		timeMenu.setVisible(false);
 
 		locationMenu = new LocationMenu();
+		locationMenu.setValues(GLStarchart.observer);
 		locationMenu.setVisible(false);
 
 		if(fullScreen){
@@ -76,6 +77,11 @@ public class Main {
 		timeMenu.setSpinnerValues(GLStarchart.observer.getUnixTime());
 		timeMenu.setVisible(true);
 		timeMenu.toFront();
+	}
+
+	public static void showLocationMenu(){
+		locationMenu.setVisible(true);
+		locationMenu.toFront();
 	}
 
 	public static void exit(){

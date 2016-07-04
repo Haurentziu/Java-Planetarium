@@ -5,67 +5,77 @@ import com.haurentziu.starchart.Main;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.tools.Tool;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by BOSS on 6/29/2016.
  */
 public class ToolBar extends JToolBar implements ActionListener{
-    BarButton equatorialButton;
-    BarButton horizontalButton;
-    BarButton groundButton;
-    BarButton constellationButton;
-    BarButton eclipticButton;
-    BarButton equatorButton;
-    BarButton dsoButton;
-    BarButton mwButton;
-    BarButton closeButton;
-    BarButton timeMenuButton;
-    BarButton boundsMenu;
+    private BarButton equatorialButton;
+    private BarButton horizontalButton;
+    private BarButton groundButton;
+    private BarButton constellationButton;
+    private BarButton eclipticButton;
+    private BarButton equatorButton;
+    private BarButton dsoButton;
+    private BarButton mwButton;
+    private BarButton closeButton;
+    private BarButton timeMenuButton;
+    private BarButton boundsMenuButton;
+    private BarButton locMenuButton;
 
-    BarButton fasterButton;
-    BarButton slowerButton;
-    BarButton pauseButton;
-    BarButton nowButton;
-    BarButton defaultButton;
+    private BarButton fasterButton;
+    private BarButton slowerButton;
+    private BarButton pauseButton;
+    private BarButton nowButton;
+    private BarButton defaultButton;
+
+    private ImageIcon pauseIcon;
+    private ImageIcon startIcon;
 
 
     public ToolBar(){
-        equatorialButton = new BarButton("./res/img/equatorial.png", "Toogle Equatorial Grid", this);
-        horizontalButton = new BarButton("./res/img/horizontal.png", "Toogle Azimuthal Grid", this);
-        groundButton = new BarButton("./res/img/ground.png", "Toogle Ground", this);
-        constellationButton = new BarButton("./res/img/const_line.png", "Toogle ConstellationLines Lines", this);
-        eclipticButton = new BarButton("./res/img/ecliptic.png", "Toogle Ecliptic", this);
-        equatorButton = new BarButton("./res/img/equator.png", "Toogle Celestial Equator", this);
-        boundsMenu = new BarButton("./res/img/bounds.png", "Toogle Constellations Bounds", this);
+        try{
+            pauseIcon = new ImageIcon(ImageIO.read(new File("./res/img/pause.png")));
+            startIcon = new ImageIcon(ImageIO.read(new File("./res/img/start.png")));
+        }
+        catch (Exception ex){
+
+        }
+        equatorialButton = new BarButton("./res/img/equatorial.png", "Toogle equatorial grid", this);
+        horizontalButton = new BarButton("./res/img/horizontal.png", "Toogle azimuthal grid", this);
+        groundButton = new BarButton("./res/img/ground.png", "Toogle ground", this);
+        constellationButton = new BarButton("./res/img/const_line.png", "Toogle constellationLines lines", this);
+        eclipticButton = new BarButton("./res/img/ecliptic.png", "Toogle ecliptic", this);
+        equatorButton = new BarButton("./res/img/equator.png", "Toogle celestial equator", this);
+        boundsMenuButton = new BarButton("./res/img/bounds.png", "Toogle constellations bounds", this);
         dsoButton = new BarButton("./res/img/dso.png", "Toogle DSOs", this);
         mwButton = new BarButton("./res/img/milky_way.png", "Toogle Milky Way", this);
-        timeMenuButton = new BarButton("./res/img/clock.png", "Time Menu", this);
-        closeButton = new BarButton("./res/img/onoff.png", "Exit Application", this);
+        timeMenuButton = new BarButton("./res/img/clock.png", "Show time menu", this);
+        locMenuButton = new BarButton("./res/img/location.png", "Show location menu", this);
+        closeButton = new BarButton("./res/img/onoff.png", "Exit application", this);
 
-        fasterButton = new BarButton("./res/img/faster.png", "Increase Time Warp", this);
+        fasterButton = new BarButton("./res/img/faster.png", "Increase time warp", this);
         pauseButton = new BarButton("./res/img/pause.png", "Pause", this);
         nowButton = new BarButton("./res/img/now.png", "Now", this);
-        slowerButton = new BarButton("./res/img/slower.png", "Decrease Time Warp", this);
-        defaultButton = new BarButton("./res/img/one.png", "Time Warp x1", this);
+        slowerButton = new BarButton("./res/img/slower.png", "Decrease time warp", this);
+        defaultButton = new BarButton("./res/img/one.png", "Time warp x1", this);
 
         add(equatorialButton);
         add(horizontalButton);
         add(groundButton);
         add(constellationButton);
-        add(boundsMenu);
+        add(boundsMenuButton);
         add(eclipticButton);
         add(equatorButton);
         add(dsoButton);
         add(mwButton);
         add(timeMenuButton);
+        add(locMenuButton);
         add(closeButton);
 
         add(Box.createHorizontalGlue());
@@ -81,42 +91,73 @@ public class ToolBar extends JToolBar implements ActionListener{
 
     }
 
+    private void setPauseButtonIcon(){
+        if(GLStarchart.isPaused){
+            pauseButton.setIcon(startIcon);
+        }
+        else{
+            pauseButton.setIcon(pauseIcon);
+        }
+
+    }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if(source == equatorialButton)
+        if(source == equatorialButton) {
             GLStarchart.toogleEqGrid();
-        else if(source == horizontalButton)
+        }
+        else if(source == horizontalButton) {
             GLStarchart.toogleAzGrid();
-        else if(source == groundButton)
+        }
+        else if(source == groundButton) {
             GLStarchart.toogleGround();
-        else if(source == constellationButton)
+        }
+        else if(source == constellationButton) {
             GLStarchart.toogleConstellations();
-        else if(source == eclipticButton)
+        }
+        else if(source == eclipticButton) {
             GLStarchart.toogleEcliptic();
-        else if(source == equatorButton)
+        }
+        else if(source == equatorButton) {
             GLStarchart.toogleCelestialEq();
-        else if(source == dsoButton)
+        }
+        else if(source == dsoButton) {
             GLStarchart.toogleDSO();
-        else if(source == mwButton)
+        }
+        else if(source == mwButton) {
             GLStarchart.toogleMilkyWay();
-        else if(source == fasterButton)
+        }
+        else if(source == fasterButton) {
             GLStarchart.changeWarp(1);
-        else if(source == slowerButton)
+        }
+        else if(source == slowerButton) {
             GLStarchart.changeWarp(-1);
-        else if(source == pauseButton)
+        }
+        else if(source == pauseButton) {
             GLStarchart.tooglePause();
-        else if(source == defaultButton)
+            setPauseButtonIcon();
+        }
+        else if(source == defaultButton) {
             GLStarchart.setDefault();
-        else if(source == closeButton)
+        }
+        else if(source == closeButton) {
             Main.exit();
-        else if(source == timeMenuButton)
+        }
+        else if(source == timeMenuButton) {
             Main.showTimeMenu();
-        else if(source == nowButton)
+        }
+        else if(source == nowButton) {
             GLStarchart.observer.setTimeNow();
-        else if(source == boundsMenu)
+        }
+        else if(source == boundsMenuButton) {
             GLStarchart.toogleBounds();
+        }
+        else if(source == locMenuButton){
+            Main.showLocationMenu();
+        }
+
     }
 
     @Override

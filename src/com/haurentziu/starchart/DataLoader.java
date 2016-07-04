@@ -53,10 +53,10 @@ public class DataLoader {
 				line = reader.readLine();
 			}
 			reader.close();
-			System.out.println("Loaded Stars");
+			System.out.println("Loaded the Hipparcos catalog");
 		}
 		catch(Exception ex){
-			System.out.println("Could not load the stars!");
+			System.out.println("Could not load the Hipparcos catalog");
 			System.exit(0);
 		}
 		
@@ -89,7 +89,7 @@ public class DataLoader {
 				constellations.add(new ConstellationLines(startLines, endLines));
 				line = reader.readLine();
 			}
-			System.out.println("Loaded Constellation Lines");
+			System.out.println("Loaded constellation lines");
 
 			return constellations;
 		}
@@ -131,10 +131,11 @@ public class DataLoader {
 				messierObjects.add(new MessierObject(data[0], ra, dec, data[1]));
 				line = reader.readLine();
 			}
+			System.out.println("Loaded Messier Objects");
 			return messierObjects;
 		}
 		catch (Exception ex){
-			System.out.println("Could not load the messier objects");
+			System.out.println("Could not load the Messier objects");
 			System.exit(0);
 			return null;
 		}
@@ -162,7 +163,7 @@ public class DataLoader {
 				line = reader.readLine();
 
 			}
-			System.out.println("Loaded Constellation Boundaries");
+			System.out.println("Loaded constellations boundaries");
 			return bounds;
 
 		}

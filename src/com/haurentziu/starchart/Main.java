@@ -4,9 +4,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import com.haurentziu.gui.LocationMenu;
-import com.haurentziu.gui.TimeMenu;
-import com.haurentziu.gui.ToolBar;
+import com.haurentziu.gui.*;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
@@ -28,8 +26,11 @@ public class Main {
 	public static LocationMenu locationMenu;
 
 	public static void main(String[] args){
-
 		boolean fullScreen = args.length > 0 && args[0].equals("-fullscreen");
+
+		SplashDialog splash = new SplashDialog();
+		splash.setVisible(true);
+
 		GLProfile glp = GLProfile.getDefault();
 		GLCapabilities caps = new GLCapabilities(glp.get(GLProfile.GL3));
 		caps.setAlphaBits(8);
@@ -51,6 +52,12 @@ public class Main {
 		locationMenu.setValues(GLStarchart.observer);
 		locationMenu.setVisible(false);
 
+		final Toolkit toolkit = Toolkit.getDefaultToolkit();
+		final Dimension screenSize = toolkit.getScreenSize();
+		final int x = (screenSize.width - width) / 2;
+		final int y = (screenSize.height - height) / 2;
+		frame.setLocation(x, y);
+
 		if(fullScreen){
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			frame.setUndecorated(true);
@@ -60,11 +67,10 @@ public class Main {
 		frame.add(bar, BorderLayout.SOUTH);
 
 		frame.setSize(width, height);
+
 		frame.setVisible(true);
+		splash.close();
 		animator.start();
-
-
-
 
 		frame.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){

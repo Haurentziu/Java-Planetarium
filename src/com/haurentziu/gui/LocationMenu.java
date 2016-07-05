@@ -85,7 +85,7 @@ public class LocationMenu extends JDialog implements MouseListener, ActionListen
         int locY = e.getY();
 
         double realY = 1 -  2.0 * locY / map.getHeight();
-        double realX = 2.0 * locX / map.getWidth() - 1;
+        double realX = 1 - 2.0 * locX / map.getWidth();
 
         double lat = 2 * Math.atan(Math.exp(realY * 2.639057329)) - Math.PI / 2.0;
         double longit = Math.PI * realX;
@@ -93,8 +93,6 @@ public class LocationMenu extends JDialog implements MouseListener, ActionListen
         map.setCursorLocation(locX, locY);
 
     }
-
-
 
     @Override
     public void mousePressed(MouseEvent e) {

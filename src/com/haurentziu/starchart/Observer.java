@@ -178,8 +178,8 @@ public class Observer {
     }
 
     public void increaseZoom(double amount){
-        zoom *= amount;
-
+        if(amount > 1 || zoom > 0.5)
+            zoom *= amount;
     }
 
     public HorizontalCoordinates getCenterHorizontal(){

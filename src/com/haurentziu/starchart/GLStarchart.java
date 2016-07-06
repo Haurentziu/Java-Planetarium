@@ -137,7 +137,6 @@ public class GLStarchart implements GLEventListener{
             ground.render(gl, observer);
         }
 
-
     }
 
     @Override

@@ -13,6 +13,7 @@ uniform float radius = 0.005;
 
 out float start;
 out vec2 fragUV;
+out vec3 frag_color;
 
 
 bool isInBounds(vec4 p){

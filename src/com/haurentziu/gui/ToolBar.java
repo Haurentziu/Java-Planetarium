@@ -27,6 +27,7 @@ public class ToolBar extends JToolBar implements ActionListener{
     private BarButton timeMenuButton;
     private BarButton boundsMenuButton;
     private BarButton locMenuButton;
+    private BarButton labelButton;
 
     private BarButton fasterButton;
     private BarButton slowerButton;
@@ -64,9 +65,11 @@ public class ToolBar extends JToolBar implements ActionListener{
         nowButton = new BarButton("./res/img/now.png", "Now", this);
         slowerButton = new BarButton("./res/img/slower.png", "Decrease time warp", this);
         defaultButton = new BarButton("./res/img/one.png", "Time warp x1", this);
+        labelButton = new BarButton("./res/img/labels.png", "Toogle Labels", this);
 
         add(equatorialButton);
         add(horizontalButton);
+        add(labelButton);
         add(groundButton);
         add(constellationButton);
         add(boundsMenuButton);
@@ -156,6 +159,9 @@ public class ToolBar extends JToolBar implements ActionListener{
         }
         else if(source == locMenuButton){
             Main.showLocationMenu();
+        }
+        else if(source == labelButton){
+            GLStarchart.toogleLabels();
         }
 
     }

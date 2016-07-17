@@ -1,7 +1,5 @@
 package com.haurentziu.starchart;
 
-import com.haurentziu.planets.VSOPLoader;
-import com.haurentziu.planets.VSOPVariable;
 import com.haurentziu.render.*;
 
 import com.haurentziu.render.Markings;
@@ -32,6 +30,7 @@ public class GLStarchart implements GLEventListener{
     public static boolean showMilkyWay = true;
     public static boolean isPaused = false;
     public static boolean showBounds = false;
+    public static boolean showLabels = true;
 
     private Stars stars;
     private Constellations constellations;
@@ -53,8 +52,7 @@ public class GLStarchart implements GLEventListener{
         messierObjects = new DeepSpaceObjects("./shader/vertex.glsl", "./shader/messier_geom.glsl", "./shader/messier_frag.glsl");
         markings = new Markings("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/marking_frag.glsl");
         ground = new Ground("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
-        astroText = new AstroText("./shader/vertex.glsl", "./shader/text_geom.glsl", "./shader/text_frag.glsl");
-        solarSystem = new SolarSystem();
+        solarSystem = new SolarSystem("./shader/vertex.glsl", "./shader/text_geom.glsl", "./shader/text_frag.glsl");
 
         ortoBounds = new Rectangle2D.Double();
         windowBounds = new Rectangle2D.Double();
@@ -64,6 +62,7 @@ public class GLStarchart implements GLEventListener{
     public void init(GLAutoDrawable glAutoDrawable) {
         GL3 gl = glAutoDrawable.getGL().getGL3();
         stars.initialize(gl);
+        solarSystem.initialize(gl);
         constellations.initialize(gl);
         constellations.loadConstellations(stars.getStarsArray());
         messierObjects.initialize(gl);
@@ -75,6 +74,7 @@ public class GLStarchart implements GLEventListener{
 
         solarSystem.loadVertices(vertsList);
         solarSystem.loadColor(colorList);
+        solarSystem.loadColor(colorList); //once for the planets, one for the text
         stars.loadVertices(vertsList);
         stars.loadColor(colorList);
         constellations.loadVertices(vertsList);
@@ -96,6 +96,7 @@ public class GLStarchart implements GLEventListener{
         messierObjects.delete(gl);
         markings.delete(gl);
         ground.delete(gl);
+        solarSystem.delete(gl);
 
         vbo.delete(gl);
     }
@@ -131,7 +132,11 @@ public class GLStarchart implements GLEventListener{
         }
 
         stars.render(gl, observer);
-        solarSystem.render(gl, stars.getShader(), vbo.getBuffers(), observer.getJDE());
+        solarSystem.renderPlanets(gl, stars.getShader(), observer, vbo.getBuffers());
+
+        if(showLabels){
+            solarSystem.renderText(gl, observer);
+        }
 
         if(showGround) {
             ground.render(gl, observer);
@@ -149,6 +154,7 @@ public class GLStarchart implements GLEventListener{
         messierObjects.setSize(gl, aspectRatio, 1f);
         markings.setSize(gl, aspectRatio, 1f);
         ground.setSize(gl, aspectRatio, 1f);
+        solarSystem.setSize(gl, aspectRatio, 1f);
 
         ortoBounds.setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         windowBounds.setRect(0, 0, i2, i3);
@@ -224,6 +230,10 @@ public class GLStarchart implements GLEventListener{
 
     public static void toogleDSO(){
         showDSO = !showDSO;
+    }
+
+    public static void toogleLabels(){
+        showLabels = !showLabels;
     }
 
 }

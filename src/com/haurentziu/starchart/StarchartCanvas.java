@@ -118,44 +118,49 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
             case KeyEvent.VK_5:     renderer.getObserver().setProjection(SphericalCoordinates.LAMBERT_AZIMUTHAL);
                 break;
 
-            case KeyEvent.VK_A:     renderer.toogleAzGrid();
+            case KeyEvent.VK_A:     GLStarchart.toogleAzGrid();
                 break;
 
-            case KeyEvent.VK_C:     renderer.toogleConstellations();
+            case KeyEvent.VK_C:     GLStarchart.toogleConstellations();
                 break;
 
-            case KeyEvent.VK_LEFT:  renderer.changeWarp(-1);
+            case KeyEvent.VK_LEFT:  GLStarchart.changeWarp(-1);
                 break;
 
-            case KeyEvent.VK_RIGHT: renderer.changeWarp(1);
+            case KeyEvent.VK_RIGHT: GLStarchart.changeWarp(1);
                 break;
 
-            case KeyEvent.VK_G:     renderer.toogleGround();
+            case KeyEvent.VK_G:     GLStarchart.toogleGround();
                 break;
 
-            case KeyEvent.VK_P:	    renderer.tooglePoints();
+            case KeyEvent.VK_P:	    GLStarchart.tooglePoints();
                 break;
 
-            case KeyEvent.VK_N:      renderer.toogleStarNames();
+            case KeyEvent.VK_N:      GLStarchart.toogleStarNames();
                 break;
 
-            case KeyEvent.VK_E:     renderer.toogleEqGrid();
+            case KeyEvent.VK_E:     GLStarchart.toogleEqGrid();
                 break;
 
-            case KeyEvent.VK_Q:     renderer.toogleCelestialEq();
+            case KeyEvent.VK_Q:     GLStarchart.toogleCelestialEq();
                 break;
 
-            case KeyEvent.VK_S:     renderer.toogleEcliptic();
+            case KeyEvent.VK_S:     GLStarchart.toogleEcliptic();
                 break;
 
-            case KeyEvent.VK_M:     renderer.toogleMilkyWay();
+            case KeyEvent.VK_M:     GLStarchart.toogleMilkyWay();
                 break;
 
-            case KeyEvent.VK_D:     renderer.toogleDSO();
+            case KeyEvent.VK_D:     GLStarchart.toogleDSO();
                 break;
 
-            case KeyEvent.VK_B:     renderer.toogleBounds();
+            case KeyEvent.VK_B:     GLStarchart.toogleBounds();
                 break;
+
+            case KeyEvent.VK_L:     GLStarchart.toogleLabels();
+                break;
+
+
         }
     }
 

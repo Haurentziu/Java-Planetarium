@@ -1,4 +1,3 @@
-
 /* FRAGMENT_SHADER */
 #version 330
 

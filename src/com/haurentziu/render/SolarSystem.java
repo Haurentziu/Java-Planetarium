@@ -107,7 +107,7 @@ public class SolarSystem extends Renderer{
 		colors.add(0f);
 
 		colors.add(0f);
-		colors.add(0f);
+		colors.add(0.5f);
 		colors.add(1f);
 
 		colors.add(0f);

@@ -52,7 +52,7 @@ public class DeepSpaceObjects extends Renderer{
         texture.enable(gl);
         texture.bind(gl);
         super.setObserver(gl, observer);
-        shader.setVariable(gl, "myTexture", 0);
+        shader.setVariable(gl, "messierTex", 0);
 
         shader.setVariable(gl, "transform_type", 1);
         shader.setVariable(gl, "vertex_type", 0);

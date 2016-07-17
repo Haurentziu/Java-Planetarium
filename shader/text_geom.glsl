@@ -10,8 +10,8 @@ uniform float width;
 uniform float height;
 uniform float zoom;
 
-const float aspect_ratio = 9.0 * 244 / 500.0;
-const float size = 0.0125;
+const float aspect_ratio = 9.0 * 111 / 180;
+const float size = 0.025;
 const float offset = 0.02;
 
 in vec3 geom_color[];
@@ -29,8 +29,8 @@ void main(){
 
     vec4 center = gl_in[0].gl_Position + vec4(normalised_zoom * offset / width, 0, 0, 0);
 
-    float sprite_width = normalised_zoom * size * aspect_ratio / width;
-    float sprite_height = normalised_zoom * size / height;
+    float sprite_width = size * aspect_ratio / width;
+    float sprite_height = size / height;
 
     gl_Position = vec4(center.x, center.y - sprite_height , center.z, center.w);
     fragUV = vec2(0, 0);

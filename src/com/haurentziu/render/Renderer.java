@@ -81,6 +81,7 @@ public class Renderer {
         shader.setVariable(gl, "sideral_time", (float)observer.getSideralTime());
         shader.setVariable(gl, "observer_latitude", (float)observer.getLatitude());
         shader.setVariable(gl, "observer_longitude", (float)(observer.getLongitude()));
+        shader.setVariable(gl, "fov", (float)observer.getFOV());
     }
 
 }

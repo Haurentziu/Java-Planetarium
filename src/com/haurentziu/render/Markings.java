@@ -117,35 +117,35 @@ public class Markings extends Renderer{
         equatorVertNumber =  verts.size() / 3 - equatorVertStart;
     }
 
-    public void renderAll(GL3 gl, Observer observer, boolean renderBounds, boolean renderMilkyWay, boolean renderAzGrid, boolean renderEqGrid, boolean renderEquator, boolean renderEcliptic){
+    public void renderAll(GL3 gl, Observer observer){
         shader.useShader(gl);
         setObserver(gl, observer);
         shader.setVariable(gl, "vertex_type", 0);
 
-        if(renderBounds) {
+        if(observer.showBounds) {
             renderBoundaries(gl);
         }
 
-        if(renderAzGrid){
+        if(observer.showAzGrid){
             shader.setVariable(gl, "color", 0.404f, 0.302f, 0f, 0.6f);
             renderGrid(gl, 0);
         }
 
-        if(renderEqGrid){
+        if(observer.showEqGrid){
             shader.setVariable(gl, "color", 0.365f, 0.541f, 659f, 0.6f);
             renderGrid(gl, 1);
         }
 
-        if(renderMilkyWay){
+        if(observer.showMilkyWay){
             renderMilkyWay(gl);
         }
 
-        if(renderEquator){
+        if(observer.showCelestialEq){
             shader.setVariable(gl, "color", 0.6f, 0f, 0.3f, 1f);
             renderEquator(gl, 1);
         }
 
-        if(renderEcliptic){
+        if(observer.showEcliptic){
             shader.setVariable(gl, "color", 0.741f, 0.718f, 0.42f, 1f);
             renderEquator(gl, 2);
         }

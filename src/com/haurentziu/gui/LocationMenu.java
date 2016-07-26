@@ -24,7 +24,9 @@ public class LocationMenu extends JDialog implements MouseListener, ActionListen
 
     private double lastLat = 0, lastLong= 0;
 
-    public LocationMenu(){
+    private Observer observer;
+
+    public LocationMenu(Observer observer){
         setSize(860, 485);
         setResizable(false);
         setAlwaysOnTop(true);
@@ -32,12 +34,15 @@ public class LocationMenu extends JDialog implements MouseListener, ActionListen
         setTitle("Observer's Location");
         setLayout(null);
         createGUI();
+        setValues(observer);
         map.addMouseListener(this);
         latField.addActionListener(this);
         longField.addActionListener(this);
         latBox.addActionListener(this);
         longBox.addActionListener(this);
         applyButton.addActionListener(this);
+
+        this.observer = observer;
 
     }
 
@@ -159,7 +164,7 @@ public class LocationMenu extends JDialog implements MouseListener, ActionListen
             if(longBox.getSelectedItem().equals("E")) {
                 longValue = -longValue;
             }
-            GLStarchart.observer.setLongitude(longValue);
+            observer.setLongitude(longValue);
             lastLong = longValue;
             isChanged = true;
 
@@ -176,7 +181,7 @@ public class LocationMenu extends JDialog implements MouseListener, ActionListen
                 latValue = - latValue;
             }
             lastLat = latValue;
-            GLStarchart.observer.setLatitude(latValue);
+            observer.setLatitude(latValue);
             isChanged = true;
         }
         catch (Exception ex){

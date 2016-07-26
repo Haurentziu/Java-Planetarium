@@ -1,6 +1,7 @@
 package com.haurentziu.gui;
 
 import com.haurentziu.starchart.GLStarchart;
+import com.haurentziu.starchart.Observer;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.awt.GLJPanel;
 
@@ -36,7 +37,9 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
     private JSpinner focusedJspinner;
     private Calendar lastValidCalendar;
 
-    public TimeMenu(){
+    private  Observer observer;
+
+    public TimeMenu(Observer observer){
         updateAll();
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         createGUI();
@@ -66,6 +69,8 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
         year.addChangeListener(this);
         JSpinner.DefaultEditor yearEditor = (JSpinner.DefaultEditor) year.getEditor();
         yearEditor.getTextField().addFocusListener(this);
+
+        this.observer = observer;
 
     }
 
@@ -132,6 +137,9 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
         setSpinnerValues(calendar);
     }
 
+    public void setSpinnerValues(){
+        setSpinnerValues(observer.getUnixTime());
+    }
 
 
     void setProprieties(JSpinner j){
@@ -139,9 +147,6 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
         j.setFont(new Font("SansSerif", Font.PLAIN , 25));
     }
 
-    void tooglVisibilty(){
-        this.setVisible(!this.isVisible());
-    }
 
     @Override
     public void stateChanged(ChangeEvent changeEvent) {
@@ -211,7 +216,7 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
         updatedCalendar.setTimeInMillis(unixTime);
 
         setSpinnerValues(updatedCalendar);
-        GLStarchart.observer.setUnixTime(unixTime);
+        observer.setUnixTime(unixTime);
 
     }
 
@@ -226,6 +231,8 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
             }
         });
     }
+
+
 
     @Override
     public void run() {

@@ -1,14 +1,9 @@
 package com.haurentziu.starchart;
 
-import com.haurentziu.coordinates.ProjectionPoint;
-import com.haurentziu.coordinates.SphericalCoordinates;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.awt.GLCanvas;
 
 import java.awt.event.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 
 /**
  * Created by haurentziu on 27.04.2016.
@@ -16,16 +11,20 @@ import java.util.ArrayList;
 
 public class StarchartCanvas extends GLCanvas implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener{
 
-    private GLStarchart renderer;
+    private static final double FOV_STEP = 1.05;
 
+
+    private GLStarchart starchart;
     private int initX, initY;
-    private boolean isDragging;
+    private Observer observer;
 
-    StarchartCanvas(GLCapabilities caps){
+    StarchartCanvas(GLCapabilities caps, Observer observer){
         super(caps);
-        renderer = new GLStarchart();
 
-        addGLEventListener(renderer);
+        this.observer = observer;
+        starchart = new GLStarchart(observer);
+
+        addGLEventListener(starchart);
 
         addMouseWheelListener(this);
         addMouseListener(this);
@@ -39,10 +38,10 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
     public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
         int moves = mouseWheelEvent.getWheelRotation();
         if(moves < 0){
-            renderer.getObserver().increaseZoom(1.1);
+            observer.increaseFOV(1/FOV_STEP);
         }
         else{
-            renderer.getObserver().increaseZoom(1/1.1);
+            observer.increaseFOV(FOV_STEP);
         }
     }
 
@@ -82,9 +81,9 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
         initX = mouseEvent.getX();
         initY = mouseEvent.getY();
 
-        double rotAz = - renderer.getBounds().getWidth() * Math.PI/4 * distanceX / (renderer.getWindowBounds().getWidth() * renderer.getObserver().getZoom());
-        double rotAlt = renderer.getBounds().getHeight() * Math.PI/4 * distanceY / (renderer.getWindowBounds().getHeight() * renderer.getObserver().getZoom());
-        renderer.getObserver().increaseRotation(rotAz, rotAlt);
+        double rotAz = - observer.getBounds().getWidth() * Math.PI/4 * distanceX / (observer.getWindowBounds().getWidth() * starchart.getObserver().getZoom());
+        double rotAlt = observer.getBounds().getHeight() * Math.PI/4 * distanceY / (observer.getWindowBounds().getHeight() * starchart.getObserver().getZoom());
+        observer.increaseRotation(rotAz, rotAlt);
 
     }
 
@@ -103,61 +102,46 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
         int k = keyEvent.getKeyCode();
 
         switch (k){
-            case KeyEvent.VK_1:     renderer.getObserver().setProjection(SphericalCoordinates.STEREOGRAPHIC_PROJECTION);
+            case KeyEvent.VK_A:     observer.toogleAzGrid();
                 break;
 
-            case KeyEvent.VK_2:     renderer.getObserver().setProjection(SphericalCoordinates.ORTOGRAPHIC_PROJECTION);
+            case KeyEvent.VK_C:     observer.toogleConstellations();
                 break;
 
-            case KeyEvent.VK_3:     renderer.getObserver().setProjection(SphericalCoordinates.AZIMUTHAL_EQUIDISTANT_PROJECTION);
+            case KeyEvent.VK_LEFT:  observer.changeWarp(-1);
                 break;
 
-            case KeyEvent.VK_4:     renderer.getObserver().setProjection(SphericalCoordinates.GNOMOIC_PROJECTION);
+            case KeyEvent.VK_RIGHT: observer.changeWarp(1);
                 break;
 
-            case KeyEvent.VK_5:     renderer.getObserver().setProjection(SphericalCoordinates.LAMBERT_AZIMUTHAL);
+            case KeyEvent.VK_G:     observer.toogleGround();
                 break;
 
-            case KeyEvent.VK_A:     GLStarchart.toogleAzGrid();
+            case KeyEvent.VK_P:	    observer.tooglePoints();
                 break;
 
-            case KeyEvent.VK_C:     GLStarchart.toogleConstellations();
+            case KeyEvent.VK_N:     observer.toogleStarNames();
                 break;
 
-            case KeyEvent.VK_LEFT:  GLStarchart.changeWarp(-1);
+            case KeyEvent.VK_E:     observer.toogleEqGrid();
                 break;
 
-            case KeyEvent.VK_RIGHT: GLStarchart.changeWarp(1);
+            case KeyEvent.VK_Q:     observer.toogleCelestialEq();
                 break;
 
-            case KeyEvent.VK_G:     GLStarchart.toogleGround();
+            case KeyEvent.VK_S:     observer.toogleEcliptic();
                 break;
 
-            case KeyEvent.VK_P:	    GLStarchart.tooglePoints();
+            case KeyEvent.VK_M:     observer.toogleMilkyWay();
                 break;
 
-            case KeyEvent.VK_N:      GLStarchart.toogleStarNames();
+            case KeyEvent.VK_D:     observer.toogleDSO();
                 break;
 
-            case KeyEvent.VK_E:     GLStarchart.toogleEqGrid();
+            case KeyEvent.VK_B:     observer.toogleBounds();
                 break;
 
-            case KeyEvent.VK_Q:     GLStarchart.toogleCelestialEq();
-                break;
-
-            case KeyEvent.VK_S:     GLStarchart.toogleEcliptic();
-                break;
-
-            case KeyEvent.VK_M:     GLStarchart.toogleMilkyWay();
-                break;
-
-            case KeyEvent.VK_D:     GLStarchart.toogleDSO();
-                break;
-
-            case KeyEvent.VK_B:     GLStarchart.toogleBounds();
-                break;
-
-            case KeyEvent.VK_L:     GLStarchart.toogleLabels();
+            case KeyEvent.VK_L:     observer.toogleLabels();
                 break;
 
 

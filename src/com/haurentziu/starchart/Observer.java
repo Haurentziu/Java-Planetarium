@@ -14,12 +14,13 @@ import java.awt.geom.Rectangle2D;
 public class Observer {
 
     private double zoom;
+    private double fov;
     private double sideralTime = 0;
     private double latitude;
     private double longitude;
-    private double fov;
 
-    private final double SIDERAL_DAY_MS = 23.9344699 * 3600 * 1000;
+    private Rectangle2D ortoBounds = new Rectangle2D.Double();
+    private Rectangle2D windowBounds = new Rectangle2D.Double();
 
     private long unixTime;
     private Timer t;
@@ -28,7 +29,26 @@ public class Observer {
     private double altRotation;
     private byte projection;
 
-    private static final double MAX_FOV = Math.PI;
+    public boolean showGround = true;
+    public boolean showCardinalPoints = true;
+    public boolean showConstellations = true;
+    public boolean showAzGrid = false;
+    public boolean showEcliptic = true;
+    public boolean showCelestialEq = true;
+    public boolean showStarNames = false;
+    public boolean showEqGrid = false;
+    public boolean showDSO = true;
+    public boolean showMilkyWay = true;
+    public boolean isPaused = false;
+    public boolean showBounds = false;
+    public boolean showLabels = false;
+
+    public static int currentWarp = 7;
+    public static int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 1, 10, 100, 1000, 3000, 5000, 10000};
+
+
+    private static final double MAX_FOV = Math.toRadians(140);
+    private static final double SCALE_FACTOR = 0.5 * Math.sin(MAX_FOV) / (1 + Math.cos(MAX_FOV));
     private static final double MIN_ALT_ROTATE = - Math.PI/2;
     private static final double MAX_ALT_ROTATE = Math.PI/2;
 
@@ -44,16 +64,13 @@ public class Observer {
     }
 
     Observer(){
-        setZoom(2);
+        setFOV(Math.toRadians(140));
         computeSideralTime(1.2);
         setLatitude(Math.toRadians(46.9300));
         setLongitude(Math.toRadians(-26.3780));
-
         setAzimuthRotation(0);
         setAltRotation(Math.PI/4);
-
         setProjection(SphericalCoordinates.STEREOGRAPHIC_PROJECTION);
-        setFOV(Math.PI/2);
         t = new Timer();
         setTimeNow();
     }
@@ -90,18 +107,14 @@ public class Observer {
 
     public void setFOV(double fov){
         this.fov = fov;
+        updateZoom();
     }
 
-
-
-    void updateZoom(Rectangle2D bounds){
-        double maxSize = Math.sqrt(2)*Math.max(bounds.getWidth(), bounds.getHeight())/2;
-        SphericalCoordinates c = new SphericalCoordinates(0, -Math.PI/2); //screen center
-        SphericalCoordinates c1 = new SphericalCoordinates(0, -Math.PI/2 + fov);
-        ProjectionPoint p = c.toProjection(0, 0, projection);
-        ProjectionPoint p1 = c1.toProjection(0, 0, projection);
-        double d = Math.sqrt((p.getX() - p1.getX()) * (p.getX() - p1.getX()) + (p.getY() - p1.getY()) * (p.getY() - p1.getY()));
-        zoom = maxSize/d;
+    void updateZoom(){
+        double d =  2 * Math.sin(fov) / (1 + Math.cos(fov));
+        double minSize = Math.min(ortoBounds.getWidth(), ortoBounds.getHeight());
+        zoom = SCALE_FACTOR * minSize / d;
+        //zoom = Math.sqrt(ortoBounds.getWidth() * ortoBounds.getWidth() + ortoBounds.getHeight() * ortoBounds.getHeight()) / d;
     }
 
     public double getZoom(){
@@ -154,12 +167,14 @@ public class Observer {
     }
 
 
-    public void updateTime(int warp){
+    public void updateTime(){
         double deltaT = t.getDeltaTime();
-        //double deltaT = 24 * 365.0/366.0 * 3600 * 1000;
-        unixTime += warp * deltaT;
-        sideralTime += 15 * Math.PI * warp * deltaT / (180.0 * 3600.0 * 1000.0) * 366.0/365.0; //convert to sideral;
-        if(sideralTime > 2*Math.PI) sideralTime -= 2*Math.PI;
+        if(!isPaused) {
+            int warp = timeWarpLevels[currentWarp];
+            unixTime += warp * deltaT;
+            sideralTime += 15 * Math.PI * warp * deltaT / (180.0 * 3600.0 * 1000.0) * 366.0 / 365.0; //convert to sideral;
+            if (sideralTime > 2 * Math.PI) sideralTime -= 2 * Math.PI;
+        }
     }
 
     private void computeSideralTime(){
@@ -177,17 +192,10 @@ public class Observer {
         return unixTime/(24.0 * 3600.0 * 1000.0) + 2440587.5;
     }
 
-    public void increaseZoom(double amount){
-        if(amount > 1 || zoom > 0.5)
-            zoom *= amount;
-    }
+    public void increaseFOV(double amount){
+        if(amount < 1 || fov < MAX_FOV)
+            setFOV(fov * amount);
 
-    public HorizontalCoordinates getCenterHorizontal(){
-        return new HorizontalCoordinates(3*Math.PI/2 - azRotation, altRotation - Math.PI/2);
-    }
-
-    public EquatorialCoordinates getCenterEquatorial(){
-        return new HorizontalCoordinates(3*Math.PI/2 - azRotation, altRotation - Math.PI/2).toEquatorial(this);
     }
 
     public void increaseRotation(double azAmount, double altAmount){
@@ -198,8 +206,81 @@ public class Observer {
         }
     }
 
+    public static void changeWarp(int amount){
+        int newWarp = amount + currentWarp;
+        if(newWarp >= 0 && newWarp < timeWarpLevels.length){
+            currentWarp = newWarp;
+        }
+    }
 
 
+    public void tooglePause(){
+        isPaused = !isPaused;
+    }
+
+    public void setDefault(){
+        currentWarp = 7;
+    }
+
+    public void toogleGround(){
+        showGround = !showGround;
+    }
+
+    public void tooglePoints(){
+        showCardinalPoints = !showCardinalPoints;
+    }
+
+    public void toogleConstellations(){
+        showConstellations = !showConstellations;
+    }
+
+    public void toogleAzGrid(){
+        showAzGrid = !showAzGrid;
+    }
+
+    public void toogleEcliptic(){
+        showEcliptic = !showEcliptic;
+    }
+
+    public void toogleEqGrid(){
+        showEqGrid = !showEqGrid;
+    }
+
+    public void toogleStarNames(){
+        showStarNames = !showStarNames;
+    }
+
+    public void toogleCelestialEq(){
+        showCelestialEq = !showCelestialEq;
+    }
+
+    public void toogleMilkyWay(){
+        showMilkyWay = !showMilkyWay;
+    }
+
+    public void toogleBounds(){
+        showBounds = !showBounds;
+    }
+
+    public void toogleDSO(){
+        showDSO = !showDSO;
+    }
+
+    public void toogleLabels(){
+        showLabels = !showLabels;
+    }
+
+    public boolean showMarkings(){
+        return showMilkyWay || showEqGrid || showAzGrid || showEcliptic || showCelestialEq;
+    }
+
+    public Rectangle2D getBounds(){
+        return ortoBounds;
+    }
+
+    public Rectangle2D getWindowBounds(){
+        return windowBounds;
+    }
 
 
 }

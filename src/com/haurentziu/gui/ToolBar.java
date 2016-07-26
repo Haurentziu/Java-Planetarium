@@ -2,6 +2,7 @@ package com.haurentziu.gui;
 
 import com.haurentziu.starchart.GLStarchart;
 import com.haurentziu.starchart.Main;
+import com.haurentziu.starchart.Observer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -38,14 +39,17 @@ public class ToolBar extends JToolBar implements ActionListener{
     private ImageIcon pauseIcon;
     private ImageIcon startIcon;
 
+    private  Observer observer;
 
-    public ToolBar(){
+
+    public ToolBar(Observer observer){
+        this.observer = observer;
         try{
             pauseIcon = new ImageIcon(ImageIO.read(new File("./res/img/pause.png")));
             startIcon = new ImageIcon(ImageIO.read(new File("./res/img/start.png")));
         }
         catch (Exception ex){
-
+            ex.printStackTrace();
         }
         equatorialButton = new BarButton("./res/img/equatorial.png", "Toogle equatorial grid", this);
         horizontalButton = new BarButton("./res/img/horizontal.png", "Toogle azimuthal grid", this);
@@ -95,7 +99,7 @@ public class ToolBar extends JToolBar implements ActionListener{
     }
 
     private void setPauseButtonIcon(){
-        if(GLStarchart.isPaused){
+        if(observer.isPaused){
             pauseButton.setIcon(startIcon);
         }
         else{
@@ -109,41 +113,41 @@ public class ToolBar extends JToolBar implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if(source == equatorialButton) {
-            GLStarchart.toogleEqGrid();
+           observer.toogleEqGrid();
         }
         else if(source == horizontalButton) {
-            GLStarchart.toogleAzGrid();
+            observer.toogleAzGrid();
         }
         else if(source == groundButton) {
-            GLStarchart.toogleGround();
+            observer.toogleGround();
         }
         else if(source == constellationButton) {
-            GLStarchart.toogleConstellations();
+            observer.toogleConstellations();
         }
         else if(source == eclipticButton) {
-            GLStarchart.toogleEcliptic();
+            observer.toogleEcliptic();
         }
         else if(source == equatorButton) {
-            GLStarchart.toogleCelestialEq();
+            observer.toogleCelestialEq();
         }
         else if(source == dsoButton) {
-            GLStarchart.toogleDSO();
+            observer.toogleDSO();
         }
         else if(source == mwButton) {
-            GLStarchart.toogleMilkyWay();
+            observer.toogleMilkyWay();
         }
         else if(source == fasterButton) {
-            GLStarchart.changeWarp(1);
+            observer.changeWarp(1);
         }
         else if(source == slowerButton) {
-            GLStarchart.changeWarp(-1);
+            observer.changeWarp(-1);
         }
         else if(source == pauseButton) {
-            GLStarchart.tooglePause();
+            observer.tooglePause();
             setPauseButtonIcon();
         }
         else if(source == defaultButton) {
-            GLStarchart.setDefault();
+            observer.setDefault();
         }
         else if(source == closeButton) {
             Main.exit();
@@ -152,16 +156,16 @@ public class ToolBar extends JToolBar implements ActionListener{
             Main.showTimeMenu();
         }
         else if(source == nowButton) {
-            GLStarchart.observer.setTimeNow();
+            observer.setTimeNow();
         }
         else if(source == boundsMenuButton) {
-            GLStarchart.toogleBounds();
+            observer.toogleBounds();
         }
         else if(source == locMenuButton){
             Main.showLocationMenu();
         }
         else if(source == labelButton){
-            GLStarchart.toogleLabels();
+            observer.toogleLabels();
         }
 
     }

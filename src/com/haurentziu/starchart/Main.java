@@ -20,13 +20,14 @@ import javax.swing.*;
 //FIXME everything
 
 public class Main {
-	static int width = 950, height = 850;  //934 x 911/876
+	static int width = 950, height = 850;
 	public static StarchartCanvas canvas;
 	public static TimeMenu timeMenu;
 	public static LocationMenu locationMenu;
 
 	public static void main(String[] args){
 		boolean fullScreen = args.length > 0 && args[0].equals("-fullscreen");
+		Observer observer = new Observer();
 
 		SplashDialog splash = new SplashDialog();
 		splash.setVisible(true);
@@ -34,10 +35,10 @@ public class Main {
 		GLProfile glp = GLProfile.getDefault();
 		GLCapabilities caps = new GLCapabilities(glp.get(GLProfile.GL3));
 		caps.setAlphaBits(8);
-		canvas = new StarchartCanvas(caps);
-		FPSAnimator animator = new FPSAnimator(canvas, 120);
+		canvas = new StarchartCanvas(caps, observer);
 
-		ToolBar bar = new ToolBar();
+		FPSAnimator animator = new FPSAnimator(canvas, 120);
+		ToolBar bar = new ToolBar(observer);
 
 		final JFrame frame = new JFrame("Java Planetarium");
 		frame.setLayout(new BorderLayout());
@@ -45,11 +46,10 @@ public class Main {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(canvas);
 
-		timeMenu = new TimeMenu();
+		timeMenu = new TimeMenu(observer);
 		timeMenu.setVisible(false);
 
-		locationMenu = new LocationMenu();
-		locationMenu.setValues(GLStarchart.observer);
+		locationMenu = new LocationMenu(observer);
 		locationMenu.setVisible(false);
 
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -80,7 +80,7 @@ public class Main {
 	}
 
 	public static void showTimeMenu(){
-		timeMenu.setSpinnerValues(GLStarchart.observer.getUnixTime());
+		timeMenu.setSpinnerValues();
 		timeMenu.setVisible(true);
 		timeMenu.toFront();
 	}

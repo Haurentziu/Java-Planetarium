@@ -1,6 +1,7 @@
 package com.haurentziu.render;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
+import com.haurentziu.starchart.Observer;
 import com.haurentziu.tle.Satellite;
 import com.haurentziu.tle.TLEFile;
 import com.jogamp.opengl.GL3;
@@ -44,7 +45,7 @@ public class ArtificialSatellites{
         texture = loadTexture(gl, "./res/textures/satellite.png");
     }
 
-    public void render(GL3 gl, Shader starShader, IntBuffer buffers){
+    public void render(GL3 gl, Observer observer, Shader starShader, IntBuffer buffers){
         texture.enable(gl);
         texture.bind(gl);
         starShader.setVariable(gl, "starTex", 0);
@@ -52,7 +53,7 @@ public class ArtificialSatellites{
         starShader.setVariable(gl, "vertex_type", 1);
         starShader.setVariable(gl, "aspect_ratio", 2.37f);
 
-        updatePositions(gl, buffers);
+        updatePositions(gl, observer, buffers);
         gl.glDrawArrays(GL3.GL_POINTS, satelliteStart, satelliteSize);
         texture.disable(gl);
     }
@@ -76,10 +77,10 @@ public class ArtificialSatellites{
         satelliteSize = verts.size() / 9 - satelliteStart;
     }
 
-    public void updatePositions(GL3 gl, IntBuffer buffers){
+    public void updatePositions(GL3 gl, Observer observer, IntBuffer buffers){
         float vertices[] = new float[satellites.size() * 9];
         for(int i = 0; i < satellites.size(); i++){
-            EquatorialCoordinates eq = satellites.get(i).getRectangularCoordinates().toEquatorialCoordinates();
+            EquatorialCoordinates eq = satellites.get(i).getRectangularCoordinates(observer.getUnixTime()).toEquatorialCoordinates();
             vertices[9 * i + 0] = (float)eq.getRightAscension();
             vertices[9 * i + 1] = (float)eq.getDeclination();
             vertices[9 * i + 2] = 0;

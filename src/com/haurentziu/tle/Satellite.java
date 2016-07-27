@@ -70,10 +70,10 @@ public class Satellite {
 
     }
 
-    public RectangularCoordinates getRectangularCoordinates(){
+    public RectangularCoordinates getRectangularCoordinates(long unixTime){
         double alpha = Math.pow(SECONDS_IN_A_DAY / meanMotion, 2.0 / 3.0) * Math.pow(GRAVITATIONAL_PARAMETER / (4 * Math.PI * Math.PI), 1.0 / 3.0); //semi-major axis
         double beta = Math.sqrt(1 - eccentricity * eccentricity);
-        double deltaT = (System.currentTimeMillis() / 1000.0 - getUnixTimeOfTLE()) / SECONDS_IN_A_DAY;
+        double deltaT = (unixTime / 1000.0 - getUnixTimeOfTLE()) / SECONDS_IN_A_DAY;
         double meanAnomalyNow = meanAnomaly + 360 * deltaT * meanMotion + 360 * deltaT * deltaT * meanMotionPrime;
         meanAnomalyNow = Math.toRadians(meanAnomalyNow - 360 * (int)(meanAnomalyNow / 360));
         double eccentricAnomaly = getEccentricAnomaly(eccentricity, meanAnomalyNow);

@@ -111,7 +111,7 @@ public class GLStarchart implements GLEventListener{
         solarSystem.renderPlanets(gl, stars.getShader(), observer, vbo.getBuffers());
 
         if(observer.showSatellites) {
-            satellites.render(gl, stars.getShader(), vbo.getBuffers());
+            satellites.render(gl, observer, stars.getShader(), vbo.getBuffers());
         }
 
 

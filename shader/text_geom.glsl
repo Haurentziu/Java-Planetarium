@@ -11,8 +11,8 @@ uniform float height;
 uniform float zoom;
 
 const float aspect_ratio = 9.0 * 111 / 180;
-const float size = 0.025;
-const float offset = 0.02;
+const float size = 0.0175;
+const float offset = 0.016;
 
 in vec3 geom_color[];
 out float start;

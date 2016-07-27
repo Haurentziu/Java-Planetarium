@@ -20,6 +20,15 @@ public class BoundaryLine {
         verts.add((float)ra);
         verts.add((float)dec);
         verts.add(0f);
+
+        verts.add(0f);
+        verts.add(0f);
+        verts.add(0f);
+
+        verts.add(0f);
+        verts.add(0f);
+        verts.add(0f);
+
     }
 
     public boolean isOriginal(){

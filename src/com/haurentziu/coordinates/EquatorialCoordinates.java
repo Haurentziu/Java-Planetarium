@@ -35,5 +35,17 @@ public class EquatorialCoordinates extends SphericalCoordinates{
 	public void setDeclination(double declination){
 		latitude = declination;
 	}
+
+	public String toString(){
+		return String.format("Right Ascension: %f\nDeclination: %f\n", normaliseAngle(longitude), Math.toDegrees(latitude));
+	}
+
+
+	private double normaliseAngle(double angle){
+		angle  = Math.toDegrees(angle);
+		if(angle < 0)
+			angle += 360;
+		return angle;
+	}
 		
 }

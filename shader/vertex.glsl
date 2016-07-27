@@ -73,7 +73,8 @@ void computeLambertAEA(vec4 coord, out vec4 projection){
 }
 
 void sphericalDistance(vec2 center, vec2 point, out float distance){
-    distance = acos(sin(center.y) * sin(point.y) + cos(center.y) * cos(point.y) * cos(center.x - point.x));
+    float k = sin(center.y) * sin(point.y) + cos(center.y) * cos(point.y) * cos(center.x - point.x);
+    distance = acos(min(k, 1));
 }
 
 void disableDrawing(){
@@ -99,11 +100,11 @@ void main(void){
             coord = vec4(azimuth, altitude, coord.z, 1);
         }
 
-        float distance;
-        sphericalDistance(vec2(azimuth_rotation, altitude_rotation), coord.xy, distance);
+        float distance = 0;
+        sphericalDistance(coord.xy, vec2(azimuth_rotation, altitude_rotation), distance);
 
 
-        if(distance < fov){
+        if(distance <= fov){
             vec4 projection;
             computeStereographic(coord, projection);
             //computeOrtographic(coord, projection);

@@ -29,6 +29,7 @@ public class ToolBar extends JToolBar implements ActionListener{
     private BarButton boundsMenuButton;
     private BarButton locMenuButton;
     private BarButton labelButton;
+    private BarButton satelliteButton;
 
     private BarButton fasterButton;
     private BarButton slowerButton;
@@ -51,6 +52,8 @@ public class ToolBar extends JToolBar implements ActionListener{
         catch (Exception ex){
             ex.printStackTrace();
         }
+
+        satelliteButton = new BarButton("./res/img/satellite.png", "Toogle artificial satellites", this);
         equatorialButton = new BarButton("./res/img/equatorial.png", "Toogle equatorial grid", this);
         horizontalButton = new BarButton("./res/img/horizontal.png", "Toogle azimuthal grid", this);
         groundButton = new BarButton("./res/img/ground.png", "Toogle ground", this);
@@ -80,6 +83,7 @@ public class ToolBar extends JToolBar implements ActionListener{
         add(eclipticButton);
         add(equatorButton);
         add(dsoButton);
+        add(satelliteButton);
         add(mwButton);
         add(timeMenuButton);
         add(locMenuButton);
@@ -166,6 +170,9 @@ public class ToolBar extends JToolBar implements ActionListener{
         }
         else if(source == labelButton){
             observer.toogleLabels();
+        }
+        else if(source == satelliteButton){
+            observer.toogleSatellites();
         }
 
     }

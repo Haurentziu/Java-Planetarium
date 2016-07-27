@@ -20,6 +20,7 @@ public class GLStarchart implements GLEventListener{
     private Ground ground;
     private SolarSystem solarSystem;
     private AstroText astroText;
+    private ArtificialSatellites satellites;
     private VBO vbo;
 
     private Observer observer;
@@ -35,6 +36,7 @@ public class GLStarchart implements GLEventListener{
         markings = new Markings("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/marking_frag.glsl");
         ground = new Ground("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
         solarSystem = new SolarSystem("./shader/vertex.glsl", "./shader/text_geom.glsl", "./shader/text_frag.glsl");
+        satellites = new ArtificialSatellites();
     }
 
     @Override
@@ -47,15 +49,14 @@ public class GLStarchart implements GLEventListener{
         messierObjects.initialize(gl);
         markings.initialize(gl);
         ground.initialize(gl);
+        satellites.initialize(gl);
 
         ArrayList<Float> vertsList = new ArrayList<>();
         ArrayList<Float> colorList = new ArrayList<>();
 
         solarSystem.loadVertices(vertsList);
-        solarSystem.loadColor(colorList);
-        solarSystem.loadColor(colorList); //once for the planets, one for the text
         stars.loadVertices(vertsList);
-        stars.loadColor(colorList);
+        satellites.loadVertices(vertsList);
         constellations.loadVertices(vertsList);
         messierObjects.loadVertices(vertsList);
         markings.loadAllVertices(vertsList);
@@ -76,6 +77,7 @@ public class GLStarchart implements GLEventListener{
         markings.delete(gl);
         ground.delete(gl);
         solarSystem.delete(gl);
+        satellites.delete(gl);
 
         vbo.delete(gl);
     }
@@ -91,7 +93,7 @@ public class GLStarchart implements GLEventListener{
 
         observer.updateTime();
 
-        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+       // System.out.println(glAutoDrawable.getAnimator().getLastFPS());
 
         if(observer.showMarkings()){
             markings.renderAll(gl, observer);
@@ -107,6 +109,11 @@ public class GLStarchart implements GLEventListener{
 
         stars.render(gl, observer);
         solarSystem.renderPlanets(gl, stars.getShader(), observer, vbo.getBuffers());
+
+        if(observer.showSatellites) {
+            satellites.render(gl, stars.getShader(), vbo.getBuffers());
+        }
+
 
         if(observer.showLabels){
             solarSystem.renderText(gl, observer);

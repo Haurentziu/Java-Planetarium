@@ -48,47 +48,55 @@ public class Markings extends Renderer{
 
     private void loadConstelBounds(ArrayList<Float> verts){
         constelBoundsNumbers = new ArrayList<>();
-        constelBoundsStart = verts.size() / 3;
+        constelBoundsStart = verts.size() / 9;
         int originalSize = verts.size();
         for(int i = 0; i < constellationBoundaries.size(); i++){
             BoundaryLine bound = constellationBoundaries.get(i);
             if(bound.isOriginal()){
-                constelBoundsNumbers.add((verts.size() - originalSize) / 3);
+                constelBoundsNumbers.add((verts.size() - originalSize) / 9);
                 originalSize = verts.size();
             }
             bound.loadVertex(verts);
         }
-        constelBoundsNumbers.add((verts.size() - originalSize) / 3);
+        constelBoundsNumbers.add((verts.size() - originalSize) / 9);
     }
 
     private void loadMWVertices(ArrayList<Float> verts){
-        mwVertStart = verts.size() / 3;
+        mwVertStart = verts.size() / 9;
         mwVertNumbers = new ArrayList<>();
         int origSize = verts.size();
 
         for(int i = 0; i < milkyWayVertices.size(); i++){
             MilkyWayVertex vert = milkyWayVertices.get(i);
             if(vert.isMove()){
-                mwVertNumbers.add((verts.size() - origSize) / 3);
+                mwVertNumbers.add((verts.size() - origSize) / 9);
                 origSize = verts.size();
             }
             vert.load(verts);
         }
 
-        mwVertNumbers.add((verts.size() - origSize) / 3);
+        mwVertNumbers.add((verts.size() - origSize) / 9);
     }
 
     private void loadGridVertices(ArrayList<Float> verts){
         gridVertNumbers = new ArrayList<>();
-        gridVertStart = verts.size() / 3;
+        gridVertStart = verts.size() / 9;
         int originalSize = verts.size();
         for(float i = 0; i < 2* Math.PI; i += STEP_GRID_HORIZONTAL){
             for(float j = (float)( -Math.PI / 2 + 0.00001); j < (float)Math.PI / 2; j += STEP_LINE_VERTICAL){
                 verts.add(i);
                 verts.add(j);
                 verts.add(0f);
+
+                verts.add(0f);
+                verts.add(0f);
+                verts.add(0f);
+
+                verts.add(0f);
+                verts.add(0f);
+                verts.add(0f);
             }
-            gridVertNumbers.add((verts.size() - originalSize)/3);
+            gridVertNumbers.add((verts.size() - originalSize)/9);
             originalSize = verts.size();
         }
 
@@ -100,21 +108,37 @@ public class Markings extends Renderer{
                 verts.add(j);
                 verts.add(i);
                 verts.add(0f);
+
+                verts.add(0f);
+                verts.add(0f);
+                verts.add(0f);
+
+                verts.add(0f);
+                verts.add(0f);
+                verts.add(0f);
             }
 
-            gridVertNumbers.add((verts.size() - originalSize)/3);
+            gridVertNumbers.add((verts.size() - originalSize)/9);
             originalSize = verts.size();
         }
     }
 
     private void loadEquatorVertices(ArrayList<Float> verts){
-        equatorVertStart = verts.size() / 3;
+        equatorVertStart = verts.size() / 9;
         for(float i = 0; i < 2*Math.PI; i += STEP_LINE_HORIZONTAL){
             verts.add(i);
             verts.add(0f);
             verts.add(0f);
+
+            verts.add(0f);
+            verts.add(0f);
+            verts.add(0f);
+
+            verts.add(0f);
+            verts.add(0f);
+            verts.add(0f);
         }
-        equatorVertNumber =  verts.size() / 3 - equatorVertStart;
+        equatorVertNumber =  verts.size() / 9 - equatorVertStart;
     }
 
     public void renderAll(GL3 gl, Observer observer){

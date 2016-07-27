@@ -9,6 +9,7 @@ layout(triangle_strip, max_vertices = 4) out;
 uniform float width;
 uniform float height;
 uniform float zoom;
+uniform float aspect_ratio;
 
 in vec3 geom_color[];
 in float draw[];
@@ -26,7 +27,7 @@ void main(){
     float radius = 18 * pow(1.4, -center.z) / 950;
     float zoomed_radius = (zoom/2 + 1) * radius / 2;
 
-    float sprite_width = zoomed_radius / width;
+    float sprite_width = zoomed_radius * aspect_ratio / width;
     float sprite_height = zoomed_radius / height;
 
 

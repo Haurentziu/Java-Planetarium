@@ -40,5 +40,13 @@ public class MessierObject {
                 break;
 
         }
+
+        verts.add(0f);
+        verts.add(0f);
+        verts.add(0f);
+
+        verts.add(0f);
+        verts.add(0f);
+        verts.add(0f);
     }
 }

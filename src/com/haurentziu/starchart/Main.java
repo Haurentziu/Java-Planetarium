@@ -26,6 +26,8 @@ public class Main {
 	public static LocationMenu locationMenu;
 
 	public static void main(String[] args){
+		//System.setProperty("java.net.preferIPv4Stack" , "true");
+
 		boolean fullScreen = args.length > 0 && args[0].equals("-fullscreen");
 		Observer observer = new Observer();
 

@@ -37,13 +37,13 @@ public class Ground extends Renderer{
    public void loadVertices(ArrayList<Float> vertList){
         tilesVertsNo = new ArrayList<>();
         int originalSize = vertList.size();
-        vertStart = originalSize / 3;
+        vertStart = originalSize / 9;
         for(double i = 0; i < 2 * Math.PI/1; i += Math.PI / 20){
             for(double j = 0; j > -Math.PI/2; j -= Math.PI / 20){
                 HorizontalCoordinates c = new HorizontalCoordinates(i, j);
                 Tile tile = new Tile(c, Math.PI/20 + 0.0001, Math.PI/20 + 0.0001);
                 loadGroundTile(tile, vertList);
-                tilesVertsNo.add((vertList.size() - originalSize)/3);
+                tilesVertsNo.add((vertList.size() - originalSize) / 9);
                 originalSize = vertList.size();
             }
         }
@@ -56,9 +56,25 @@ public class Ground extends Renderer{
             vertList.add((float)c.getAltitude());
             vertList.add(0f);
 
+            vertList.add(0f);
+            vertList.add(0f);
+            vertList.add(0f);
+
+            vertList.add(0f);
+            vertList.add(0f);
+            vertList.add(0f);
+
             for(double i = tile.getStartAz(); i <= tile.getEndAz(); i += GROUND_STEP){
                 vertList.add((float)i);
                 vertList.add((float)tile.getStartAlt());
+                vertList.add(0f);
+
+                vertList.add(0f);
+                vertList.add(0f);
+                vertList.add(0f);
+
+                vertList.add(0f);
+                vertList.add(0f);
                 vertList.add(0f);
             }
 
@@ -66,11 +82,27 @@ public class Ground extends Renderer{
                 vertList.add((float)tile.getEndAz());
                 vertList.add((float)i);
                 vertList.add(0f);
+
+                vertList.add(0f);
+                vertList.add(0f);
+                vertList.add(0f);
+
+                vertList.add(0f);
+                vertList.add(0f);
+                vertList.add(0f);
             }
 
             for(double i = tile.getEndAz(); i >= tile.getStartAz(); i -= GROUND_STEP){
                 vertList.add((float)i);
                 vertList.add((float)tile.getEndAlt());
+                vertList.add(0f);
+
+                vertList.add(0f);
+                vertList.add(0f);
+                vertList.add(0f);
+
+                vertList.add(0f);
+                vertList.add(0f);
                 vertList.add(0f);
             }
 
@@ -78,10 +110,26 @@ public class Ground extends Renderer{
                 vertList.add((float)tile.getStartAz());
                 vertList.add((float)i);
                 vertList.add(0f);
+
+                vertList.add(0f);
+                vertList.add(0f);
+                vertList.add(0f);
+
+                vertList.add(0f);
+                vertList.add(0f);
+                vertList.add(0f);
             }
 
             vertList.add((float)tile.getStartAz());
             vertList.add((float)tile.getStartAlt());
+            vertList.add(0f);
+
+            vertList.add(0f);
+            vertList.add(0f);
+            vertList.add(0f);
+
+            vertList.add(0f);
+            vertList.add(0f);
             vertList.add(0f);
 
     }

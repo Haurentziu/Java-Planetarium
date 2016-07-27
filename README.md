@@ -15,6 +15,7 @@ Open Source planetarium software programmed in Java and JOGL
 * M - show/hide Milky Way
 * D - show/hide deep space objects
 * B - show/hide constellations boundaries
+* S - show/hide artificial satellites
 * Right Arrow - increase time speed
 * Left Arrow - decrease time speed
 
@@ -22,6 +23,7 @@ Open Source planetarium software programmed in Java and JOGL
 
 * Realtime sky rendering
 * Realtime planet positions
+* Realtime satellite positions 
 * Valuare
 * Talent
 

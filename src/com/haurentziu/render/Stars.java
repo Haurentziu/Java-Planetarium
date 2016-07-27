@@ -39,26 +39,27 @@ public class Stars extends Renderer{
     }
 
     public void loadVertices(ArrayList<Float> verts){
-        vertStart = verts.size() / 3;
+        vertStart = verts.size() / 9;
 
         for(int  i = 0; i < starsArray.size(); i++){
             Star star = starsArray.get(i);
+            Color starColor = star.getStarRGB();
             EquatorialCoordinates eq = star.getEquatorialCoordinates();
+
             verts.add((float)eq.getRightAscension());
             verts.add((float)eq.getDeclination());
             verts.add(star.getMagnitude());
-        }
-        vertsNumber = verts.size() / 3 - vertStart;
-    }
 
-    public void loadColor(ArrayList<Float> color){
-        for(int i = 0; i < starsArray.size(); i++){
-            Star star = starsArray.get(i);
-            Color starColor = star.getStarRGB();
-            color.add(starColor.getRed() / 255f);
-            color.add(starColor.getGreen() / 255f);
-            color.add(starColor.getBlue() / 255f);
+            verts.add(starColor.getRed() / 255f);
+            verts.add(starColor.getGreen() / 255f);
+            verts.add(starColor.getBlue() / 255f);
+
+            verts.add(0f);
+            verts.add(0f);
+            verts.add(0f);
+
         }
+        vertsNumber = verts.size() / 9 - vertStart;
     }
 
     public void render(GL3 gl, Observer observer){
@@ -69,6 +70,7 @@ public class Stars extends Renderer{
         texture.bind(gl);
         super.setObserver(gl, observer);
         shader.setVariable(gl, "transform_type", 1);
+        shader.setVariable(gl, "aspect_ratio", 1f);
         shader.setVariable(gl, "max_mag", observer.getMaxMagnitude());
 
         shader.setVariable(gl, "vertex_type", 1);

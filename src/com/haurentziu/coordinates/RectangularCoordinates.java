@@ -26,7 +26,13 @@ public class RectangularCoordinates {
 		double latitude = Math.atan2(z, Math.sqrt(x*x + y*y));
 		return new EclipticCoordinates(longitude, latitude);
 	}
-	
+
+	public EquatorialCoordinates toEquatorialCoordinates(){
+		double longitude = Math.atan2(y, x);
+		double latitude = Math.atan2(z, Math.sqrt(x*x + y*y));
+		return new EquatorialCoordinates(longitude, latitude);
+	}
+
 	public double getX(){
 		return x;
 	}

@@ -38,11 +38,11 @@ public class DeepSpaceObjects extends Renderer{
     }
 
     public void loadVertices(ArrayList<Float> verts){
-        vertStart = verts.size() / 3;
+        vertStart = verts.size() / 9;
         for(int i = 0; i < messierObjects.size(); i++){
             messierObjects.get(i).load(verts);
         }
-        vertNumber = verts.size() / 3 - vertStart;
+        vertNumber = verts.size() / 9 - vertStart;
     }
 
     public void render(GL3 gl, Observer observer){

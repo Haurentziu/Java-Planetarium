@@ -28,22 +28,22 @@ void main(){
         float sprite_height = 0.0155 / height;
 
         gl_Position = vec4(center.x - sprite_width, center.y - sprite_height , center.z, center.w);
-        fragUV = vec2(0, 0);
+        fragUV = vec2(center.z, 0);
         start = center.z;
         EmitVertex();
 
         gl_Position = vec4(center.x - sprite_width, center.y + sprite_height , center.z, center.w);
-        fragUV = vec2(0, 1);
+        fragUV = vec2(center.z, 1);
         start = center.z;
         EmitVertex();
 
         gl_Position = vec4(center.x + sprite_width, center.y - sprite_height , center.z, center.w);
-        fragUV = vec2(1, 0);
+        fragUV = vec2(center.z + 1.0 / 6.0, 0);
         start = center.z;
         EmitVertex();
 
         gl_Position = vec4(center.x + sprite_width, center.y + sprite_height , center.z, center.w);
-        fragUV = vec2(1, 1);
+        fragUV = vec2(center.z + 1.0 / 6.0, 1);
         start = center.z;
         EmitVertex();
 

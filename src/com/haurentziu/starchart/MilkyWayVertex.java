@@ -25,6 +25,14 @@ public class MilkyWayVertex {
         verts.add((float)equatorialCoordinates.getRightAscension());
         verts.add((float)equatorialCoordinates.getDeclination());
         verts.add(0f);
+
+        verts.add(0f);
+        verts.add(0f);
+        verts.add(0f);
+
+        verts.add(0f);
+        verts.add(0f);
+        verts.add(0f);
     }
 
     public boolean isMove(){

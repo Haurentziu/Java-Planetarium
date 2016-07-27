@@ -28,7 +28,7 @@ public class Constellations extends Renderer{
     }
 
     public void loadVertices(ArrayList<Float> verts){
-        vertStart = verts.size() / 3;
+        vertStart = verts.size() / 9;
         for(int i = 0; i < constellationsArray.size(); i++) {
             ConstellationLines c = constellationsArray.get(i);
 
@@ -38,17 +38,25 @@ public class Constellations extends Renderer{
             for (int j = 0; j < startStars.size(); j++) {
                 EquatorialCoordinates startEq = startStars.get(j).getEquatorialCoordinates();
                 EquatorialCoordinates endEq = endStars.get(j).getEquatorialCoordinates();
-                verts.add((float) startEq.getRightAscension());
-                verts.add((float) startEq.getDeclination());
-                verts.add(0f);
-
-                verts.add((float) endEq.getRightAscension());
-                verts.add((float) endEq.getDeclination());
-                verts.add(0f);
-
+                loadCoordinates(startEq, verts);
+                loadCoordinates(endEq, verts);
             }
         }
-        vertNumber = verts.size() / 3 - vertStart;
+        vertNumber = verts.size() / 9 - vertStart;
+    }
+
+    private void loadCoordinates(EquatorialCoordinates eq, ArrayList<Float> verts){
+        verts.add((float) eq.getRightAscension());
+        verts.add((float) eq.getDeclination());
+        verts.add(0f);
+
+        verts.add(0f);
+        verts.add(0f);
+        verts.add(0f);
+
+        verts.add(0f);
+        verts.add(0f);
+        verts.add(0f);
     }
 
     public void render(GL3  gl, Observer observer){

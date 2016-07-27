@@ -41,7 +41,8 @@ public class Observer {
     public boolean showMilkyWay = true;
     public boolean isPaused = false;
     public boolean showBounds = false;
-    public boolean showLabels = false;
+    public boolean showLabels = true;
+    public boolean showSatellites = true;
 
     public static int currentWarp = 7;
     public static int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 1, 10, 100, 1000, 3000, 5000, 10000};
@@ -268,6 +269,10 @@ public class Observer {
 
     public void toogleLabels(){
         showLabels = !showLabels;
+    }
+
+    public void toogleSatellites(){
+        showSatellites = !showSatellites;
     }
 
     public boolean showMarkings(){

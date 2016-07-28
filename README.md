@@ -1,8 +1,11 @@
 #Java Planetarium
 
-Open Source planetarium software programmed in Java and JOGL
+Open Source planetarium software programmed in Java
 
-![Java Planetarium](http://i.imgur.com/ARBk1t0.png)
+![Java Planetarium](http://i.imgur.com/2nYv8N3.png)
+
+
+![Java Planetarium](http://i.imgur.com/WHfSApk.png)
 
 ###Controls
 
@@ -19,16 +22,21 @@ Open Source planetarium software programmed in Java and JOGL
 * Right Arrow - increase time speed
 * Left Arrow - decrease time speed
 
-###Features
+###Current Features
 
 * Realtime sky rendering
 * Realtime planet positions
 * Realtime satellite positions 
-* Valuare
-* Talent
 
-###Credits
+### Planned Features
+* Realtime comets and asteroid positions
+* Prediction of satellite passes
 
-* Haurentziu
+### References and acknowledgements
+
+1. Star positions from the [Hipparcos Catalogue](http://vizier.u-strasbg.fr/viz-bin/VizieR?-source=I/239/hip_main)
+2. Two-line element set (TLEs) data from http://celestrak.com/ 
+3. [F.R. Hoots, "Reformulation of the Brouwer geopotential theory for improved computational efficiency", Celestial Mechanics 24 (1981)](http://adsabs.harvard.edu/full/1981CeMec..24..367H)
+4. [P. L. Palmer & Yan Mai, A Fast Prediction Algorithm of Satellite Passes](http://digitalcommons.usu.edu/cgi/viewcontent.cgi?article=2075&context=smallsat)
 
 ![Java Planetarium](http://i.imgur.com/RCuV0Fn.png)

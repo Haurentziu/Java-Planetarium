@@ -32,6 +32,11 @@ public class SphericalCoordinates {
 		double rotatedLatitude = Math.asin(Math.sin(latitude) * Math.cos(latRot) + Math.cos(latitude)*Math.sin(latRot)*Math.sin(longRot - longitude));
 		return new SphericalCoordinates(rotatedLongitude, rotatedLatitude);
 	}
+
+	public void add(double deltaLong, double deltaLat){
+		longitude += deltaLong;
+		latitude += deltaLat;
+	}
 	
 	
 
@@ -79,6 +84,18 @@ public class SphericalCoordinates {
 	public static double getAngularDistance(SphericalCoordinates c1, SphericalCoordinates c2){
 		double d = Math.acos(Math.sin(c1.getLatitude()) * Math.sin(c2.getLatitude()) + Math.cos(c1.getLatitude()) * Math.cos(c2.getLatitude()) * Math.cos(c1.getLongitude() - c2.getLongitude()));
 		return d;
+	}
+
+	public String toString(){
+		return String.format("Longitude: %f\nLatitude: %f\n", normaliseAngle(longitude), Math.toDegrees(latitude));
+	}
+
+
+	private double normaliseAngle(double angle){
+		angle  = Math.toDegrees(angle);
+		if(angle < 0)
+			angle += 360;
+		return angle;
 	}
 	
 	public double getLatitude(){

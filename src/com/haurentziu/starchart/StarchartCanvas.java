@@ -147,6 +147,12 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
             case KeyEvent.VK_Z:     observer.toogleSatellites();
                 break;
 
+            case KeyEvent.VK_F1:    Main.showTimeMenu();
+                break;
+
+            case KeyEvent.VK_F2:    Main.showLocationMenu();
+                break;
+
 
         }
     }

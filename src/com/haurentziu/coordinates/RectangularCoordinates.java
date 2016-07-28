@@ -20,6 +20,10 @@ public class RectangularCoordinates {
 		z += r.getZ();
 	}
 
+	public double getDistanceFromCenter(){
+		return Math.sqrt(x * x + y * y + z * z);
+	}
+
 
 	public EclipticCoordinates toEclipticCoordinates(){
 		double longitude = Math.atan2(y, x);

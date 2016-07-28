@@ -24,9 +24,10 @@ public class Main {
 	public static StarchartCanvas canvas;
 	public static TimeMenu timeMenu;
 	public static LocationMenu locationMenu;
+	public static SatelliteMenu satelliteMenu;
 
 	public static void main(String[] args){
-		//System.setProperty("java.net.preferIPv4Stack" , "true");
+		GraphicsDevice d = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
 		boolean fullScreen = args.length > 0 && args[0].equals("-fullscreen");
 		Observer observer = new Observer();
@@ -54,6 +55,9 @@ public class Main {
 		locationMenu = new LocationMenu(observer);
 		locationMenu.setVisible(false);
 
+		satelliteMenu = new SatelliteMenu();
+		satelliteMenu.setVisible(false);
+
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
 		final Dimension screenSize = toolkit.getScreenSize();
 		final int x = (screenSize.width - width) / 2;
@@ -63,16 +67,23 @@ public class Main {
 		if(fullScreen){
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			frame.setUndecorated(true);
+			if(d.isFullScreenSupported()){
+				d.setFullScreenWindow(frame);
+			}
+
+		}
+
+		else{
+			frame.setSize(width, height);
 		}
 
 		frame.setContentPane(panel);
 		frame.add(bar, BorderLayout.SOUTH);
 
-		frame.setSize(width, height);
-
 		frame.setVisible(true);
 		splash.close();
 		animator.start();
+
 
 		frame.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){
@@ -91,6 +102,12 @@ public class Main {
 		locationMenu.setVisible(true);
 		locationMenu.toFront();
 	}
+
+	public static void showSatelliteMenu(){
+		satelliteMenu.setVisible(true);
+		satelliteMenu.toFront();
+	}
+
 
 	public static void exit(){
 		canvas.destroy();

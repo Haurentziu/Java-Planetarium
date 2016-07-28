@@ -53,26 +53,26 @@ public class ToolBar extends JToolBar implements ActionListener{
             ex.printStackTrace();
         }
 
-        satelliteButton = new BarButton("./res/img/satellite.png", "Toogle artificial satellites", this);
-        equatorialButton = new BarButton("./res/img/equatorial.png", "Toogle equatorial grid", this);
-        horizontalButton = new BarButton("./res/img/horizontal.png", "Toogle azimuthal grid", this);
-        groundButton = new BarButton("./res/img/ground.png", "Toogle ground", this);
-        constellationButton = new BarButton("./res/img/const_line.png", "Toogle constellationLines lines", this);
-        eclipticButton = new BarButton("./res/img/ecliptic.png", "Toogle ecliptic", this);
-        equatorButton = new BarButton("./res/img/equator.png", "Toogle celestial equator", this);
-        boundsMenuButton = new BarButton("./res/img/bounds.png", "Toogle constellations bounds", this);
-        dsoButton = new BarButton("./res/img/dso.png", "Toogle DSOs", this);
-        mwButton = new BarButton("./res/img/milky_way.png", "Toogle Milky Way", this);
-        timeMenuButton = new BarButton("./res/img/clock.png", "Show time menu", this);
-        locMenuButton = new BarButton("./res/img/location.png", "Show location menu", this);
+        satelliteButton = new BarButton("./res/img/satellite.png", "Toogle artificial satellites (Z)", this);
+        equatorialButton = new BarButton("./res/img/equatorial.png", "Toogle equatorial grid (E)", this);
+        horizontalButton = new BarButton("./res/img/horizontal.png", "Toogle azimuthal grid (A)", this);
+        groundButton = new BarButton("./res/img/ground.png", "Toogle ground (G)", this);
+        constellationButton = new BarButton("./res/img/const_line.png", "Toogle constellationLines lines (C)", this);
+        eclipticButton = new BarButton("./res/img/ecliptic.png", "Toogle ecliptic (S)", this);
+        equatorButton = new BarButton("./res/img/equator.png", "Toogle celestial equator (Q)", this);
+        boundsMenuButton = new BarButton("./res/img/bounds.png", "Toogle constellations bounds (B)", this);
+        dsoButton = new BarButton("./res/img/dso.png", "Toogle DSOs (D)", this);
+        mwButton = new BarButton("./res/img/milky_way.png", "Toogle Milky Way (M)", this);
+        timeMenuButton = new BarButton("./res/img/clock.png", "Show time menu (F1)", this);
+        locMenuButton = new BarButton("./res/img/location.png", "Show location menu (F2)", this);
         closeButton = new BarButton("./res/img/onoff.png", "Exit application", this);
 
-        fasterButton = new BarButton("./res/img/faster.png", "Increase time warp", this);
+        fasterButton = new BarButton("./res/img/faster.png", "Increase time warp (Right Arrow)", this);
         pauseButton = new BarButton("./res/img/pause.png", "Pause", this);
         nowButton = new BarButton("./res/img/now.png", "Now", this);
-        slowerButton = new BarButton("./res/img/slower.png", "Decrease time warp", this);
+        slowerButton = new BarButton("./res/img/slower.png", "Decrease time warp (Left Arrow)", this);
         defaultButton = new BarButton("./res/img/one.png", "Time warp x1", this);
-        labelButton = new BarButton("./res/img/labels.png", "Toogle Labels", this);
+        labelButton = new BarButton("./res/img/labels.png", "Toogle Labels (L)", this);
 
         add(equatorialButton);
         add(horizontalButton);

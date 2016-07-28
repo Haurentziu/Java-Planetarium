@@ -1,7 +1,9 @@
 package com.haurentziu.tle;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
+import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.RectangularCoordinates;
+import com.haurentziu.starchart.Observer;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -92,6 +94,16 @@ public class Satellite {
         double posZ = 2 * y4 * Math.cos(inclination / 2.0);
         RectangularCoordinates r = new RectangularCoordinates(posX * y1 / 1000.0, posY * y1 / 1000.0, posZ * y1 / 1000.0);
         return r;
+    }
+
+    public HorizontalCoordinates getHorizonatalCoordinates(Observer observer){
+        RectangularCoordinates rectangular = getRectangularCoordinates(observer.getUnixTime());
+        HorizontalCoordinates horizontal = rectangular.toEquatorialCoordinates().toHorizontal(observer.getLongitude(), observer.getLatitude(), observer.getSideralTime());
+        double distance = rectangular.getDistanceFromCenter();
+        double topocentricDistance = Math.sqrt(EARTH_RADIUS * EARTH_RADIUS + distance * distance - 2 * distance * EARTH_RADIUS * Math.sin(horizontal.getAltitude()));
+        double parallax = Math.asin(EARTH_RADIUS / topocentricDistance * Math.cos(horizontal.getAltitude())); // sin(PI / 2 - a) = sin(z) = cos(a)
+        horizontal.add(0, - parallax);
+        return horizontal;
     }
 
     private double getUnixTimeOfTLE(){

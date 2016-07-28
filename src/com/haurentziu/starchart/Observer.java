@@ -4,8 +4,10 @@ import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.ProjectionPoint;
 import com.haurentziu.coordinates.SphericalCoordinates;
+import com.haurentziu.tle.Satellite;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 /**
  * Created by haurentziu on 27.04.2016.
@@ -28,6 +30,8 @@ public class Observer {
     private double azRotation;
     private double altRotation;
     private byte projection;
+
+    private ArrayList<Satellite> satelliteList;
 
     public boolean showGround = true;
     public boolean showCardinalPoints = true;
@@ -287,5 +291,8 @@ public class Observer {
         return windowBounds;
     }
 
+    public void setSatelliteList(ArrayList<Satellite> satelliteList){
+        this.satelliteList = satelliteList;
+    }
 
 }

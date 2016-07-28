@@ -1,27 +1,20 @@
 package com.haurentziu.tle;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 
 /**
  * Created by haurentziu on 17.07.2016.
  */
-public class TLEFile {
-    BufferedReader fileReader;
-
-    public TLEFile(String path) throws IOException {
-        URL fileURL = new URL(path);
-
-        fileReader = new BufferedReader(new InputStreamReader(fileURL.openConnection().getInputStream()));
-
+public final class TLEIO {
+    private TLEIO(){
 
     }
 
-    public ArrayList<Satellite> getSatellites() throws IOException{
+
+    public static ArrayList<Satellite> getSatellites(String path) throws IOException{
+        BufferedReader fileReader = new BufferedReader(new FileReader(path));
         ArrayList<Satellite> satellites = new ArrayList<>();
         String line = null;
         while((line = fileReader.readLine()) != null){

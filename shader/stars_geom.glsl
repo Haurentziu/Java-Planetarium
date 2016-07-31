@@ -55,6 +55,7 @@ void main(){
 
         EndPrimitive();
     }
+
     else{
         EndPrimitive();
     }

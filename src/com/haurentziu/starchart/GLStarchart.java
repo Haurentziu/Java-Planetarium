@@ -21,6 +21,7 @@ public class GLStarchart implements GLEventListener{
     private SolarSystem solarSystem;
     private AstroText astroText;
     private ArtificialSatellites satellites;
+    private InfoText infoText;
     private VBO vbo;
 
     private Observer observer;
@@ -36,6 +37,7 @@ public class GLStarchart implements GLEventListener{
         markings = new Markings("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/marking_frag.glsl");
         ground = new Ground("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
         solarSystem = new SolarSystem("./shader/vertex.glsl", "./shader/text_geom.glsl", "./shader/text_frag.glsl");
+        infoText = new InfoText("./shader/info_vert.glsl", "./shader/info_geom.glsl", "./shader/info_frag.glsl");
         satellites = new ArtificialSatellites();
     }
 
@@ -43,6 +45,7 @@ public class GLStarchart implements GLEventListener{
     public void init(GLAutoDrawable glAutoDrawable) {
         GL3 gl = glAutoDrawable.getGL().getGL3();
         stars.initialize(gl);
+
         solarSystem.initialize(gl);
         constellations.initialize(gl);
         constellations.loadConstellations(stars.getStarsArray());
@@ -50,6 +53,7 @@ public class GLStarchart implements GLEventListener{
         markings.initialize(gl);
         ground.initialize(gl);
         satellites.initialize(gl);
+        infoText.initialize(gl);
 
         ArrayList<Float> vertsList = new ArrayList<>();
         ArrayList<Float> colorList = new ArrayList<>();
@@ -61,6 +65,7 @@ public class GLStarchart implements GLEventListener{
         messierObjects.loadVertices(vertsList);
         markings.loadAllVertices(vertsList);
         ground.loadVertices(vertsList);
+        infoText.loadVertices(vertsList);
 
         vbo.init(gl, vertsList,  colorList);
 
@@ -78,6 +83,7 @@ public class GLStarchart implements GLEventListener{
         ground.delete(gl);
         solarSystem.delete(gl);
         satellites.delete(gl);
+        infoText.delete(gl);
 
         vbo.delete(gl);
     }
@@ -93,7 +99,7 @@ public class GLStarchart implements GLEventListener{
 
         observer.updateTime();
 
-       // System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+        // System.out.println(glAutoDrawable.getAnimator().getLastFPS());
 
         if(observer.showMarkings()){
             markings.renderAll(gl, observer);
@@ -123,6 +129,9 @@ public class GLStarchart implements GLEventListener{
             ground.render(gl, observer);
         }
 
+        infoText.render(gl);
+
+
     }
 
     @Override
@@ -136,10 +145,12 @@ public class GLStarchart implements GLEventListener{
         markings.setSize(gl, aspectRatio, 1f);
         ground.setSize(gl, aspectRatio, 1f);
         solarSystem.setSize(gl, aspectRatio, 1f);
+        infoText.setScale(gl, 1, aspectRatio);
 
         observer.getBounds().setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         observer.getWindowBounds().setRect(0, 0, i2, i3);
         observer.updateZoom();
+
     }
 
     Observer getObserver(){

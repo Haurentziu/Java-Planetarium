@@ -49,10 +49,10 @@ public class Main {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(canvas);
 
-		timeMenu = new TimeMenu(observer);
+		timeMenu = new TimeMenu(frame, observer);
 		timeMenu.setVisible(false);
 
-		locationMenu = new LocationMenu(observer);
+		locationMenu = new LocationMenu(frame, observer);
 		locationMenu.setVisible(false);
 
 		satelliteMenu = new SatelliteMenu();
@@ -67,9 +67,9 @@ public class Main {
 		if(fullScreen){
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			frame.setUndecorated(true);
-			if(d.isFullScreenSupported()){
+		/*	if(d.isFullScreenSupported()){
 				d.setFullScreenWindow(frame);
-			}
+			}*/
 
 		}
 
@@ -77,13 +77,12 @@ public class Main {
 			frame.setSize(width, height);
 		}
 
+		panel.add(bar, BorderLayout.SOUTH);
 		frame.setContentPane(panel);
-		frame.add(bar, BorderLayout.SOUTH);
 
+		animator.start();
 		frame.setVisible(true);
 		splash.close();
-		animator.start();
-
 
 		frame.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){

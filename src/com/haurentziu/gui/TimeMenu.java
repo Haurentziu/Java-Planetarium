@@ -39,7 +39,8 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
 
     private  Observer observer;
 
-    public TimeMenu(Observer observer){
+    public TimeMenu(JFrame parent, Observer observer){
+        super(parent);
         updateAll();
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         createGUI();
@@ -76,7 +77,6 @@ public class TimeMenu extends JDialog  implements Runnable, ChangeListener, Focu
 
     void createGUI(){
         setSize(490, 105);
-        setAlwaysOnTop(true);
         setResizable(false);
         setTitle("Date & Time");
         JPanel jp = new JPanel();

@@ -38,5 +38,7 @@ Open Source planetarium software programmed in Java
 2. Two-line element set (TLEs) data from http://celestrak.com/ 
 3. [F.R. Hoots, "Reformulation of the Brouwer geopotential theory for improved computational efficiency", Celestial Mechanics 24 (1981)](http://adsabs.harvard.edu/full/1981CeMec..24..367H)
 4. [P. L. Palmer & Yan Mai, A Fast Prediction Algorithm of Satellite Passes](http://digitalcommons.usu.edu/cgi/viewcontent.cgi?article=2075&context=smallsat)
+5. [Map Projections - A Working Manual](http://eaps.mit.edu/12.114/Map_projections_a_working_manual.pdf)
+6. Jean Meeus - Astronomical Algorithms, Second Edition
 
 ![Java Planetarium](http://i.imgur.com/RCuV0Fn.png)

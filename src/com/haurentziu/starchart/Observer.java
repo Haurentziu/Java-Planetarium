@@ -250,7 +250,7 @@ public class Observer {
         String offSet = offsetFormat.format(tz.getOffset(unixTime) / 1000 / 3600);
         sdf.setTimeZone(tz);
 
-        String s = String.format("Location: %s %s    %s GMT%s", longitudeString, latitudeString, sdf.format(unixTime), offSet);
+        String s = String.format("Location: %s %s    %s UTC%s", longitudeString, latitudeString, sdf.format(unixTime), offSet);
         return s;
     }
 

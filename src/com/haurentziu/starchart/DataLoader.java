@@ -54,6 +54,7 @@ public class DataLoader {
 				stars.add(star);
 				line = reader.readLine();
 			}
+
 			reader.close();
 			System.out.println("Loaded the Hipparcos catalog");
 		}

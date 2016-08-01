@@ -129,7 +129,9 @@ public class GLStarchart implements GLEventListener{
             ground.render(gl, observer);
         }
 
+        infoText.updateObserverInfo(gl, vbo.getBuffers(), observer);
         infoText.render(gl);
+
 
 
     }
@@ -145,7 +147,8 @@ public class GLStarchart implements GLEventListener{
         markings.setSize(gl, aspectRatio, 1f);
         ground.setSize(gl, aspectRatio, 1f);
         solarSystem.setSize(gl, aspectRatio, 1f);
-        infoText.setScale(gl, 1, aspectRatio);
+        float scale = 210 * 1f / i3;
+        infoText.setScale(scale / aspectRatio, scale);
 
         observer.getBounds().setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         observer.getWindowBounds().setRect(0, 0, i2, i3);

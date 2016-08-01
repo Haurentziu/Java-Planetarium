@@ -4,7 +4,7 @@ import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.starchart.ConstellationLines;
 import com.haurentziu.starchart.DataLoader;
 import com.haurentziu.starchart.Observer;
-import com.haurentziu.starchart.Star;
+import com.haurentziu.astro_objects.Star;
 import com.jogamp.opengl.GL3;
 
 import java.util.ArrayList;

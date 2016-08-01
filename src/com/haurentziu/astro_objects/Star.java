@@ -1,7 +1,6 @@
-package com.haurentziu.starchart;
+package com.haurentziu.astro_objects;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
@@ -13,7 +12,7 @@ import com.haurentziu.coordinates.ProjectionPoint;
  *
  */
 
-public class Star{
+public class Star extends CelestialBody{
 	
 	private final float magnitude;
 	private final int hipparcosNumber;
@@ -22,8 +21,8 @@ public class Star{
 	private EquatorialCoordinates equatorial = new EquatorialCoordinates(0, 0);
 	private float bv;
 	
-	Star(double rightAscension, double declination, float magnitude, float bv, int hipparcosNumber) {
-		equatorial = new EquatorialCoordinates(rightAscension, declination);
+	public Star(double rightAscension, double declination, float magnitude, float bv, int hipparcosNumber) {
+		super(rightAscension, declination);
 		this.magnitude = magnitude;
 		this.hipparcosNumber = hipparcosNumber;
 		this.bv = bv;
@@ -41,10 +40,6 @@ public class Star{
 		return horizontal;
 	}
 
-	public EquatorialCoordinates getEquatorialCoordinates(){
-		return equatorial;
-	}
-
 	ProjectionPoint getProjection(){
 		return projection;
 	}
@@ -57,11 +52,11 @@ public class Star{
 		return  (float)(18*Math.pow(1.4, -magnitude)/800);
 	}
 	
-	int getHipparcos(){
+	public int getHipparcos(){
 		return hipparcosNumber;
 	}
 
-	float getBVMagnitude(){
+	public float getBVMagnitude(){
 		return (float)bv;
 	}
 

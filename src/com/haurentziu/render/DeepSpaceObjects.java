@@ -1,7 +1,7 @@
 package com.haurentziu.render;
 
 import com.haurentziu.starchart.DataLoader;
-import com.haurentziu.starchart.MessierObject;
+import com.haurentziu.astro_objects.MessierObject;
 import com.haurentziu.starchart.Observer;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.texture.Texture;

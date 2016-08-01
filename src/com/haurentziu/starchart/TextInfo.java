@@ -1,5 +1,6 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.astro_objects.Star;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.utils.Utils;

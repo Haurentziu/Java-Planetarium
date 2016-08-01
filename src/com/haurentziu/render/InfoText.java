@@ -2,10 +2,17 @@ package com.haurentziu.render;
 
 import com.haurentziu.bitmap_fonts.Character;
 import com.haurentziu.bitmap_fonts.FontLoader;
+import com.haurentziu.starchart.Observer;
+import com.haurentziu.utils.Utils;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.texture.Texture;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 /**
  * Created by haurentziu on 31.07.2016.
@@ -17,7 +24,10 @@ public class InfoText extends Renderer{
     private Texture fontTex;
     private ArrayList<Character> font;
     private int fontSize = 3;
+    private float scaleX, scaleY;
 
+    private final String locationPattern = "Location:  00°00′00″E  00°00′00″N    0000-00-00 00:00:00 GMT+00";
+    private float fontHeight = 40f / 512f;
 
     public InfoText(String vertShader, String geomShader, String fragShader){
         super(vertShader, geomShader, fragShader);
@@ -31,8 +41,7 @@ public class InfoText extends Renderer{
         fontTex.enable(gl);
         fontTex.bind(gl);
         shader.setVariable(gl, "messierTex", 0);
-        //for(int i = 0; i < size; i += 4)
-            gl.glDrawArrays(GL3.GL_TRIANGLES, start, size);
+        gl.glDrawArrays(GL3.GL_TRIANGLES, start, size);
         fontTex.disable(gl);
     }
 
@@ -50,12 +59,12 @@ public class InfoText extends Renderer{
 
     public void loadVertices(ArrayList<Float> verts){
         start = verts.size() / 9;
-        loadString(-1, -0.97f, 0.15f, "Java Planetarium v3.2-internal β", verts);
+        loadString(-1, -0.97f, locationPattern, verts);
         size = verts.size() / 9 - start;
 
     }
 
-    private void loadString(float x, float y, float scale, String s, ArrayList<Float> verts){
+    private void loadString(float x, float y, String s, ArrayList<Float> verts){
         float posX = x;
         float posY = y;
         for(int i = 0; i < s.length(); i++){
@@ -69,27 +78,46 @@ public class InfoText extends Renderer{
             }
 
             if(c != null) {
-                loadChar(posX + c.getXOffset() * scale, posY - c.getYOffset() * scale, scale, c, verts);
-                posX += c.getXAdvance() * scale;
+                loadChar(posX + c.getXOffset() * scaleX, posY - c.getYOffset() * scaleY, c, verts);
+                posX += c.getXAdvance() * scaleX;
             }
             else{
-                posX += 0.058 * scale;
+                posX += 0.058 * scaleX;
             }
         }
     }
 
-    public void setScale(GL3 gl, float scaleX, float scaleY){
-        shader.useShader(gl);
-        shader.setVariable(gl, "scaleX", scaleX);
-        shader.setVariable(gl, "scaleY", scaleY);
+    public void updateObserverInfo(GL3 gl, IntBuffer buffers, Observer observer){
+        String s = observer.getInfoString();
+
+        ArrayList<Float> newVerts = new ArrayList<>();
+        loadString(-1f, -0.99f + scaleY * fontHeight, s, newVerts);
+        float[] vertices = Utils.floatArrayList2FloatArray(newVerts);
+
+        FloatBuffer vertBuffer = FloatBuffer.wrap(vertices);
+
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
+        gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, 4 * 9 * start, 4 * vertices.length - 4, vertBuffer);
+
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(1));
+        gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, 4 * 9 * start, 4 * vertices.length - 4, vertBuffer);
+
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(2));
+        gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, 4 * 9 * start, 4 * vertices.length - 4, vertBuffer);
+
     }
 
-    public void loadChar(float x, float y, float scale, Character c, ArrayList<Float> verts){
+    public void setScale(float scaleX, float scaleY){
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+    }
+
+    public void loadChar(float x, float y, Character c, ArrayList<Float> verts){
         //First triangle
 
         //bottom left corner
         verts.add(x);
-        verts.add(y - scale * c.getHeight());
+        verts.add(y - scaleY * c.getHeight());
         verts.add(0f);
 
         verts.add(0f);
@@ -114,7 +142,7 @@ public class InfoText extends Renderer{
         verts.add(0f);
 
         //top right corner
-        verts.add(x + scale * c.getWidth());
+        verts.add(x + scaleX * c.getWidth());
         verts.add(y);
         verts.add(0f);
 
@@ -131,8 +159,8 @@ public class InfoText extends Renderer{
         //Second triangle
 
         //bottom right corner
-        verts.add(x + scale * c.getWidth());
-        verts.add(y - scale * c.getHeight());
+        verts.add(x + scaleX * c.getWidth());
+        verts.add(y - scaleY * c.getHeight());
         verts.add(0f);
 
         verts.add(0f);
@@ -145,7 +173,7 @@ public class InfoText extends Renderer{
 
         //bottom left corner
         verts.add(x);
-        verts.add(y - scale * c.getHeight());
+        verts.add(y - scaleY * c.getHeight());
         verts.add(0f);
 
         verts.add(0f);
@@ -157,7 +185,7 @@ public class InfoText extends Renderer{
         verts.add(0f);
 
         //top right corner
-        verts.add(x + scale * c.getWidth());
+        verts.add(x + scaleX * c.getWidth());
         verts.add(y);
         verts.add(0f);
 

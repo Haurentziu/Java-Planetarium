@@ -1,5 +1,7 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.astro_objects.Star;
+
 import java.util.ArrayList;
 
 /**

@@ -1,4 +1,4 @@
-package com.haurentziu.starchart;
+package com.haurentziu.astro_objects;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
 
@@ -8,20 +8,19 @@ import java.util.ArrayList;
  * Created by haurentziu on 15.05.2016.
  */
 
-public class MessierObject {
+public class MessierObject extends CelestialBody{
     private String name;
-    private EquatorialCoordinates equatorial;
     private String type;
 
     public MessierObject(String name, double ra, double dec, String type){
+        super(ra, dec);
         this.name = name;
         this.type = type;
-        equatorial = new EquatorialCoordinates(ra, dec);
     }
 
     public void load(ArrayList<Float> verts){
-        verts.add((float)equatorial.getRightAscension());
-        verts.add((float)equatorial.getDeclination());
+        verts.add((float)equatorialCoordinates.getRightAscension());
+        verts.add((float)equatorialCoordinates.getDeclination());
         switch(type)
         {
             case "Globular Cluster":    verts.add(0/6f);

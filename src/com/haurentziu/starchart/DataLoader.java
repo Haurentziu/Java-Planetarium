@@ -1,5 +1,7 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.astro_objects.MessierObject;
+import com.haurentziu.astro_objects.Star;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 
 import java.io.BufferedReader;

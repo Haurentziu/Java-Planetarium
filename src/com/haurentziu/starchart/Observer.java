@@ -2,12 +2,15 @@ package com.haurentziu.starchart;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
-import com.haurentziu.coordinates.ProjectionPoint;
 import com.haurentziu.coordinates.SphericalCoordinates;
 import com.haurentziu.tle.Satellite;
+import com.haurentziu.utils.Utils;
 
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 /**
  * Created by haurentziu on 27.04.2016.
@@ -50,12 +53,15 @@ public class Observer {
 
     public static int currentWarp = 7;
     public static int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 1, 10, 100, 1000, 3000, 5000, 10000};
-
+    public int mountType = EQUATORIAL_MOUNT;
 
     private static final double MAX_FOV = Math.toRadians(140);
     private static final double SCALE_FACTOR = 0.5 * Math.sin(MAX_FOV) / (1 + Math.cos(MAX_FOV));
     private static final double MIN_ALT_ROTATE = - Math.PI/2;
     private static final double MAX_ALT_ROTATE = Math.PI/2;
+
+    public static final byte EQUATORIAL_MOUNT = 1;
+    public static final byte AZIMUTHAL_MOUNT = 0;
 
     Observer(double longitude, double latitude, double sideralTime, double azRotation, double altRotation, byte projection, double zoom){
         setZoom(zoom);
@@ -119,6 +125,7 @@ public class Observer {
         double d =  2 * Math.sin(fov) / (1 + Math.cos(fov));
         double minSize = Math.min(ortoBounds.getWidth(), ortoBounds.getHeight());
         zoom = SCALE_FACTOR * minSize / d;
+        //zoom = 1;
         //zoom = Math.sqrt(ortoBounds.getWidth() * ortoBounds.getWidth() + ortoBounds.getHeight() * ortoBounds.getHeight()) / d;
     }
 
@@ -217,6 +224,36 @@ public class Observer {
             currentWarp = newWarp;
         }
     }
+
+    public String getInfoString(){
+        String longitudeString = Utils.rad2String(Math.abs(longitude), false, false);
+        String latitudeString = Utils.rad2String(Math.abs(latitude), false, false);
+
+        if(longitude < 0){
+            longitudeString += "E";
+        }
+        else{
+            longitudeString += "W";
+        }
+
+        if(latitude < 0){
+            latitudeString += "S";
+        }
+        else{
+            latitudeString += "N";
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        TimeZone tz = TimeZone.getDefault();
+
+        DecimalFormat offsetFormat = new DecimalFormat("+#00;-#00");
+        String offSet = offsetFormat.format(tz.getOffset(unixTime) / 1000 / 3600);
+        sdf.setTimeZone(tz);
+
+        String s = String.format("Location: %s %s    %s GMT%s", longitudeString, latitudeString, sdf.format(unixTime), offSet);
+        return s;
+    }
+
 
 
     public void tooglePause(){

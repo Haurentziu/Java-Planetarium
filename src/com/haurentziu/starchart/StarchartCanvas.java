@@ -1,7 +1,12 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.coordinates.EquatorialCoordinates;
+import com.haurentziu.coordinates.HorizontalCoordinates;
+import com.haurentziu.coordinates.ProjectionPoint;
+import com.haurentziu.utils.Utils;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.util.texture.ImageType;
 
 import java.awt.event.*;
 
@@ -48,8 +53,13 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
 
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
-
-
+        double x = (2 * mouseEvent.getX() / observer.getWindowBounds().getWidth() - 1) / observer.getZoom();
+        double y = (1 - 2 * mouseEvent.getY() / observer.getWindowBounds().getHeight()) / observer.getZoom();
+        //System.out.println(x + " " + y);
+        ProjectionPoint pp = new ProjectionPoint(x, y);
+        HorizontalCoordinates h = pp.inverseProjection(observer.getAzRotation(), observer.getAltRotation());
+        EquatorialCoordinates eq = h.toEquatorial(observer);
+        System.out.println(Utils.rad2String(eq.getRightAscension(), true, true) + " " + Utils.rad2String(eq.getDeclination(), false, false));
     }
 
     @Override

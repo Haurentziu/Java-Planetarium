@@ -3,7 +3,7 @@ package com.haurentziu.render;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.starchart.DataLoader;
 import com.haurentziu.starchart.Observer;
-import com.haurentziu.starchart.Star;
+import com.haurentziu.astro_objects.Star;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.texture.Texture;
 

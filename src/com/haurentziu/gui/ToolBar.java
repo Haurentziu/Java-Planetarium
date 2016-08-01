@@ -161,6 +161,7 @@ public class ToolBar extends JToolBar implements ActionListener{
         }
         else if(source == nowButton) {
             observer.setTimeNow();
+            observer.setDefault();
         }
         else if(source == boundsMenuButton) {
             observer.toogleBounds();

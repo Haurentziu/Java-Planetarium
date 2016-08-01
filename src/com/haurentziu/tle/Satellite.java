@@ -4,6 +4,7 @@ import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.RectangularCoordinates;
 import com.haurentziu.starchart.Observer;
+import com.haurentziu.tle.AstroUtils;
 
 import java.util.Calendar;
 import java.util.TimeZone;

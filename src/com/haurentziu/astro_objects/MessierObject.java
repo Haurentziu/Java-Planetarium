@@ -18,6 +18,12 @@ public class MessierObject extends CelestialBody{
         this.type = type;
     }
 
+    @Override
+    public String toString(){
+        String nameString = name + "         ";
+        return nameString.substring(0, 10);
+    }
+
     public void load(ArrayList<Float> verts){
         verts.add((float)equatorialCoordinates.getRightAscension());
         verts.add((float)equatorialCoordinates.getDeclination());

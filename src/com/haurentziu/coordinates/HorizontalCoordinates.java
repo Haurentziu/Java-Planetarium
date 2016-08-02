@@ -22,6 +22,8 @@ public class HorizontalCoordinates extends SphericalCoordinates{
 		while(ra < 0) ra += 2*Math.PI;
 		return new EquatorialCoordinates(ra, delta);
 	}
+
+
 	
 	public double getAzimuth(){
 		return longitude;

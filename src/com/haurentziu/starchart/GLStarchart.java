@@ -1,11 +1,12 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.astro_objects.CelestialBody;
+import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.render.*;
 
 import com.haurentziu.render.Markings;
 import com.jogamp.opengl.*;
 
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 /**
@@ -99,7 +100,9 @@ public class GLStarchart implements GLEventListener{
 
         observer.updateTime();
 
-        // System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+        if(observer.trackSelectedBody){
+            observer.updateRotation();
+        }
 
         if(observer.showMarkings()){
             markings.renderAll(gl, observer);
@@ -129,7 +132,8 @@ public class GLStarchart implements GLEventListener{
             ground.render(gl, observer);
         }
 
-        infoText.updateObserverInfo(gl, vbo.getBuffers(), observer);
+        infoText.updateText(gl, vbo.getBuffers(), observer);
+
         infoText.render(gl);
 
 
@@ -154,6 +158,43 @@ public class GLStarchart implements GLEventListener{
         observer.getWindowBounds().setRect(0, 0, i2, i3);
         observer.updateZoom();
 
+    }
+
+    CelestialBody getCelestialBodyAt(EquatorialCoordinates eq, ArrayList<? extends CelestialBody>... bodiesArrays){
+        ArrayList<CelestialBody> closeBodies= new ArrayList<>();
+        double axisDistance = observer.getFOV() / 50f;
+        for(int i = 0; i < bodiesArrays.length; i++){
+            for (int j = 0; j < bodiesArrays[i].size(); j++){
+                CelestialBody body = bodiesArrays[i].get(j);
+                EquatorialCoordinates bodyEq = body.getEquatorialCoordinates();
+                if(Math.abs(bodyEq.getDeclination() - eq.getDeclination()) < axisDistance
+                        && Math.abs(bodyEq.getRightAscension() - eq.getRightAscension()) < axisDistance && body.isVisible(observer.getMaxMagnitude())){
+                    closeBodies.add(body);
+                }
+            }
+        }
+
+        //System.out.println(closeBodies.size());
+
+        double smallestDistance = 9999999;
+        CelestialBody clickedBody = null;
+        for(int i = 0; i < closeBodies.size(); i++){
+            double distance = closeBodies.get(i).getEquatorialCoordinates().distanceTo(eq);
+            if(distance < smallestDistance){
+                smallestDistance = distance;
+                clickedBody = closeBodies.get(i);
+            }
+        }
+
+        return clickedBody;
+    }
+
+    public Stars getStarRenderer(){
+        return stars;
+    }
+
+    public DeepSpaceObjects getDSORenderer(){
+        return messierObjects;
     }
 
     Observer getObserver(){

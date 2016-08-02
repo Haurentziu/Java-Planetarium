@@ -22,7 +22,7 @@ public final class Utils {
             deg /= 15.0;
         int degrees = (int)deg;
         int minutes = (int)Math.abs((deg - (int)deg)*60);
-        int seconds = (int)Math.abs(deg - degrees - minutes/60.0)*3600;
+        int seconds = (int)(Math.abs(deg - degrees - minutes/60.0)*3600);
 
         String degString = String.format("%3d", degrees);
         String minString = String.format("%02d", minutes);

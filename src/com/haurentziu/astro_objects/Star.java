@@ -60,6 +60,19 @@ public class Star extends CelestialBody{
 		return (float)bv;
 	}
 
+	@Override
+	public boolean isVisible(double lim){
+		return magnitude < lim;
+	}
+
+	@Override
+	public String toString(){
+		String hipString = hipparcosNumber + "      ";
+		return "HIP " + hipString.substring(0, 6);
+	}
+
+
+
 
 
 	/* stack overflow interpolation table http://stackoverflow.com/questions/21977786/star-b-v-color-index-to-apparent-rgb-color */

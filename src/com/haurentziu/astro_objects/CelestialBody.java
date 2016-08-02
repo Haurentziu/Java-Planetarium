@@ -27,4 +27,12 @@ public class CelestialBody {
     }
 
 
+    public String toString(){
+        return null;
+    }
+
+    public boolean isVisible(double lim){
+        return true;
+    }
+
 }

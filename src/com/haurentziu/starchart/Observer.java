@@ -1,5 +1,6 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.astro_objects.CelestialBody;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.SphericalCoordinates;
@@ -34,7 +35,7 @@ public class Observer {
     private double altRotation;
     private byte projection;
 
-    private ArrayList<Satellite> satelliteList;
+    private CelestialBody selectedBody;
 
     public boolean showGround = true;
     public boolean showCardinalPoints = true;
@@ -51,6 +52,10 @@ public class Observer {
     public boolean showLabels = true;
     public boolean showSatellites = true;
 
+    public boolean isSelected = false;
+
+    public boolean trackSelectedBody = false;
+
     public static int currentWarp = 7;
     public static int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 1, 10, 100, 1000, 3000, 5000, 10000};
     public int mountType = EQUATORIAL_MOUNT;
@@ -59,6 +64,8 @@ public class Observer {
     private static final double SCALE_FACTOR = 0.5 * Math.sin(MAX_FOV) / (1 + Math.cos(MAX_FOV));
     private static final double MIN_ALT_ROTATE = - Math.PI/2;
     private static final double MAX_ALT_ROTATE = Math.PI/2;
+
+    private EquatorialCoordinates mouseLocation = new EquatorialCoordinates(0, 0);
 
     public static final byte EQUATORIAL_MOUNT = 1;
     public static final byte AZIMUTHAL_MOUNT = 0;
@@ -86,7 +93,11 @@ public class Observer {
         setTimeNow();
     }
 
-
+    public void updateRotation(){
+        HorizontalCoordinates h = selectedBody.getEquatorialCoordinates().toHorizontal(longitude, latitude, sideralTime);
+        azRotation = h.getAzimuth();
+        altRotation = h.getAltitude();
+    }
 
     public void setZoom(double zoom){
         this.zoom = zoom;
@@ -127,6 +138,22 @@ public class Observer {
         zoom = SCALE_FACTOR * minSize / d;
         //zoom = 1;
         //zoom = Math.sqrt(ortoBounds.getWidth() * ortoBounds.getWidth() + ortoBounds.getHeight() * ortoBounds.getHeight()) / d;
+    }
+
+    public void setMouseLocation(EquatorialCoordinates mouseLocation){
+        this.mouseLocation = mouseLocation;
+    }
+
+    public EquatorialCoordinates getMouseLocation(){
+        return mouseLocation;
+    }
+
+    public void setSelectedBody(CelestialBody selectedBody){
+        this.selectedBody = selectedBody;
+    }
+
+    public CelestialBody getSelectedBody(){
+        return selectedBody;
     }
 
     public double getZoom(){
@@ -320,6 +347,13 @@ public class Observer {
         return showMilkyWay || showEqGrid || showAzGrid || showEcliptic || showCelestialEq;
     }
 
+    public void toogleTrack(){
+        if(trackSelectedBody || isSelected){
+            trackSelectedBody = !trackSelectedBody;
+        }
+
+    }
+
     public Rectangle2D getBounds(){
         return ortoBounds;
     }
@@ -328,8 +362,5 @@ public class Observer {
         return windowBounds;
     }
 
-    public void setSatelliteList(ArrayList<Satellite> satelliteList){
-        this.satelliteList = satelliteList;
-    }
 
 }

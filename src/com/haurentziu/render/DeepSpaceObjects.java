@@ -60,6 +60,10 @@ public class DeepSpaceObjects extends Renderer{
         texture.disable(gl);
     }
 
+    public ArrayList<MessierObject> getDSOArray(){
+        return messierObjects;
+    }
+
 
 
 }

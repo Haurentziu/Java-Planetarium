@@ -1,5 +1,6 @@
 package com.haurentziu.starchart;
 
+import com.haurentziu.astro_objects.CelestialBody;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.ProjectionPoint;
@@ -53,13 +54,29 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
 
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
-        double x = (2 * mouseEvent.getX() / observer.getWindowBounds().getWidth() - 1) / observer.getZoom();
-        double y = (1 - 2 * mouseEvent.getY() / observer.getWindowBounds().getHeight()) / observer.getZoom();
-        //System.out.println(x + " " + y);
-        ProjectionPoint pp = new ProjectionPoint(x, y);
-        HorizontalCoordinates h = pp.inverseProjection(observer.getAzRotation(), observer.getAltRotation());
-        EquatorialCoordinates eq = h.toEquatorial(observer);
-        System.out.println(Utils.rad2String(eq.getRightAscension(), true, true) + " " + Utils.rad2String(eq.getDeclination(), false, false));
+
+        if(mouseEvent.getButton() == MouseEvent.BUTTON1) {
+            double x = (2 * mouseEvent.getX() / observer.getWindowBounds().getWidth() - 1) / observer.getZoom();
+            double y = (1 - 2 * mouseEvent.getY() / observer.getWindowBounds().getHeight()) / observer.getZoom();
+            ProjectionPoint pp = new ProjectionPoint(x, y);
+            HorizontalCoordinates h = pp.inverseProjection(observer.getAzRotation(), observer.getAltRotation());
+            EquatorialCoordinates eq = h.toEquatorial(observer);
+            CelestialBody body = starchart.getCelestialBodyAt(eq, starchart.getStarRenderer().getStarsArray(), starchart.getDSORenderer().getDSOArray());
+            if (body == null) {
+                observer.isSelected = false;
+                observer.trackSelectedBody = false;
+            }
+
+            else{
+                observer.isSelected = true;
+            }
+            observer.setMouseLocation(eq);
+            observer.setSelectedBody(body);
+        }
+        else{
+            observer.trackSelectedBody = false;
+            observer.isSelected = false;
+        }
     }
 
     @Override
@@ -85,6 +102,9 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
 
     @Override
     public void mouseDragged(MouseEvent mouseEvent) {
+        observer.trackSelectedBody = false;
+
+
         int distanceX = mouseEvent.getX() - initX;
         int distanceY = mouseEvent.getY() - initY;
 
@@ -161,6 +181,9 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
                 break;
 
             case KeyEvent.VK_F2:    Main.showLocationMenu();
+                break;
+
+            case KeyEvent.VK_SPACE: observer.toogleTrack();
                 break;
 
 

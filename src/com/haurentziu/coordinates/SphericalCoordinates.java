@@ -81,8 +81,8 @@ public class SphericalCoordinates {
 
 
 	
-	public static double getAngularDistance(SphericalCoordinates c1, SphericalCoordinates c2){
-		double d = Math.acos(Math.sin(c1.getLatitude()) * Math.sin(c2.getLatitude()) + Math.cos(c1.getLatitude()) * Math.cos(c2.getLatitude()) * Math.cos(c1.getLongitude() - c2.getLongitude()));
+	public double distanceTo(SphericalCoordinates c){
+		double d = Math.acos(Math.sin(latitude) * Math.sin(c.getLatitude()) + Math.cos(latitude) * Math.cos(c.getLatitude()) * Math.cos(longitude - c.getLongitude()));
 		return d;
 	}
 

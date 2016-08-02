@@ -24,6 +24,11 @@ public class MessierObject extends CelestialBody{
         return nameString.substring(0, 10);
     }
 
+    @Override
+    public boolean isVisible(double limit){
+        return true;
+    }
+
     public void load(ArrayList<Float> verts){
         verts.add((float)equatorialCoordinates.getRightAscension());
         verts.add((float)equatorialCoordinates.getDeclination());

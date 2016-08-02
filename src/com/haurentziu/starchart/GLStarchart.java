@@ -161,28 +161,18 @@ public class GLStarchart implements GLEventListener{
     }
 
     CelestialBody getCelestialBodyAt(EquatorialCoordinates eq, ArrayList<? extends CelestialBody>... bodiesArrays){
-        ArrayList<CelestialBody> closeBodies= new ArrayList<>();
-        double axisDistance = observer.getFOV() / 50f;
-        for(int i = 0; i < bodiesArrays.length; i++){
-            for (int j = 0; j < bodiesArrays[i].size(); j++){
-                CelestialBody body = bodiesArrays[i].get(j);
-                EquatorialCoordinates bodyEq = body.getEquatorialCoordinates();
-                if(Math.abs(bodyEq.getDeclination() - eq.getDeclination()) < axisDistance
-                        && Math.abs(bodyEq.getRightAscension() - eq.getRightAscension()) < axisDistance && body.isVisible(observer.getMaxMagnitude())){
-                    closeBodies.add(body);
-                }
-            }
-        }
-
-        //System.out.println(closeBodies.size());
-
-        double smallestDistance = 9999999;
+        double maxDistance = observer.getFOV() / 50f;
+        double smallestDistance = Math.PI;
         CelestialBody clickedBody = null;
-        for(int i = 0; i < closeBodies.size(); i++){
-            double distance = closeBodies.get(i).getEquatorialCoordinates().distanceTo(eq);
-            if(distance < smallestDistance){
-                smallestDistance = distance;
-                clickedBody = closeBodies.get(i);
+
+        for(int i = 0; i < bodiesArrays.length; i++) {
+            for (int j = 0; j < bodiesArrays[i].size(); j++) {
+                CelestialBody body = bodiesArrays[i].get(j);
+                double distance = body.getEquatorialCoordinates().distanceTo(eq);
+                if (distance < smallestDistance && body.isVisible(observer.getMaxMagnitude()) && distance < maxDistance) {
+                    smallestDistance = distance;
+                    clickedBody = body;
+                }
             }
         }
 

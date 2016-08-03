@@ -24,6 +24,7 @@ public class Stars extends Renderer{
         super(vertShader, geomShader, fragShader);
         DataLoader loader = new DataLoader();
         starsArray = loader.loadStars();
+        loader.loadStarNames(starsArray);
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class BodyText extends Text{
     private final String celestialPattern[] = {
-            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
             "Right Ascension / Declination: 00h00m00s / 00a00a00a",
             "Azimuth / Altitude: 00h00m00s / 00a00a00a",
 

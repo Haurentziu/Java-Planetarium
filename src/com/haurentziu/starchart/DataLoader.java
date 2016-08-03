@@ -65,6 +65,26 @@ public class DataLoader {
 		
 		return stars;
 	}
+
+	public void loadStarNames(ArrayList<Star> stars){
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader("./res/name.fab"));
+			String line = reader.readLine();
+
+			while (line != null) {
+				String[] data = line.split("\\|");
+				System.out.println(data[0]);
+				int hipNo = Integer.parseInt(data[0].trim());
+				String name = data[1].trim();
+
+				binarySearch(stars, hipNo).addName(name);
+				line = reader.readLine();
+			}
+		}
+		catch (Exception ex){
+			ex.printStackTrace();
+		}
+	}
 	
 	public ArrayList<ConstellationLines> loadConstellations(ArrayList<Star> stars){
 		try{

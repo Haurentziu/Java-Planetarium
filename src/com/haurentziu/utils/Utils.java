@@ -21,18 +21,18 @@ public final class Utils {
         if(inHours)
             deg /= 15.0;
         int degrees = (int)deg;
-        int minutes = (int)Math.abs((deg - (int)deg)*60);
-        int seconds = (int)(Math.abs(deg - degrees - minutes/60.0)*3600);
+        int minutes = (int)((deg - degrees)*60);
+        int seconds = (int)((deg - degrees - minutes/60.0)*3600);
 
         String degString = String.format("%3d", degrees);
-        String minString = String.format("%02d", minutes);
-        String secString = String.format("%02d", seconds);
+        String minString = String.format("%02d", Math.abs(minutes));
+        String secString = String.format("%02d", Math.abs(seconds));
 
         String s;
 
 
         if(inHours)
-            s = String.format("%sh%sm%s", degString, minString, secString);
+            s = String.format("%sh%sm%ss", degString, minString, secString);
         else
             s = String.format("%s\u00b0%s\u2032%s\u2033", degString, minString, secString);
 

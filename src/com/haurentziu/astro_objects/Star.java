@@ -5,6 +5,8 @@ import java.awt.*;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.ProjectionPoint;
+import com.haurentziu.starchart.Observer;
+import com.haurentziu.utils.Utils;
 
 /**
  * 
@@ -22,7 +24,7 @@ public class Star extends CelestialBody{
 	private float bv;
 	
 	public Star(double rightAscension, double declination, float magnitude, float bv, int hipparcosNumber) {
-		super(rightAscension, declination);
+		super("HIP " + hipparcosNumber, rightAscension, declination);
 		this.magnitude = magnitude;
 		this.hipparcosNumber = hipparcosNumber;
 		this.bv = bv;
@@ -64,14 +66,6 @@ public class Star extends CelestialBody{
 	public boolean isVisible(double lim){
 		return magnitude < lim;
 	}
-
-	@Override
-	public String toString(){
-		String hipString = hipparcosNumber + "      ";
-		return "HIP " + hipString.substring(0, 6);
-	}
-
-
 
 
 

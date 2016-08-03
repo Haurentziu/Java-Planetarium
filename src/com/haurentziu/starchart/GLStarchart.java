@@ -22,10 +22,12 @@ public class GLStarchart implements GLEventListener{
     private SolarSystem solarSystem;
     private AstroText astroText;
     private ArtificialSatellites satellites;
-    private InfoText infoText;
+    private TextRenderer textRenderer;
     private VBO vbo;
 
     private Observer observer;
+
+    private boolean shouldUpdate = false;
 
 
     GLStarchart(Observer observer){
@@ -38,7 +40,7 @@ public class GLStarchart implements GLEventListener{
         markings = new Markings("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/marking_frag.glsl");
         ground = new Ground("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
         solarSystem = new SolarSystem("./shader/vertex.glsl", "./shader/text_geom.glsl", "./shader/text_frag.glsl");
-        infoText = new InfoText("./shader/info_vert.glsl", "./shader/info_geom.glsl", "./shader/info_frag.glsl");
+        textRenderer = new TextRenderer("./shader/info_vert.glsl", "./shader/info_geom.glsl", "./shader/info_frag.glsl");
         satellites = new ArtificialSatellites();
     }
 
@@ -54,7 +56,7 @@ public class GLStarchart implements GLEventListener{
         markings.initialize(gl);
         ground.initialize(gl);
         satellites.initialize(gl);
-        infoText.initialize(gl);
+        textRenderer.initialize(gl);
 
         ArrayList<Float> vertsList = new ArrayList<>();
         ArrayList<Float> colorList = new ArrayList<>();
@@ -66,7 +68,7 @@ public class GLStarchart implements GLEventListener{
         messierObjects.loadVertices(vertsList);
         markings.loadAllVertices(vertsList);
         ground.loadVertices(vertsList);
-        infoText.loadVertices(vertsList);
+        textRenderer.loadVertices(vertsList);
 
         vbo.init(gl, vertsList,  colorList);
 
@@ -84,7 +86,7 @@ public class GLStarchart implements GLEventListener{
         ground.delete(gl);
         solarSystem.delete(gl);
         satellites.delete(gl);
-        infoText.delete(gl);
+        textRenderer.delete(gl);
 
         vbo.delete(gl);
     }
@@ -117,10 +119,10 @@ public class GLStarchart implements GLEventListener{
         }
 
         stars.render(gl, observer);
-        solarSystem.renderPlanets(gl, stars.getShader(), observer, vbo.getBuffers());
+        solarSystem.renderPlanets(gl, stars.getShader(), observer, vbo);
 
         if(observer.showSatellites) {
-            satellites.render(gl, observer, stars.getShader(), vbo.getBuffers());
+            satellites.render(gl, observer, stars.getShader(), vbo);
         }
 
 
@@ -132,11 +134,15 @@ public class GLStarchart implements GLEventListener{
             ground.render(gl, observer);
         }
 
-        infoText.updateText(gl, vbo.getBuffers(), observer);
+        textRenderer.getShader().useShader(gl);
 
-        infoText.render(gl);
+        textRenderer.renderObserverText(gl, vbo, observer);
 
+        if(observer.isSelected){
+            textRenderer.updateCelestialBodyText(gl, vbo, observer);
+            textRenderer.renderCelestialBodyText(gl);
 
+        }
 
     }
 
@@ -152,7 +158,7 @@ public class GLStarchart implements GLEventListener{
         ground.setSize(gl, aspectRatio, 1f);
         solarSystem.setSize(gl, aspectRatio, 1f);
         float scale = 210 * 1f / i3;
-        infoText.setScale(scale / aspectRatio, scale);
+        textRenderer.setAllAspectRatios(1 / aspectRatio);
 
         observer.getBounds().setRect(-aspectRatio, - 2, 2 * aspectRatio, 2);
         observer.getWindowBounds().setRect(0, 0, i2, i3);
@@ -160,31 +166,15 @@ public class GLStarchart implements GLEventListener{
 
     }
 
-    CelestialBody getCelestialBodyAt(EquatorialCoordinates eq, ArrayList<? extends CelestialBody>... bodiesArrays){
-        double maxDistance = observer.getFOV() / 50f;
-        double smallestDistance = Math.PI;
-        CelestialBody clickedBody = null;
 
-        for(int i = 0; i < bodiesArrays.length; i++) {
-            for (int j = 0; j < bodiesArrays[i].size(); j++) {
-                CelestialBody body = bodiesArrays[i].get(j);
-                double distance = body.getEquatorialCoordinates().distanceTo(eq);
-                if (distance < smallestDistance && body.isVisible(observer.getMaxMagnitude()) && distance < maxDistance) {
-                    smallestDistance = distance;
-                    clickedBody = body;
-                }
-            }
-        }
 
-        return clickedBody;
-    }
-
-    public Stars getStarRenderer(){
-        return stars;
-    }
-
-    public DeepSpaceObjects getDSORenderer(){
-        return messierObjects;
+    public ArrayList<CelestialBody> getAllBodies(){
+        ArrayList<CelestialBody> bodies = new ArrayList<>();
+        bodies.addAll(stars.getStarsArray());
+        bodies.addAll(messierObjects.getDSOArray());
+        bodies.addAll(solarSystem.getBodies());
+        bodies.addAll(satellites.getSattelites());
+        return bodies;
     }
 
     Observer getObserver(){

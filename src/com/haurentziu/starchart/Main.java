@@ -20,7 +20,7 @@ import javax.swing.*;
 //FIXME everything
 
 public class Main {
-	static int width = 950, height = 850;
+	static int width = 950, height = 950;
 	public static StarchartCanvas canvas;
 	public static TimeMenu timeMenu;
 	public static LocationMenu locationMenu;

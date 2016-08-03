@@ -1,5 +1,6 @@
 package com.haurentziu.render;
 
+import com.haurentziu.astro_objects.CelestialBody;
 import com.haurentziu.coordinates.*;
 import com.haurentziu.planets.Moon;
 import com.haurentziu.planets.Planet;
@@ -28,12 +29,23 @@ public class SolarSystem extends Renderer{
 		{0.5f, 1f, 0.5f},
 		{0.8f, 0.7f, 0.2f}
 	};
+	private final String names[] = {
+		"Mercury",
+		"Venus",
+		"Mars",
+		"Jupiter",
+		"Saturn",
+		"Uranus",
+		"Neptune"
+	};
 
 	private Moon moon;
 
 	private int textStart;
 	private int textSize;
 	private Texture texture;
+
+	private ArrayList<CelestialBody> bodies = new ArrayList<>();
 
 	public SolarSystem(String vertShader, String geomShader, String fragShader){
 		super(vertShader, geomShader, fragShader);
@@ -65,10 +77,10 @@ public class SolarSystem extends Renderer{
 
 	}
 
-	public void renderPlanets(GL3 gl, Shader starShader, Observer observer, IntBuffer buffer){
-		updateSystem(gl, buffer, observer.getJDE());
+	public void renderPlanets(GL3 gl, Shader starShader, Observer observer, VBO vbo){
+		updateSystem(gl, vbo, observer.getJDE());
 		starShader.setVariable(gl, "vertex_type", 0);
-		starShader.setVariable(gl, "transform_type", 2);
+		starShader.setVariable(gl, "transform_type", 1);
 		gl.glDrawArrays(GL3.GL_POINTS, 0, 9);
 
 	}
@@ -81,7 +93,7 @@ public class SolarSystem extends Renderer{
 		texture.bind(gl);
 		super.setObserver(gl, observer);
 		shader.setVariable(gl, "texTexture", 0);
-		shader.setVariable(gl, "transform_type", 2);
+		shader.setVariable(gl, "transform_type", 1);
 		shader.setVariable(gl, "vertex_type", 0);
 		gl.glDrawArrays(GL3.GL_POINTS, 9, 9);
 		texture.disable(gl);
@@ -120,33 +132,42 @@ public class SolarSystem extends Renderer{
 		}
 	}
 
-	private void updateSystem(GL3 gl, IntBuffer buffers, double jde){
+	private void updateSystem(GL3 gl, VBO vbo, double jde){
+		bodies = new ArrayList<>();
 		double tau = (jde - 2451545) / 365250; //julian millenia
+		double obliquity = EclipticCoordinates.getObliquity();
+
 		RectangularCoordinates earthRect = earth.getRectangularCoordinates(tau);
 		earthRect.invert();
 		EclipticCoordinates earthEcliptical = earthRect.toEclipticCoordinates();
 		float vertices[] = new float[(planets.length + 2) * 18];
 
-		EclipticCoordinates moonCoord = moon.computeMoonEquatorial(10 * tau); //julian centuries, not millenia
-		vertices[0] = (float)moonCoord.getLongitude();
-		vertices[1] = (float)moonCoord.getLatitude();
+		EquatorialCoordinates moonCoord = moon.computeMoonEquatorial(10 * tau).toEquatorialCoordinates(obliquity);
+		vertices[0] = (float)moonCoord.getRightAscension();
+		vertices[1] = (float)moonCoord.getDeclination();
 		vertices[2] = -2.4f;
 
-		//3, 4, 5  6, 7, 8
-		vertices[9] = (float)earthEcliptical.getLongitude();
-		vertices[10] = (float)earthEcliptical.getLatitude();
+		bodies.add(new CelestialBody("Moon", moonCoord));
+
+		EquatorialCoordinates sunCoord = earthEcliptical.toEquatorialCoordinates(obliquity);
+		vertices[9] = (float)sunCoord.getRightAscension();
+		vertices[10] = (float)sunCoord.getDeclination();
 		vertices[11] = -2.5f;
 
-		//12, 13, 14, 15, 16, 17,
+		bodies.add(new CelestialBody("Sun", sunCoord));
+
 
 		for(int i = 0; i < planets.length; i++) {
 			RectangularCoordinates rect = planets[i].getRectangularCoordinates(tau);
 			rect.addCoordinates(earthRect);
-			EclipticCoordinates ecliptical = rect.toEclipticCoordinates();
+			EquatorialCoordinates equatorial = rect.toEclipticCoordinates().toEquatorialCoordinates(obliquity);
 
-			vertices[9*i + 18] = (float)ecliptical.getLongitude();
-			vertices[9*i + 19] = (float)ecliptical.getLatitude();
+			vertices[9*i + 18] = (float)equatorial.getRightAscension();
+			vertices[9*i + 19] = (float)equatorial.getDeclination();
 			vertices[9*i + 20] = magnitudes[i];
+			bodies.add(new CelestialBody(names[i], equatorial));
+
+
 		}
 
 		for(int i = 0; i < planets.length + 2; i++){
@@ -173,15 +194,12 @@ public class SolarSystem extends Renderer{
 			vertices[9 * i + 89] = 0;
 		}
 
-		arraySize = vertices.length / 9;
-		FloatBuffer systemFB = FloatBuffer.wrap(vertices);
-		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
-		gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, 0, 4 * vertices.length - 4, systemFB);
+		vbo.update(gl, 0, vertices);
 
 	}
-	
-	static double computeObliquityOfTheEcliptic(double jde){
-		double obliquity = 0.4093197552;
-		return obliquity;
+
+	public ArrayList<CelestialBody> getBodies(){
+		return bodies;
 	}
+
 }

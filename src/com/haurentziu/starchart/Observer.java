@@ -140,6 +140,10 @@ public class Observer {
         //zoom = Math.sqrt(ortoBounds.getWidth() * ortoBounds.getWidth() + ortoBounds.getHeight() * ortoBounds.getHeight()) / d;
     }
 
+    public double getSize(){
+        return 2 * Math.sin(fov) / (1 + Math.cos(fov));
+    }
+
     public void setMouseLocation(EquatorialCoordinates mouseLocation){
         this.mouseLocation = mouseLocation;
     }

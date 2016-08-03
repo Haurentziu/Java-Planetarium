@@ -1,6 +1,9 @@
 package com.haurentziu.astro_objects;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
+import com.haurentziu.coordinates.HorizontalCoordinates;
+import com.haurentziu.starchart.Observer;
+import com.haurentziu.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -13,15 +16,9 @@ public class MessierObject extends CelestialBody{
     private String type;
 
     public MessierObject(String name, double ra, double dec, String type){
-        super(ra, dec);
+        super(name, ra, dec);
         this.name = name;
         this.type = type;
-    }
-
-    @Override
-    public String toString(){
-        String nameString = name + "         ";
-        return nameString.substring(0, 10);
     }
 
     @Override

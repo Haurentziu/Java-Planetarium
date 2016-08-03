@@ -128,7 +128,7 @@ public class Shader {
         gl.glDeleteProgram(shaderProgram);
     }
 
-    void useShader(GL3 gl){
+    public void useShader(GL3 gl){
         gl.glUseProgram(shaderProgram);
     }
 

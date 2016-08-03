@@ -1,5 +1,6 @@
 package com.haurentziu.render;
 
+import com.haurentziu.astro_objects.CelestialBody;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.starchart.Observer;
 import com.haurentziu.tle.Satellite;
@@ -23,6 +24,8 @@ public class ArtificialSatellites{
 
     private int satelliteStart;
     private int satelliteSize;
+
+    private ArrayList<CelestialBody> satteliteBodies = new ArrayList<>();
 
     public ArtificialSatellites(){
         try{
@@ -53,7 +56,7 @@ public class ArtificialSatellites{
         texture = loadTexture(gl, "./res/textures/satellite.png");
     }
 
-    public void render(GL3 gl, Observer observer, Shader starShader, IntBuffer buffers){
+    public void render(GL3 gl, Observer observer, Shader starShader, VBO vbo){
         texture.enable(gl);
         texture.bind(gl);
         starShader.setVariable(gl, "starTex", 0);
@@ -61,7 +64,7 @@ public class ArtificialSatellites{
         starShader.setVariable(gl, "vertex_type", 1);
         starShader.setVariable(gl, "aspect_ratio", 2.37f);
 
-        updatePositions(gl, observer, buffers);
+        updatePositions(gl, observer, vbo);
         gl.glDrawArrays(GL3.GL_POINTS, satelliteStart, satelliteSize);
         texture.disable(gl);
     }
@@ -85,7 +88,8 @@ public class ArtificialSatellites{
         satelliteSize = verts.size() / 9 - satelliteStart;
     }
 
-    public void updatePositions(GL3 gl, Observer observer, IntBuffer buffers){
+    public void updatePositions(GL3 gl, Observer observer, VBO vbo){
+        satteliteBodies = new ArrayList<>();
         float vertices[] = new float[satellites.size() * 9];
         for(int i = 0; i < satellites.size(); i++){
             HorizontalCoordinates h = satellites.get(i).getHorizonatalCoordinates(observer);
@@ -93,19 +97,19 @@ public class ArtificialSatellites{
             vertices[9 * i + 1] = (float)h.getAltitude();
             vertices[9 * i + 2] = 1;
 
-            vertices[9 * i + 3] = 1f;
-            vertices[9 * i + 4] = 0f;
-            vertices[9 * i + 5] = 0f;
+            vertices[9 * i + 3] = 0.8f;
+            vertices[9 * i + 4] = 0.8f;
+            vertices[9 * i + 5] = 0.8f;
 
             vertices[9 * i + 6] = 0;
             vertices[9 * i + 7] = 1;
             vertices[9 * i + 8] = 0;
+            satteliteBodies.add(new CelestialBody(satellites.get(i).getName(), h.toEquatorial(observer)));
 
         }
 
-        FloatBuffer systemFB = FloatBuffer.wrap(vertices);
-        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
-        gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, satelliteStart * 9 * 4, 4 * vertices.length - 4, systemFB);
+        vbo.update(gl, 4 * 9 * satelliteStart, vertices);
+
     }
 
     public Texture loadTexture(GL3 gl, String path){
@@ -122,6 +126,10 @@ public class ArtificialSatellites{
             System.err.printf("Could not load the texture located at %s \n", path);
         }
         return texture;
+    }
+
+    public ArrayList<CelestialBody> getSattelites(){
+        return satteliteBodies;
     }
 
 

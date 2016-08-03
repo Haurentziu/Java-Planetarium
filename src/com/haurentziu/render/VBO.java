@@ -20,7 +20,6 @@ public class VBO {
 
     public void delete(GL3 gl){
         gl.glDeleteVertexArrays(vertexArraySize, vertexArray);
-    //    gl.glDeleteBuffers(texArraySize, texArray);
         gl.glDeleteBuffers(3, buffers);
     }
 
@@ -60,5 +59,21 @@ public class VBO {
         gl.glVertexAttribPointer(2, 3, GL3.GL_FLOAT, false, 36, 24);
 
         vertexFB.clear();
+    }
+
+    public void update(GL3 gl, int start, float vertices[]){
+        FloatBuffer vertBuffer = FloatBuffer.wrap(vertices);
+
+        for(int i = 0; i < buffers.capacity(); i++) {
+
+            gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
+            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length - 4, vertBuffer);
+
+            gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(1));
+            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length - 4, vertBuffer);
+
+            gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(2));
+            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length - 4, vertBuffer);
+        }
     }
 }

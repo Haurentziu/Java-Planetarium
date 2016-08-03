@@ -16,4 +16,8 @@ public class EclipticCoordinates extends SphericalCoordinates {
         return new EquatorialCoordinates(rightAscension, declination);
     }
 
+    public static double getObliquity(){
+        return 0.4084071;
+    }
+
 }

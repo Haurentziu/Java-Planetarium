@@ -10,6 +10,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.texture.ImageType;
 
 import java.awt.event.*;
+import java.util.ArrayList;
 
 /**
  * Created by haurentziu on 27.04.2016.
@@ -56,20 +57,23 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
     public void mouseClicked(MouseEvent mouseEvent) {
 
         if(mouseEvent.getButton() == MouseEvent.BUTTON1) {
-            double x = (2 * mouseEvent.getX() / observer.getWindowBounds().getWidth() - 1) / observer.getZoom();
-            double y = (1 - 2 * mouseEvent.getY() / observer.getWindowBounds().getHeight()) / observer.getZoom();
+            double maxDimension = observer.getSize();
+            //double x = ((mouseEvent.getX()  - observer.getWindowBounds().getWidth() / 2) / observer.getWindowBounds().getWidth()) / observer.getZoom();
+            double x = 1 * (mouseEvent.getX() / observer.getWindowBounds().getWidth() - 0.5) / (observer.getZoom() / observer.getBounds().getWidth());
+            double y = 1 * (0.5 -  mouseEvent.getY() / observer.getWindowBounds().getHeight()) / (observer.getZoom() / observer.getBounds().getHeight());
             ProjectionPoint pp = new ProjectionPoint(x, y);
             HorizontalCoordinates h = pp.inverseProjection(observer.getAzRotation(), observer.getAltRotation());
             EquatorialCoordinates eq = h.toEquatorial(observer);
-            CelestialBody body = starchart.getCelestialBodyAt(eq, starchart.getStarRenderer().getStarsArray(), starchart.getDSORenderer().getDSOArray());
+            CelestialBody body = getCelestialBodyAt(eq, starchart.getAllBodies());
+
             if (body == null) {
                 observer.isSelected = false;
                 observer.trackSelectedBody = false;
             }
-
             else{
                 observer.isSelected = true;
             }
+           // System.out.println(eq.toString());
             observer.setMouseLocation(eq);
             observer.setSelectedBody(body);
         }
@@ -193,5 +197,30 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
     @Override
     public void keyReleased(KeyEvent keyEvent) {
 
+    }
+
+    CelestialBody getCelestialBodyAt(EquatorialCoordinates eq, ArrayList<? extends CelestialBody>... bodiesArrays){
+        double maxDistance = observer.getFOV() / 80f;
+        double smallestDistance = Math.PI;
+        CelestialBody clickedBody = null;
+
+        for(int i = 0; i < bodiesArrays.length; i++) {
+            for (int j = 0; j < bodiesArrays[i].size(); j++) {
+                CelestialBody body = bodiesArrays[i].get(j);
+
+                double distance = body.getEquatorialCoordinates().distanceTo(eq);
+
+                if (distance < smallestDistance && body.isVisible(observer.getMaxMagnitude()) && distance < maxDistance) {
+                    smallestDistance = distance;
+                    clickedBody = body;
+                    if(body.getName().equals("Neptune")){
+                        System.out.println("uaie");
+                    }
+                }
+            }
+        }
+
+
+        return clickedBody;
     }
 }

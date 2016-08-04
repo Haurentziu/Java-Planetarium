@@ -14,29 +14,15 @@ import java.util.ArrayList;
  * Created by haurentziu on 20.05.2016.
  */
 
-public class Stars extends Renderer{
+public class Stars{
     private final ArrayList<Star> starsArray;
     private int vertStart;
     private int vertsNumber;
-    private Texture texture;
 
-    public Stars(String vertShader, String geomShader, String fragShader){
-        super(vertShader, geomShader, fragShader);
+    public Stars(){
         DataLoader loader = new DataLoader();
         starsArray = loader.loadStars();
         loader.loadStarNames(starsArray);
-    }
-
-    @Override
-    public void initialize(GL3 gl){
-        shader.init(gl);
-        texture = loadTexture(gl, "./res/textures/star.png");
-    }
-
-    @Override
-    public void delete(GL3 gl){
-        shader.deleteProgram(gl);
-        texture.destroy(gl);
     }
 
     public void loadVertices(ArrayList<Float> verts){
@@ -55,7 +41,7 @@ public class Stars extends Renderer{
             verts.add(starColor.getGreen() / 255f);
             verts.add(starColor.getBlue() / 255f);
 
-            verts.add(0f);
+            verts.add(6f / 8f);
             verts.add(0f);
             verts.add(0f);
 
@@ -63,20 +49,14 @@ public class Stars extends Renderer{
         vertsNumber = verts.size() / 9 - vertStart;
     }
 
-    public void render(GL3 gl, Observer observer){
-        shader.useShader(gl);
-        gl.glEnable(GL3.GL_TEXTURE_2D);
-        gl.glActiveTexture(GL3.GL_TEXTURE0);
-        texture.enable(gl);
-        texture.bind(gl);
-        super.setObserver(gl, observer);
+    public void render(GL3 gl, Shader shader, Observer observer){
         shader.setVariable(gl, "transform_type", 1);
+        shader.setVariable(gl, "zoomable", 1);
         shader.setVariable(gl, "aspect_ratio", 1f);
         shader.setVariable(gl, "max_mag", observer.getMaxMagnitude());
 
         shader.setVariable(gl, "vertex_type", 1);
         gl.glDrawArrays(GL3.GL_POINTS, vertStart, vertsNumber);
-        texture.disable(gl);
     }
 
 

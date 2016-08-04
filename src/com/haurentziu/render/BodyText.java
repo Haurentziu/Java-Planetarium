@@ -5,6 +5,7 @@ import com.haurentziu.starchart.Observer;
 import com.haurentziu.utils.Utils;
 import com.jogamp.opengl.GL3;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -25,6 +26,7 @@ public class BodyText extends Text{
     public void loadVertices(ArrayList<Float> verts){
         arrayStart = verts.size() / 9;
         setFontSize(2f);
+        setColor(new Color(111, 195, 255));
         for(int i = 0; i < celestialPattern.length; i++) {
             loadString(-1, 1, celestialPattern[i], verts);
         }
@@ -36,7 +38,6 @@ public class BodyText extends Text{
         ArrayList<Float> newVerts = new ArrayList<>();
         if(observer.getSelectedBody() != null) {
             String bodyStrings[] = observer.getSelectedBody().toString(observer).split("\n");
-
             setFontSize(0.35f);
             loadString(-1, 1, bodyStrings[0], newVerts);
 

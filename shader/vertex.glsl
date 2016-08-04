@@ -40,9 +40,11 @@ number  |   type
 
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec3 color;
+layout(location = 2) in vec3 proprieties;
 
 out vec3 geom_color;
 out float draw;
+out float tex_start;
 
 
 void computeStereographic(vec4 coord, out vec4 projection){
@@ -86,6 +88,7 @@ void main(void){
     geom_color = color;
 
     if(vertex_type != 1 || pos.z < max_mag){
+        tex_start = proprieties.x;
         vec4 coord = vec4(pos, 1);
         if(transform_type == 2){
             float declination = asin(sin(coord.y) * cos(obliquity) + cos(coord.y) * sin(obliquity) * sin(coord.x));

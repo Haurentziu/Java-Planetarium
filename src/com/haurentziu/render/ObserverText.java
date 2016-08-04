@@ -5,6 +5,7 @@ import com.haurentziu.starchart.Observer;
 import com.haurentziu.utils.Utils;
 import com.jogamp.opengl.GL3;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 public class ObserverText extends Text{
 
     //load the number of vertices required
-    private final String observerPattern = "Location:  00°00′00″E  00°00′00″N    0000-00-00 00:00:00 GMT+00";
+    private final String observerPattern = "000°00′00″E  000°00′00″N    0000-00-00 00:00:00 GMT+00";
 
 
     public ObserverText(ArrayList<Character> font){
@@ -23,7 +24,7 @@ public class ObserverText extends Text{
 
     public void loadVertices(ArrayList<Float> verts){
         arrayStart = verts.size() / 9;
-
+        setColor(new Color(178, 255, 100));
         setFontSize(1f);
         loadString(-1,  -0.97f, observerPattern, verts);
 

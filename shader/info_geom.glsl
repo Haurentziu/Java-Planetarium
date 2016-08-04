@@ -4,6 +4,7 @@ layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
 in vec2 geomUV[];
+in vec3 geomColor[];
 out vec2 fragUV;
 
 uniform float scaleX = 1;
@@ -31,14 +32,17 @@ void main() {
 
     gl_Position = gl_in[0].gl_Position;
     fragUV = geomUV[0];
+    fragColor = geomColor[0];
     EmitVertex();
 
     gl_Position = gl_in[1].gl_Position;
     fragUV = geomUV[1];
+    fragColor = geomColor[1];
     EmitVertex();
 
     gl_Position = gl_in[2].gl_Position;
     fragUV = geomUV[2];
+    fragColor = geomColor[2];
     EmitVertex();
 
 

@@ -12,29 +12,14 @@ import java.util.ArrayList;
  * Created by haurentziu on 20.05.2016.
  */
 
-public class DeepSpaceObjects extends Renderer{
+public class DeepSpaceObjects{
     private final ArrayList<MessierObject> messierObjects;
-    private Texture texture;
     private int vertStart;
     private int vertNumber;
 
-    public DeepSpaceObjects(String vertShader, String geomShader, String fragShader){
-        super(vertShader, geomShader, fragShader);
+    public DeepSpaceObjects(){
         DataLoader loader = new DataLoader();
         messierObjects = loader.loadMessierObjects();
-    }
-
-    @Override
-    public void initialize(GL3 gl){
-        shader.init(gl);
-        texture = loadTexture(gl, "./res/textures/dso.png");
-    }
-
-    @Override
-    public void delete(GL3 gl){
-        shader.deleteProgram(gl);
-        texture.destroy(gl);
-
     }
 
     public void loadVertices(ArrayList<Float> verts){
@@ -45,19 +30,13 @@ public class DeepSpaceObjects extends Renderer{
         vertNumber = verts.size() / 9 - vertStart;
     }
 
-    public void render(GL3 gl, Observer observer){
-        shader.useShader(gl);
-        gl.glEnable(GL3.GL_TEXTURE_2D);
-        gl.glActiveTexture(GL3.GL_TEXTURE0);
-        texture.enable(gl);
-        texture.bind(gl);
-        super.setObserver(gl, observer);
-        shader.setVariable(gl, "messierTex", 0);
+    public void render(GL3 gl, Shader starShader){
+        starShader.setVariable(gl, "messierTex", 0);
+        starShader.setVariable(gl, "transform_type", 1);
+        starShader.setVariable(gl, "vertex_type", 0);
+        starShader.setVariable(gl, "zoomable", 0);
 
-        shader.setVariable(gl, "transform_type", 1);
-        shader.setVariable(gl, "vertex_type", 0);
         gl.glDrawArrays(GL3.GL_POINTS, vertStart, vertNumber);
-        texture.disable(gl);
     }
 
     public ArrayList<MessierObject> getDSOArray(){

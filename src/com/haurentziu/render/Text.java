@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -21,6 +22,8 @@ public class Text{
     protected float aspectRatio;
     protected float fontSize;
 
+    protected float red, green, blue;
+
     public Text(ArrayList<Character> font, float fontSize){
         this.font = font;
         this.fontSize = fontSize;
@@ -29,6 +32,13 @@ public class Text{
     public Text(ArrayList<Character> font){
         this.font = font;
         this.fontSize = 1f;
+    }
+
+    public void setColor(Color color){
+        this.red = color.getRed() / 255f;
+        this.green = color.getGreen() / 255f;
+        this.blue = color.getBlue() / 255f;
+
     }
 
     public void setTexture(Texture texture){
@@ -98,9 +108,9 @@ public class Text{
         verts.add(y - quadHeight);
         verts.add(0f);
 
-        verts.add(0f);
-        verts.add(0f);
-        verts.add(0f);
+        verts.add(red);
+        verts.add(green);
+        verts.add(blue);
 
         verts.add(c.getX());
         verts.add(c.getY());
@@ -111,9 +121,9 @@ public class Text{
         verts.add(y);
         verts.add(0f);
 
-        verts.add(0f);
-        verts.add(0f);
-        verts.add(0f);
+        verts.add(red);
+        verts.add(green);
+        verts.add(blue);
 
         verts.add(c.getX());
         verts.add(c.getMaxY());
@@ -124,9 +134,9 @@ public class Text{
         verts.add(y);
         verts.add(0f);
 
-        verts.add(0f);
-        verts.add(0f);
-        verts.add(0f);
+        verts.add(red);
+        verts.add(green);
+        verts.add(blue);
 
         verts.add(c.getMaxX());
         verts.add(c.getMaxY());
@@ -140,9 +150,9 @@ public class Text{
         verts.add(y - quadHeight);
         verts.add(0f);
 
-        verts.add(0f);
-        verts.add(0f);
-        verts.add(0f);
+        verts.add(red);
+        verts.add(green);
+        verts.add(blue);
 
         verts.add(c.getMaxX());
         verts.add(c.getY());
@@ -153,9 +163,9 @@ public class Text{
         verts.add(y - quadHeight);
         verts.add(0f);
 
-        verts.add(0f);
-        verts.add(0f);
-        verts.add(0f);
+        verts.add(red);
+        verts.add(green);
+        verts.add(blue);
 
         verts.add(c.getX());
         verts.add(c.getY());
@@ -166,9 +176,9 @@ public class Text{
         verts.add(y);
         verts.add(0f);
 
-        verts.add(0f);
-        verts.add(0f);
-        verts.add(0f);
+        verts.add(red);
+        verts.add(green);
+        verts.add(blue);
 
         verts.add(c.getMaxX());
         verts.add(c.getMaxY());

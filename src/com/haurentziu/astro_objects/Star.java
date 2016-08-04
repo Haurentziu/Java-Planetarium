@@ -50,8 +50,8 @@ public class Star extends CelestialBody{
 		return magnitude;
 	}
 	
-	float getRadius(){
-		return  (float)(18*Math.pow(1.4, -magnitude)/800);
+	public float getRadius(){
+		return  (float)(18.0 * Math.pow(1.4, -magnitude) / 950.0);
 	}
 	
 	public int getHipparcos(){

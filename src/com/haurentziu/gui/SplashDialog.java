@@ -18,7 +18,9 @@ public class SplashDialog extends JDialog{
 
         try {
             getRootPane().setOpaque(false);
-//            setBackground(new Color(255, 255, 255, 0));
+            getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+
+            //           setBackground(new Color(255, 255, 255, 0));
             setUndecorated(true);
             setBackground(new Color(255,255,255,0));
             setAlwaysOnTop(false);

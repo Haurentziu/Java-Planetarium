@@ -4,13 +4,11 @@ import com.haurentziu.astro_objects.CelestialBody;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.SphericalCoordinates;
-import com.haurentziu.tle.Satellite;
 import com.haurentziu.utils.Utils;
 
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.TimeZone;
 
 /**
@@ -91,6 +89,7 @@ public class Observer {
         setProjection(SphericalCoordinates.STEREOGRAPHIC_PROJECTION);
         t = new Timer();
         setTimeNow();
+
     }
 
     public void updateRotation(){
@@ -203,6 +202,7 @@ public class Observer {
     public void setUnixTime(long unixTime){
         this.unixTime = unixTime;
         computeSideralTime();
+
     }
 
     public float getMaxMagnitude(){
@@ -215,9 +215,10 @@ public class Observer {
         if(!isPaused) {
             int warp = timeWarpLevels[currentWarp];
             unixTime += warp * deltaT;
-            sideralTime += 15 * Math.PI * warp * deltaT / (180.0 * 3600.0 * 1000.0) * 366.0 / 365.0; //convert to sideral;
+            sideralTime += Math.toRadians(15 * warp * deltaT / (3600.0 * 1000.0) * 366.0 / 365.0); //convert to sideral;
             if (sideralTime > 2 * Math.PI) sideralTime -= 2 * Math.PI;
         }
+
     }
 
     private void computeSideralTime(){
@@ -281,7 +282,7 @@ public class Observer {
         String offSet = offsetFormat.format(tz.getOffset(unixTime) / 1000 / 3600);
         sdf.setTimeZone(tz);
 
-        String s = String.format("Location: %s %s    %s UTC%s", longitudeString, latitudeString, sdf.format(unixTime), offSet);
+        String s = String.format("%s  %s    %s UTC%s", longitudeString, latitudeString, sdf.format(unixTime), offSet);
         return s;
     }
 

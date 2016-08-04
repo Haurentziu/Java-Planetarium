@@ -79,7 +79,9 @@ public class SolarSystem extends Renderer{
 
 	public void renderPlanets(GL3 gl, Shader starShader, Observer observer, VBO vbo){
 		updateSystem(gl, vbo, observer.getJDE());
+		starShader.setVariable(gl, "aspect_ratio", 1f);
 		starShader.setVariable(gl, "vertex_type", 0);
+		starShader.setVariable(gl, "zoomable", 1);
 		starShader.setVariable(gl, "transform_type", 1);
 		gl.glDrawArrays(GL3.GL_POINTS, 0, 9);
 
@@ -175,7 +177,7 @@ public class SolarSystem extends Renderer{
 			vertices[9 * i + 4] = colors[i][1];
 			vertices[9 * i + 5] = colors[i][2];
 
-			vertices[9 * i + 6] = 0f;
+			vertices[9 * i + 6] = 6f / 8f;
 			vertices[9 * i + 7] = 0f;
 			vertices[9 * i + 8] = 0f;
 		}

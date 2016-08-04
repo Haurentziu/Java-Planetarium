@@ -7,7 +7,7 @@ in vec3 fragColor;
 uniform sampler2D tex;
 
 void main() {
-    outColor = vec4(1, 1, 1, texture(tex, fragUV).a);
+    outColor = vec4(fragColor, texture(tex, fragUV).a);
     //outColor = vec4(fragColor, 1);
 
 }

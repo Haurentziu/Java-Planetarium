@@ -29,7 +29,7 @@ public class LocationMenu extends JDialog implements MouseListener, ActionListen
     public LocationMenu(JFrame parent, Observer observer){
         super(parent);
         setSize(860, 485);
-        setResizable(true);
+        setResizable(false);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         setTitle("Observer's Location");
         setLayout(null);

@@ -1,15 +1,14 @@
 package com.haurentziu.gui;
 
-import com.haurentziu.starchart.GLStarchart;
 import com.haurentziu.starchart.Main;
 import com.haurentziu.starchart.Observer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
@@ -30,6 +29,7 @@ public class ToolBar extends JToolBar implements ActionListener{
     private BarButton locMenuButton;
     private BarButton labelButton;
     private BarButton satelliteButton;
+    private BarButton screenButton;
 
     private BarButton fasterButton;
     private BarButton slowerButton;
@@ -65,10 +65,11 @@ public class ToolBar extends JToolBar implements ActionListener{
         mwButton = new BarButton("./res/img/milky_way.png", "Toogle Milky Way (M)", this);
         timeMenuButton = new BarButton("./res/img/clock.png", "Show time menu (F1)", this);
         locMenuButton = new BarButton("./res/img/location.png", "Show location menu (F2)", this);
+        screenButton = new BarButton("./res/img/fullscreen.png", "Toogle fullscreen (F12)", this);
         closeButton = new BarButton("./res/img/onoff.png", "Exit application", this);
 
         fasterButton = new BarButton("./res/img/faster.png", "Increase time warp (Right Arrow)", this);
-        pauseButton = new BarButton("./res/img/pause.png", "Pause", this);
+        pauseButton = new BarButton(pauseIcon, "Pause", this);
         nowButton = new BarButton("./res/img/now.png", "Now", this);
         slowerButton = new BarButton("./res/img/slower.png", "Decrease time warp (Left Arrow)", this);
         defaultButton = new BarButton("./res/img/one.png", "Time warp x1", this);
@@ -87,6 +88,7 @@ public class ToolBar extends JToolBar implements ActionListener{
         add(mwButton);
         add(timeMenuButton);
         add(locMenuButton);
+        add(screenButton);
         add(closeButton);
 
         add(Box.createHorizontalGlue());
@@ -174,6 +176,9 @@ public class ToolBar extends JToolBar implements ActionListener{
         }
         else if(source == satelliteButton){
             observer.toogleSatellites();
+        }
+        else if(source == screenButton){
+            Main.toogleFullScreen();
         }
 
     }

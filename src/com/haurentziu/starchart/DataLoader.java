@@ -73,7 +73,6 @@ public class DataLoader {
 
 			while (line != null) {
 				String[] data = line.split("\\|");
-				System.out.println(data[0]);
 				int hipNo = Integer.parseInt(data[0].trim());
 				String name = data[1].trim();
 

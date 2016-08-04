@@ -10,6 +10,7 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -28,6 +29,16 @@ public class ArtificialSatellites{
     private ArrayList<CelestialBody> satteliteBodies = new ArrayList<>();
 
     public ArtificialSatellites(){
+        try {
+            loadSatellites();
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+    }
+
+    public void loadSatellites() throws IOException{
         try{
             satellites = new ArrayList<>();
             satellites.addAll(TLEIO.getSatellites("./res/tle/visual.txt"));
@@ -41,7 +52,6 @@ public class ArtificialSatellites{
 
             ex.printStackTrace();
         }
-
     }
 
     public ArrayList<Satellite> getSatelliteList(){
@@ -57,16 +67,14 @@ public class ArtificialSatellites{
     }
 
     public void render(GL3 gl, Observer observer, Shader starShader, VBO vbo){
-        texture.enable(gl);
-        texture.bind(gl);
         starShader.setVariable(gl, "starTex", 0);
+        starShader.setVariable(gl, "zoomable", 0);
         starShader.setVariable(gl, "transform_type", 0);
         starShader.setVariable(gl, "vertex_type", 1);
-        starShader.setVariable(gl, "aspect_ratio", 2.37f);
+        starShader.setVariable(gl, "aspect_ratio", 1f);
 
         updatePositions(gl, observer, vbo);
         gl.glDrawArrays(GL3.GL_POINTS, satelliteStart, satelliteSize);
-        texture.disable(gl);
     }
 
     public void loadVertices(ArrayList<Float> verts){
@@ -80,7 +88,7 @@ public class ArtificialSatellites{
             verts.add(0.8f);
             verts.add(0.8f);
 
-            verts.add(0f);
+            verts.add(7f / 8f);
             verts.add(0f);
             verts.add(0f);
 
@@ -95,14 +103,14 @@ public class ArtificialSatellites{
             HorizontalCoordinates h = satellites.get(i).getHorizonatalCoordinates(observer);
             vertices[9 * i + 0] = (float)h.getAzimuth();
             vertices[9 * i + 1] = (float)h.getAltitude();
-            vertices[9 * i + 2] = 1;
+            vertices[9 * i + 2] = -0.5f;
 
             vertices[9 * i + 3] = 0.8f;
             vertices[9 * i + 4] = 0.8f;
             vertices[9 * i + 5] = 0.8f;
 
-            vertices[9 * i + 6] = 0;
-            vertices[9 * i + 7] = 1;
+            vertices[9 * i + 6] = 7f / 8f;
+            vertices[9 * i + 7] = 0;
             vertices[9 * i + 8] = 0;
             satteliteBodies.add(new CelestialBody(satellites.get(i).getName(), h.toEquatorial(observer)));
 
@@ -128,7 +136,7 @@ public class ArtificialSatellites{
         return texture;
     }
 
-    public ArrayList<CelestialBody> getSattelites(){
+    public ArrayList<CelestialBody> getSattelitesAsBodies(){
         return satteliteBodies;
     }
 

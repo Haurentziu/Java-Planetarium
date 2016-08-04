@@ -14,14 +14,12 @@ import java.util.ArrayList;
  */
 
 public class GLStarchart implements GLEventListener{
-    private Stars stars;
+    private CelestialBodyRenderer cbRenderer;
     private Constellations constellations;
-    private DeepSpaceObjects messierObjects;
     private Markings markings;
     private Ground ground;
     private SolarSystem solarSystem;
     private AstroText astroText;
-    private ArtificialSatellites satellites;
     private TextRenderer textRenderer;
     private VBO vbo;
 
@@ -34,38 +32,32 @@ public class GLStarchart implements GLEventListener{
         this.observer = observer;
 
         vbo = new VBO();
-        stars = new Stars("./shader/vertex.glsl", "./shader/stars_geom.glsl", "./shader/star_frag.glsl");
+        cbRenderer = new CelestialBodyRenderer("./shader/vertex.glsl", "./shader/stars_geom.glsl", "./shader/star_frag.glsl");
         constellations = new Constellations("./shader/vertex.glsl", "./shader/const_geom.glsl", "./shader/const_frag.glsl");
-        messierObjects = new DeepSpaceObjects("./shader/vertex.glsl", "./shader/messier_geom.glsl", "./shader/messier_frag.glsl");
         markings = new Markings("./shader/vertex.glsl", "./shader/marking_geom.glsl", "./shader/marking_frag.glsl");
         ground = new Ground("./shader/vertex.glsl", "./shader/ground_geom.glsl", "./shader/ground_frag.glsl");
         solarSystem = new SolarSystem("./shader/vertex.glsl", "./shader/text_geom.glsl", "./shader/text_frag.glsl");
         textRenderer = new TextRenderer("./shader/info_vert.glsl", "./shader/info_geom.glsl", "./shader/info_frag.glsl");
-        satellites = new ArtificialSatellites();
     }
 
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
         GL3 gl = glAutoDrawable.getGL().getGL3();
-        stars.initialize(gl);
+        cbRenderer.initialize(gl);
 
         solarSystem.initialize(gl);
         constellations.initialize(gl);
-        constellations.loadConstellations(stars.getStarsArray());
-        messierObjects.initialize(gl);
+        constellations.loadConstellations(cbRenderer.getStarsArray());
         markings.initialize(gl);
         ground.initialize(gl);
-        satellites.initialize(gl);
         textRenderer.initialize(gl);
 
         ArrayList<Float> vertsList = new ArrayList<>();
         ArrayList<Float> colorList = new ArrayList<>();
 
         solarSystem.loadVertices(vertsList);
-        stars.loadVertices(vertsList);
-        satellites.loadVertices(vertsList);
+        cbRenderer.loadAll(vertsList);
         constellations.loadVertices(vertsList);
-        messierObjects.loadVertices(vertsList);
         markings.loadAllVertices(vertsList);
         ground.loadVertices(vertsList);
         textRenderer.loadVertices(vertsList);
@@ -79,13 +71,11 @@ public class GLStarchart implements GLEventListener{
     public void dispose(GLAutoDrawable glAutoDrawable) {
         System.err.println("Closing application...");
         GL3 gl = glAutoDrawable.getGL().getGL3();
-        stars.delete(gl);
+        cbRenderer.delete(gl);
         constellations.delete(gl);
-        messierObjects.delete(gl);
         markings.delete(gl);
         ground.delete(gl);
         solarSystem.delete(gl);
-        satellites.delete(gl);
         textRenderer.delete(gl);
 
         vbo.delete(gl);
@@ -110,20 +100,12 @@ public class GLStarchart implements GLEventListener{
             markings.renderAll(gl, observer);
         }
 
-        if(observer.showDSO){
-           messierObjects.render(gl, observer);
-        }
-
         if(observer.showConstellations) {
             constellations.render(gl, observer);
         }
 
-        stars.render(gl, observer);
-        solarSystem.renderPlanets(gl, stars.getShader(), observer, vbo);
-
-        if(observer.showSatellites) {
-            satellites.render(gl, observer, stars.getShader(), vbo);
-        }
+        cbRenderer.render(gl, vbo, observer);
+        solarSystem.renderPlanets(gl, cbRenderer.getShader(), observer, vbo);
 
 
         if(observer.showLabels){
@@ -151,9 +133,8 @@ public class GLStarchart implements GLEventListener{
         final GL3 gl = glAutoDrawable.getGL().getGL3();
         float aspectRatio = (float)i2/i3;
 
-        stars.setSize(gl, aspectRatio, 1f);
+        cbRenderer.setSize(gl, aspectRatio, 1f);
         constellations.setSize(gl, aspectRatio, 1f);
-        messierObjects.setSize(gl, aspectRatio, 1f);
         markings.setSize(gl, aspectRatio, 1f);
         ground.setSize(gl, aspectRatio, 1f);
         solarSystem.setSize(gl, aspectRatio, 1f);
@@ -170,10 +151,10 @@ public class GLStarchart implements GLEventListener{
 
     public ArrayList<CelestialBody> getAllBodies(){
         ArrayList<CelestialBody> bodies = new ArrayList<>();
-        bodies.addAll(stars.getStarsArray());
-        bodies.addAll(messierObjects.getDSOArray());
+        bodies.addAll(cbRenderer.getStarsArray());
+        bodies.addAll(cbRenderer.getDSOArray());
         bodies.addAll(solarSystem.getBodies());
-        bodies.addAll(satellites.getSattelites());
+        bodies.addAll(cbRenderer.getSatellitesArray());
         return bodies;
     }
 

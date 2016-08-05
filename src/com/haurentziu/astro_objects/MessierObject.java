@@ -43,7 +43,7 @@ public class MessierObject extends CelestialBody{
             case "Open Cluster":        verts.add(1/8f);
                 break;
 
-            case "Nebula":              verts.add(2/8f);
+            case "Nebula":              verts.add(3/8f);
                 break;
 
             case "Galaxy":              verts.add(4/8f);

@@ -73,7 +73,6 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
             else{
                 observer.isSelected = true;
             }
-            System.out.println(eq.toString());
             observer.setMouseLocation(eq);
             observer.setSelectedBody(body);
         }

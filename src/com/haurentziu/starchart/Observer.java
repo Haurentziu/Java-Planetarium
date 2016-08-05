@@ -227,9 +227,7 @@ public class Observer {
         double jde = getJDE();
         double T = (jde - 2451545.0)/36525.0;
         double LST0 = 280.46061837 + 360.98564736629 * (jde - 2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
-
-        while(LST0 > 360)
-            LST0 -= 360;
+        LST0 = LST0 - 360 * (int)(LST0 / 360.0);
 
         sideralTime = Math.toRadians(LST0);
     }

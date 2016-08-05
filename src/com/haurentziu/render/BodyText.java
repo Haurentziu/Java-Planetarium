@@ -44,7 +44,7 @@ public class BodyText extends Text{
             setFontSize(0.45f);
             loadString(-0.995f, 1 - 0.07f, bodyStrings[1], newVerts);
             loadString(-0.995f, 1 - 0.11f, bodyStrings[2], newVerts);
-
+            
         }
 
         float verts[] = Utils.floatArrayList2FloatArray(newVerts);

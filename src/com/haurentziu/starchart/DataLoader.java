@@ -4,8 +4,8 @@ import com.haurentziu.astro_objects.MessierObject;
 import com.haurentziu.astro_objects.Star;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
+
 import java.util.ArrayList;
 
 /**
@@ -68,7 +68,9 @@ public class DataLoader {
 
 	public void loadStarNames(ArrayList<Star> stars){
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader("./res/name.fab"));
+			File file = new File("./res/name.fab");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"));
+			//BufferedReader reader = new BufferedReader(new FileReader("./res/name.fab"));
 			String line = reader.readLine();
 
 			while (line != null) {

@@ -5,7 +5,6 @@ import com.haurentziu.starchart.Observer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +29,7 @@ public class ToolBar extends JToolBar implements ActionListener{
     private BarButton labelButton;
     private BarButton satelliteButton;
     private BarButton screenButton;
+    private BarButton downButton;
 
     private BarButton fasterButton;
     private BarButton slowerButton;
@@ -67,6 +67,7 @@ public class ToolBar extends JToolBar implements ActionListener{
         locMenuButton = new BarButton("./res/img/location.png", "Show location menu (F2)", this);
         screenButton = new BarButton("./res/img/fullscreen.png", "Toogle fullscreen (F12)", this);
         closeButton = new BarButton("./res/img/onoff.png", "Exit application", this);
+        downButton = new BarButton("./res/img/down_tle.png", "Download TLE Data", this);
 
         fasterButton = new BarButton("./res/img/faster.png", "Increase time warp (Right Arrow)", this);
         pauseButton = new BarButton(pauseIcon, "Pause", this);
@@ -85,6 +86,7 @@ public class ToolBar extends JToolBar implements ActionListener{
         add(equatorButton);
         add(dsoButton);
         add(satelliteButton);
+        add(downButton);
         add(mwButton);
         add(timeMenuButton);
         add(locMenuButton);
@@ -179,6 +181,9 @@ public class ToolBar extends JToolBar implements ActionListener{
         }
         else if(source == screenButton){
             Main.toogleFullScreen();
+        }
+        else if(source == downButton){
+            observer.shouldUpdateTLE = true;
         }
 
     }

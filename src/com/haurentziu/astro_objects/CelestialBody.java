@@ -12,8 +12,8 @@ import com.haurentziu.utils.Utils;
 
 public class CelestialBody {
     protected final static int MAX_NAME_STRING_LENGTH = 32;
-    protected final static String EQUATORIAL_FORMAT = "Right Ascension/ Declination:%s / %s";
-    protected final static String AZIMUTH_FORMAT = "Azimuth/ Latitude:%s / %s";
+    protected final static String EQUATORIAL_FORMAT = "Right Ascension/ Declination: %s / %s    ";
+    protected final static String AZIMUTH_FORMAT = "Azimuth/ Latitude: %s / %s    ";
 
 
     protected EquatorialCoordinates equatorialCoordinates;
@@ -41,7 +41,7 @@ public class CelestialBody {
         String eqString = String.format(CelestialBody.EQUATORIAL_FORMAT, Utils.rad2String(equatorialCoordinates.getRightAscension(), true, true), Utils.rad2String(equatorialCoordinates.getDeclination(), false, false));
         HorizontalCoordinates az = equatorialCoordinates.toHorizontal(observer.getLongitude(), observer.getLatitude(), observer.getSideralTime());
         String azString = String.format(CelestialBody.AZIMUTH_FORMAT, Utils.rad2String(az.getAzimuth() - Math.PI, true, false), Utils.rad2String(az.getAltitude(), false, false));
-        return nameString.substring(0, CelestialBody.MAX_NAME_STRING_LENGTH) + "\n" + eqString + "\n" + azString;
+        return nameString.substring(0, CelestialBody.MAX_NAME_STRING_LENGTH) + "\n" + eqString.substring(0, 53) + "\n" + azString.substring(0, 43);
 
     }
 

@@ -24,7 +24,7 @@ public final class Utils {
         int minutes = (int)((deg - degrees)*60);
         int seconds = (int)((deg - degrees - minutes/60.0)*3600);
 
-        String degString = String.format("%3d", degrees);
+        String degString = Integer.toString(degrees);
         String minString = String.format("%02d", Math.abs(minutes));
         String secString = String.format("%02d", Math.abs(seconds));
 

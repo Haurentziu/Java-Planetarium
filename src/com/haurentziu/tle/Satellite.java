@@ -40,6 +40,7 @@ public class Satellite {
     private double meanMotion;
     private double revolutionsAtEpoch;
 
+
     public Satellite(String name, String line1, String line2){
         this.name = name;
         this.number = Integer.parseInt(line1.substring(2, 7));

@@ -18,6 +18,7 @@ public class TextRenderer extends Renderer{
     private BodyText bodyText;
     private ArrayList<Character> font;
 
+
     public TextRenderer(String vertShader, String geomShader, String fragShader){
         super(vertShader, geomShader, fragShader);
         font = FontLoader.loadFonts("./res/fonts/font.fnt", "./res/fonts/font.png");
@@ -29,7 +30,8 @@ public class TextRenderer extends Renderer{
     public void renderObserverText(GL3 gl, VBO vbo, Observer observer){
         observerText.updateText(gl, vbo, observer);
         observerText.render(gl, shader);
-    }
+
+   }
 
     public void renderCelestialBodyText(GL3 gl){
         bodyText.render(gl, shader);

@@ -14,8 +14,7 @@ import java.util.ArrayList;
 public class ObserverText extends Text{
 
     //load the number of vertices required
-    private final String observerPattern = "000°00′00″E  000°00′00″N    0000-00-00 00:00:00 GMT+00";
-
+    private final String observerPattern = "000°00′00″E  000°00′00″N    0000-00-00 00:00:00 GMT+00 | Updating TLE data...";
 
     public ObserverText(ArrayList<Character> font){
         super(font);
@@ -25,7 +24,7 @@ public class ObserverText extends Text{
     public void loadVertices(ArrayList<Float> verts){
         arrayStart = verts.size() / 9;
         setColor(new Color(178, 255, 100));
-        setFontSize(1f);
+        setFontSize(2f);
         loadString(-1,  -0.97f, observerPattern, verts);
 
         arraySize = verts.size() / 9 - arrayStart;
@@ -37,8 +36,8 @@ public class ObserverText extends Text{
 
         ArrayList<Float> newVerts = new ArrayList<>();
 
-        setFontSize(.25f);
-        loadString(-1f, -0.965f,  obsString, newVerts);
+        setFontSize(.45f);
+        loadString(-1f, -0.963f,  obsString, newVerts);
 
 
 

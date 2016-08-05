@@ -193,7 +193,6 @@ public class StarchartCanvas extends GLCanvas implements MouseWheelListener, Mou
             case KeyEvent.VK_F12:   Main.toogleFullScreen();
                 break;
 
-
         }
     }
 

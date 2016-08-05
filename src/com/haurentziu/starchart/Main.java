@@ -67,9 +67,9 @@ public class Main {
 		locationMenu = new LocationMenu(frame, observer);
 		locationMenu.setVisible(false);
 
-		satelliteMenu = new SatelliteMenu();
-		satelliteMenu.setVisible(false);
-
+		/*satelliteMenu = new SatelliteMenu();
+		satelliteMenu.setVisible(true);
+**/
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
 		final Dimension screenSize = toolkit.getScreenSize();
 		final int x = (screenSize.width - DEFAULT_WIDTH) / 2;
@@ -84,8 +84,6 @@ public class Main {
 		animator.start();
 		frame.setVisible(true);
 		splash.close();
-
-
 
 		frame.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){

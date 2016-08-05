@@ -4,6 +4,7 @@ import com.haurentziu.astro_objects.CelestialBody;
 import com.haurentziu.coordinates.EquatorialCoordinates;
 import com.haurentziu.coordinates.HorizontalCoordinates;
 import com.haurentziu.coordinates.SphericalCoordinates;
+import com.haurentziu.tle.TLEInput;
 import com.haurentziu.utils.Utils;
 
 import java.awt.geom.Rectangle2D;
@@ -49,10 +50,12 @@ public class Observer {
     public boolean showBounds = false;
     public boolean showLabels = true;
     public boolean showSatellites = true;
-
     public boolean isSelected = false;
-
     public boolean trackSelectedBody = false;
+
+    public boolean shouldUpdateTLE = false;
+    public boolean isUpdatingTLE = true;
+    public int updatePerCent;
 
     public static int currentWarp = 7;
     public static int timeWarpLevels[] = {-10000, -5000, -3000, -1000, -100, -10, -1, 1, 10, 100, 1000, 3000, 5000, 10000};
@@ -89,7 +92,6 @@ public class Observer {
         setProjection(SphericalCoordinates.STEREOGRAPHIC_PROJECTION);
         t = new Timer();
         setTimeNow();
-
     }
 
     public void updateRotation(){
@@ -282,7 +284,15 @@ public class Observer {
         String offSet = offsetFormat.format(tz.getOffset(unixTime) / 1000 / 3600);
         sdf.setTimeZone(tz);
 
-        String s = String.format("%s  %s    %s UTC%s", longitudeString, latitudeString, sdf.format(unixTime), offSet);
+        String updateString;
+        if(isUpdatingTLE){
+            updateString = "| Updating TLE data...";
+        }
+        else{
+            updateString = "                      ";
+        }
+
+        String s = String.format("%s  %s    %s UTC%s %s", longitudeString, latitudeString, sdf.format(unixTime), offSet, updateString);
         return s;
     }
 

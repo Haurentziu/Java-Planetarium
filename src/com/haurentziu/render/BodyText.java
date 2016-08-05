@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class BodyText extends Text{
     private final String celestialPattern[] = {
             "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-            "Right Ascension / Declination: 00h00m00s / 00a00a00a",
-            "Azimuth / Altitude: 00h00m00s / 00a00a00a",
+            "Right Ascension / Declination: 00h00m00s / -00a00a00a",
+            "Azimuth / Altitude: 000h00m00s / -00a00a00a",
 
     };
 
@@ -25,7 +25,7 @@ public class BodyText extends Text{
 
     public void loadVertices(ArrayList<Float> verts){
         arrayStart = verts.size() / 9;
-        setFontSize(2f);
+        setFontSize(4f);
         setColor(new Color(111, 195, 255));
         for(int i = 0; i < celestialPattern.length; i++) {
             loadString(-1, 1, celestialPattern[i], verts);
@@ -38,12 +38,12 @@ public class BodyText extends Text{
         ArrayList<Float> newVerts = new ArrayList<>();
         if(observer.getSelectedBody() != null) {
             String bodyStrings[] = observer.getSelectedBody().toString(observer).split("\n");
-            setFontSize(0.35f);
-            loadString(-1, 1, bodyStrings[0], newVerts);
+            setFontSize(0.65f);
+            loadString(-0.995f, 1, bodyStrings[0], newVerts);
 
-            setFontSize(0.25f);
-            loadString(-1, 1 - 0.07f, bodyStrings[1], newVerts);
-            loadString(-1, 1 - 0.11f, bodyStrings[2], newVerts);
+            setFontSize(0.45f);
+            loadString(-0.995f, 1 - 0.07f, bodyStrings[1], newVerts);
+            loadString(-0.995f, 1 - 0.11f, bodyStrings[2], newVerts);
 
         }
 

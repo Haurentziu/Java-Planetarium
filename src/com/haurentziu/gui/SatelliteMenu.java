@@ -13,6 +13,8 @@ public class SatelliteMenu extends JDialog{
     private JCheckBox iridiumBox;
     private JCheckBox gpsBox;
 
+    private JButton updateButton;
+
 
     public SatelliteMenu(){
         setTitle("Satellite Menu");
@@ -33,10 +35,13 @@ public class SatelliteMenu extends JDialog{
         gpsBox = new JCheckBox("GPS Satellites");
         geocentricBox = new JCheckBox("Geocentric satellites");
 
+        updateButton = new JButton("Download & Update TLEs");
+
         checkBoxPanel.add(visualBox);
         checkBoxPanel.add(iridiumBox);
         checkBoxPanel.add(gpsBox);
         checkBoxPanel.add(geocentricBox);
+        checkBoxPanel.add(updateButton);
 
         add(checkBoxPanel, BorderLayout.WEST);
 

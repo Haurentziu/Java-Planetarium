@@ -38,12 +38,15 @@ public final class FontLoader {
                 Element element = (Element) nodes.item(i);
                 int id = Integer.parseInt(element.getAttribute("id"));
                 float x = (float)Integer.parseInt(element.getAttribute("x")) / image.getWidth();
-                float y = 1f - (float)Integer.parseInt(element.getAttribute("y")) / image.getHeight();
+                float y = 1 - (float)Integer.parseInt(element.getAttribute("y")) / image.getHeight();
+
                 float width = (float)Integer.parseInt(element.getAttribute("width")) / image.getWidth();
                 float height = (float)Integer.parseInt(element.getAttribute("height")) / image.getHeight();
+
                 float xOffset = (float)Integer.parseInt(element.getAttribute("xoffset")) / image.getWidth();
                 float yOffset = (float)Integer.parseInt(element.getAttribute("yoffset")) / image.getHeight();
                 float xAdvance = (float)Integer.parseInt(element.getAttribute("xadvance")) / image.getWidth();
+
                 Character character = new Character(id, x, y - height, width, height, xOffset, yOffset, xAdvance);
                 font.add(character);
             }

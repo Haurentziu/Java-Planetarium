@@ -63,17 +63,16 @@ public class VBO {
 
     public void update(GL3 gl, int start, float vertices[]){
         FloatBuffer vertBuffer = FloatBuffer.wrap(vertices);
-
         for(int i = 0; i < buffers.capacity(); i++) {
 
             gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(0));
-            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length - 4, vertBuffer);
+            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length, vertBuffer);
 
             gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(1));
-            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length - 4, vertBuffer);
+            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length, vertBuffer);
 
             gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, buffers.get(2));
-            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length - 4, vertBuffer);
+            gl.glBufferSubData(GL3.GL_ARRAY_BUFFER, start, 4 * vertices.length, vertBuffer);
         }
     }
 }

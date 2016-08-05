@@ -19,13 +19,12 @@ public class GLStarchart implements GLEventListener{
     private Markings markings;
     private Ground ground;
     private SolarSystem solarSystem;
-    private AstroText astroText;
     private TextRenderer textRenderer;
     private VBO vbo;
 
     private Observer observer;
 
-    private boolean shouldUpdate = false;
+
 
 
     GLStarchart(Observer observer){
@@ -119,6 +118,8 @@ public class GLStarchart implements GLEventListener{
         textRenderer.getShader().useShader(gl);
 
         textRenderer.renderObserverText(gl, vbo, observer);
+
+
 
         if(observer.isSelected){
             textRenderer.updateCelestialBodyText(gl, vbo, observer);

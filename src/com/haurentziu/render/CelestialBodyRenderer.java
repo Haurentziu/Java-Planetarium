@@ -11,12 +11,14 @@ import java.util.ArrayList;
 /**
  * Created by haurentziu on 04.08.2016.
  */
-public class CelestialBodyRenderer extends Renderer{
+public class CelestialBodyRenderer extends Renderer implements Runnable{
     private Texture texture;
 
     private Stars stars;
     private DeepSpaceObjects dso;
     private ArtificialSatellites satellites;
+
+    private boolean isUpdating = false;
 
     public CelestialBodyRenderer(String vertShader, String geomShader, String fragShader){
         super(vertShader, geomShader, fragShader);
@@ -33,9 +35,17 @@ public class CelestialBodyRenderer extends Renderer{
         satellites.loadVertices(verts);
     }
 
-
-
     public void render(GL3 gl, VBO vbo, Observer observer){
+        if(observer.shouldUpdateTLE && !observer.isUpdatingTLE){
+            observer.isUpdatingTLE = true;
+            Thread t = new Thread(this);
+            t.start();
+            observer.shouldUpdateTLE = false;
+        }
+
+        observer.isUpdatingTLE = isUpdating;
+
+
         shader.useShader(gl);
         super.setObserver(gl, observer);
         gl.glEnable(GL3.GL_TEXTURE_2D);
@@ -77,5 +87,13 @@ public class CelestialBodyRenderer extends Renderer{
 
     public ArrayList<? extends CelestialBody> getSatellitesArray(){
         return satellites.getSattelitesAsBodies();
+    }
+
+
+    @Override
+    public void run() {
+        isUpdating = true;
+        satellites.downloadAndLoadSatellites();
+        isUpdating = false;
     }
 }

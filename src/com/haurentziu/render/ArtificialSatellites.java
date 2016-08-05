@@ -16,14 +16,12 @@ import java.util.ArrayList;
  * Created by haurentziu on 27.07.2016.
  */
 
-public class ArtificialSatellites implements Runnable{
+public class ArtificialSatellites{
     private ArrayList<Satellite> satellites;
     private Texture texture;
 
     private int satelliteStart;
     private int satelliteSize;
-
-    private boolean isUpdating = false;
 
     private ArrayList<CelestialBody> satteliteBodies = new ArrayList<>();
 
@@ -39,7 +37,7 @@ public class ArtificialSatellites implements Runnable{
 
     }
 
-    private void downloadAndLoadSatellites(){
+    public void downloadAndLoadSatellites(){
         try{
             TLEInput.downloadAllTLE();
             satellites = TLEInput.getALlSatellites();
@@ -53,14 +51,6 @@ public class ArtificialSatellites implements Runnable{
 
     public ArrayList<Satellite> getSatelliteList(){
         return satellites;
-    }
-
-    public void delete(GL3 gl){
-        texture.destroy(gl);
-    }
-
-    public void initialize(GL3 gl){
-        texture = loadTexture(gl, "./res/textures/satellite.png");
     }
 
     public void render(GL3 gl, Observer observer, Shader starShader, VBO vbo){
@@ -94,14 +84,6 @@ public class ArtificialSatellites implements Runnable{
     }
 
     public void updatePositions(GL3 gl, Observer observer, VBO vbo){
-        if(observer.shouldUpdateTLE){
-            observer.isUpdatingTLE = true;
-            Thread t = new Thread(this);
-            t.start();
-            observer.shouldUpdateTLE = false;
-        }
-
-        observer.isUpdatingTLE = isUpdating;
 
         satteliteBodies = new ArrayList<>();
         float vertices[] = new float[satellites.size() * 9];
@@ -126,31 +108,9 @@ public class ArtificialSatellites implements Runnable{
 
     }
 
-    public Texture loadTexture(GL3 gl, String path){
-        Texture texture = null;
-        try{
-            texture = TextureIO.newTexture(new File(path), false);
-            texture.setTexParameteri(gl, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
-            texture.setTexParameteri(gl, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);
-            texture.setTexParameteri(gl, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
-            texture.setTexParameteri(gl, GL3.GL_TEXTURE_WRAP_T, GL3.GL_CLAMP_TO_EDGE);
-
-        }
-        catch (Exception ex){
-            System.err.printf("Could not load the texture located at %s \n", path);
-        }
-        return texture;
-    }
-
     public ArrayList<CelestialBody> getSattelitesAsBodies(){
         return satteliteBodies;
     }
 
 
-    @Override
-    public void run() {
-        isUpdating = true;
-        downloadAndLoadSatellites();
-        isUpdating = false;
-    }
 }

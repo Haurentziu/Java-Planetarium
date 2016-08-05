@@ -11,7 +11,7 @@ import com.haurentziu.utils.Utils;
  */
 
 public class CelestialBody {
-    protected final static int MAX_NAME_STRING_LENGTH = 32;
+    protected final static int MAX_NAME_STRING_LENGTH = 64;
     protected final static String EQUATORIAL_FORMAT = "Right Ascension/ Declination: %s / %s    ";
     protected final static String AZIMUTH_FORMAT = "Azimuth/ Latitude: %s / %s    ";
 

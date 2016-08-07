@@ -89,7 +89,7 @@ public class GLStarchart implements GLEventListener{
         gl.glClearColor(0f, 0.075f, 0.125f, 1f);
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
-        System.out.println(glAutoDrawable.getAnimator().getLastFPS());
+        //System.out.println(glAutoDrawable.getAnimator().getLastFPS());
 
         observer.updateTime();
 

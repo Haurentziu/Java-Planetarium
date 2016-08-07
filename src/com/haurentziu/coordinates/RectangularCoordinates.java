@@ -37,6 +37,10 @@ public class RectangularCoordinates {
 		return new EquatorialCoordinates(longitude, latitude);
 	}
 
+	public String toString(){
+		return  String.format("X: %f\nY: %f\nZ: %f\n", x, y, z);
+	}
+
 	public double getX(){
 		return x;
 	}

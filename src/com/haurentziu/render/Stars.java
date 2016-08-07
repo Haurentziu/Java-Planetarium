@@ -1,6 +1,9 @@
 package com.haurentziu.render;
 
 import com.haurentziu.coordinates.EquatorialCoordinates;
+import com.haurentziu.coordinates.HorizontalCoordinates;
+import com.haurentziu.coordinates.ProjectionPoint;
+import com.haurentziu.coordinates.SphericalCoordinates;
 import com.haurentziu.starchart.DataLoader;
 import com.haurentziu.starchart.Observer;
 import com.haurentziu.astro_objects.Star;
@@ -48,6 +51,7 @@ public class Stars{
         }
         vertsNumber = verts.size() / 9 - vertStart;
     }
+
 
     public void render(GL3 gl, Shader shader, Observer observer){
         shader.setVariable(gl, "transform_type", 1);

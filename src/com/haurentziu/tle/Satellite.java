@@ -75,10 +75,12 @@ public class Satellite {
     }
 
     public RectangularCoordinates getRectangularCoordinates(long unixTime){
-        double alpha = Math.pow(SECONDS_IN_A_DAY / meanMotion, 2.0 / 3.0) * Math.pow(GRAVITATIONAL_PARAMETER / (4 * Math.PI * Math.PI), 1.0 / 3.0); //semi-major axis
-        double beta = Math.sqrt(1 - eccentricity * eccentricity);
         double deltaT = (unixTime / 1000.0 - getUnixTimeOfTLE()) / SECONDS_IN_A_DAY;
-        double meanAnomalyNow = meanAnomaly + 360 * deltaT * meanMotion + 360 * deltaT * deltaT * meanMotionPrime;
+        double meanMotionNow = meanMotion + meanMotionPrime * deltaT + deltaT * deltaT * meanMotionDouble;
+
+        double alpha = Math.pow(SECONDS_IN_A_DAY / meanMotionNow, 2.0 / 3.0) * Math.pow(GRAVITATIONAL_PARAMETER / (4 * Math.PI * Math.PI), 1.0 / 3.0); //semi-major axis
+        double beta = Math.sqrt(1 - eccentricity * eccentricity);
+        double meanAnomalyNow = meanAnomaly + 360 * deltaT * meanMotion + 360 * deltaT * deltaT * meanMotionPrime + 360 * deltaT * deltaT * deltaT * meanMotionDouble;
         meanAnomalyNow = Math.toRadians(meanAnomalyNow - 360 * (int)(meanAnomalyNow / 360));
         double eccentricAnomaly = getEccentricAnomaly(eccentricity, meanAnomalyNow);
         double trueAnomaly = getTrueAnomaly(eccentricity, eccentricAnomaly);
@@ -93,8 +95,9 @@ public class Satellite {
         double y6 = trueAnomaly + argumentOfPerigee + raAscendingNode;
         double posX = 2.0 * y4 * (y5 * Math.sin(y6) - y4 * Math.cos(y6)) + Math.cos(y6);
         double posY = - 2.0 * y4 * (y5 * Math.cos(y6) + y4 * Math.sin(y6)) + Math.sin(y6);
-        double posZ = 2 * y4 * Math.cos(inclination / 2.0);
+        double posZ = 2.0 * y4 * Math.cos(inclination / 2.0);
         RectangularCoordinates r = new RectangularCoordinates(posX * y1 / 1000.0, posY * y1 / 1000.0, posZ * y1 / 1000.0);
+        //System.out.println(r.toEquatorialCoordinates().toString());
         return r;
     }
 
@@ -104,7 +107,10 @@ public class Satellite {
         double distance = rectangular.getDistanceFromCenter();
         double topocentricDistance = Math.sqrt(EARTH_RADIUS * EARTH_RADIUS + distance * distance - 2 * distance * EARTH_RADIUS * Math.sin(horizontal.getAltitude()));
         double parallax = Math.asin(EARTH_RADIUS / topocentricDistance * Math.cos(horizontal.getAltitude())); // sin(PI / 2 - a) = sin(z) = cos(a)
-        horizontal.add(0, - parallax);
+        if(EARTH_RADIUS / topocentricDistance * Math.cos(horizontal.getAltitude()) > 1){
+            System.out.println(name);
+        }
+        horizontal.add(0,  -parallax);
         return horizontal;
     }
 
@@ -130,7 +136,7 @@ public class Satellite {
     private double getEccentricAnomaly(double eccentricity, double meanAnomaly){
         double lastValue = 0;
         double eccentricAnomaly = meanAnomaly;
-        while(Math.abs(lastValue - eccentricAnomaly) > 0.0005){
+        while(Math.abs(lastValue - eccentricAnomaly) > 0.000001){
             lastValue = eccentricAnomaly;
             eccentricAnomaly = lastValue + (meanAnomaly + eccentricity * Math.sin(lastValue) - lastValue) / (1 - eccentricity * Math.cos(lastValue));
         }
@@ -138,7 +144,11 @@ public class Satellite {
     }
 
     private double getTrueAnomaly(double eccentricity, double eccentricAnomaly){
-        return 2.0 * Math.atan(Math.sqrt((1 + eccentricity) / (1 - eccentricity)) * Math.tan(eccentricAnomaly / 2.0));
+        double cosV = (Math.cos(eccentricAnomaly) - eccentricity);
+        double sinV = Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly);
+        double v = Math.atan2(sinV, cosV);
+        while (v < 0) v+=2 * Math.PI;
+        return v;
     }
 
     public void print(){

@@ -2,6 +2,7 @@ package com.haurentziu.render;
 
 import com.haurentziu.astro_objects.CelestialBody;
 import com.haurentziu.coordinates.HorizontalCoordinates;
+import com.haurentziu.coordinates.RectangularCoordinates;
 import com.haurentziu.starchart.Observer;
 import com.haurentziu.tle.Satellite;
 import com.haurentziu.tle.TLEInput;
@@ -88,14 +89,27 @@ public class ArtificialSatellites{
         satteliteBodies = new ArrayList<>();
         float vertices[] = new float[satellites.size() * 9];
         for(int i = 0; i < satellites.size(); i++){
+           /* if(satellites.get(i).getName().equals("ISS (ZARYA)")){
+                RectangularCoordinates r = satellites.get(i).getRectangularCoordinates(observer.getUnixTime());
+                System.out.println(satellites.get(i).getHorizonatalCoordinates(observer).toString());
+            }*/
             HorizontalCoordinates h = satellites.get(i).getHorizonatalCoordinates(observer);
             vertices[9 * i + 0] = (float)h.getAzimuth();
             vertices[9 * i + 1] = (float)h.getAltitude();
             vertices[9 * i + 2] = -1.1f;
 
-            vertices[9 * i + 3] = 0.8f;
-            vertices[9 * i + 4] = 0.8f;
-            vertices[9 * i + 5] = 0.8f;
+            if(satellites.get(i).getName().equals("ISS (ZARYA)")){
+                vertices[9 * i + 3] = 1f;
+                vertices[9 * i + 4] = 0f;
+                vertices[9 * i + 5] = 0f;
+
+
+            }
+            else {
+                vertices[9 * i + 3] = 0.8f;
+                vertices[9 * i + 4] = 0.8f;
+                vertices[9 * i + 5] = 0.8f;
+            }
 
             vertices[9 * i + 6] = 7f / 8f;
             vertices[9 * i + 7] = 0;

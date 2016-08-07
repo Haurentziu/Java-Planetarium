@@ -12,8 +12,8 @@ import java.util.ArrayList;
 public final class TLEInput {
     public static final String URL_PATH = "http://www.celestrak.com/NORAD/elements/";
     public static final String LOCAL_PATH = "./res/tle/";
-    public static final String[] DATA = {"geo", "iridium", "gps-ops", "science", "resource", "weather",
-        "stations", "sarsat", "orbcomm", "globalstar", "amateur", "glo-ops" , "cubesat"
+    public static final String[] DATA = /*{"visual"};*/ {"geo", "iridium", "gps-ops", "science", "resource", "weather",
+        "stations", "sarsat", "orbcomm", "globalstar", "amateur", "glo-ops"
     };
 
 

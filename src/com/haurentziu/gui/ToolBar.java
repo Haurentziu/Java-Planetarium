@@ -65,7 +65,7 @@ public class ToolBar extends JToolBar implements ActionListener{
         mwButton = new BarButton("./res/img/milky_way.png", "Toogle Milky Way (M)", this);
         timeMenuButton = new BarButton("./res/img/clock.png", "Show time menu (F1)", this);
         locMenuButton = new BarButton("./res/img/location.png", "Show location menu (F2)", this);
-        screenButton = new BarButton("./res/img/fullscreen.png", "Toogle fullscreen (F12)", this);
+        screenButton = new BarButton("./res/img/fullscreen.png", "Toogle fullscreen (F11)", this);
         closeButton = new BarButton("./res/img/onoff.png", "Exit application", this);
         downButton = new BarButton("./res/img/down_tle.png", "Download TLE Data", this);
 
